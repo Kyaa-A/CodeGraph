@@ -1,0 +1,44 @@
+# ========================
+# Python (backend)
+# ========================
+__pycache__/
+*.py[cod]
+*.so
+.venv/
+venv/
+env/
+*.egg-info/
+dist/
+build/
+
+# ========================
+# Node.js (frontend)
+# ========================
+node_modules/
+.next/
+out/
+.turbo/
+
+# ========================
+# Environment variables
+# ========================
+.env
+.env.local
+.env.*.local
+
+# ========================
+# IDE / OS
+# ========================
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# ========================
+# Misc
+# ========================
+*.log
+coverage/
+.cache/
