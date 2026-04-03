@@ -151,3 +151,46 @@ def rag_chat(session_id: str, lesson_id: str, question: str) -> dict:
         "response": result["response"],
         "sources": result["sources"],
     }
+
+
+async def rag_chat_stream(session_id: str, lesson_id: str, question: str):
+    """Stream the RAG response token by token via SSE."""
+    import json
+
+    # Load chat history and retrieve context (non-streaming parts)
+    chat_history = load_chat_history(session_id)
+    search_results = semantic_search(question, top_k=5)
+
+    lesson_chunks = [r for r in search_results if r["lesson_id"] == lesson_id]
+    if not lesson_chunks:
+        lesson_chunks = search_results
+
+    context = "\n\n---\n\n".join(c["chunk_text"] for c in lesson_chunks)
+    sources = [
+        {"lesson_id": c["lesson_id"], "lesson_title": c["lesson_title"]}
+        for c in lesson_chunks
+    ]
+
+    # Build the prompt
+    messages = RAG_PROMPT.format_messages(
+        context=context,
+        chat_history=chat_history,
+        question=question,
+    )
+
+    # Send sources first as an SSE event
+    yield f"event: sources\ndata: {json.dumps(sources)}\n\n"
+
+    # Stream tokens from the LLM
+    full_response = ""
+    async for chunk in llm.astream(messages):
+        token = chunk.content
+        if token:
+            full_response += token
+            yield f"event: token\ndata: {json.dumps(token)}\n\n"
+
+    # Signal completion
+    yield f"event: done\ndata: {json.dumps({'full_response': full_response})}\n\n"
+
+    # Save to database after streaming completes
+    save_messages(session_id, question, full_response)

@@ -1,8 +1,9 @@
 from fastapi import APIRouter, HTTPException
+from fastapi.responses import StreamingResponse
 
 from app.core.supabase import supabase
 from app.models.chat import ChatRequest, ChatResponse, SessionResponse
-from app.services.chat import rag_chat
+from app.services.chat import rag_chat, rag_chat_stream
 
 router = APIRouter(prefix="/api", tags=["chat"])
 
@@ -25,3 +26,16 @@ def chat(request: ChatRequest):
         return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/chat/stream")
+async def chat_stream(request: ChatRequest):
+    """Stream chat response via Server-Sent Events."""
+    return StreamingResponse(
+        rag_chat_stream(request.session_id, request.lesson_id, request.message),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+        },
+    )
