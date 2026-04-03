@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.supabase import supabase
-from app.routers import ingest, search
+from app.routers import ingest, search, chat
 
 app = FastAPI(title="CodeGraph API", version="0.1.0")
 
@@ -16,6 +16,7 @@ app.add_middleware(
 
 app.include_router(ingest.router)
 app.include_router(search.router)
+app.include_router(chat.router)
 
 
 @app.get("/health")
