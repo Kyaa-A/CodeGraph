@@ -1,19 +1,27 @@
+from typing import Annotated, TypedDict
+
 from langchain_openai import ChatOpenAI
-from langchain.prompts import ChatPromptTemplate
+from langchain.prompts import ChatPromptTemplate, MessagesPlaceholder
+from langchain_core.messages import HumanMessage, AIMessage
+from langgraph.graph import StateGraph, START, END
 
 from app.core.config import settings
+from app.core.supabase import supabase
 from app.services.search import semantic_search
 
-# Initialize the LLM (OpenAI-compatible endpoint — works with Azure AI Foundry)
+# Initialize the LLM
 llm = ChatOpenAI(
     base_url=settings.LLM_BASE_URL,
     api_key=settings.LLM_API_KEY,
     model=settings.LLM_MODEL,
 )
 
-# RAG prompt — instructs the LLM to answer using only the provided context
-RAG_PROMPT = ChatPromptTemplate.from_template(
-    """You are an AI tutor for CodeGraph, an AI/ML course platform.
+# RAG prompt with chat history support
+RAG_PROMPT = ChatPromptTemplate.from_messages(
+    [
+        (
+            "system",
+            """You are an AI tutor for CodeGraph, an AI/ML course platform.
 Answer the student's question based on the lesson context below.
 
 Rules:
@@ -23,39 +31,123 @@ Rules:
 - Use code examples from the context when relevant
 
 Context:
-{context}
-
-Question: {question}"""
+{context}""",
+        ),
+        MessagesPlaceholder("chat_history"),
+        ("human", "{question}"),
+    ]
 )
 
 
-def rag_chat(lesson_id: str, question: str) -> dict:
-    """Retrieve relevant chunks for the lesson, then generate an answer."""
+# --- LangGraph State ---
 
-    # 1. Search for relevant chunks (filtered to this lesson's content)
-    search_results = semantic_search(question, top_k=5)
+class ChatState(TypedDict):
+    lesson_id: str
+    question: str
+    chat_history: list  # previous messages
+    context: str  # retrieved chunks
+    response: str  # final answer
+    sources: list[dict]
 
-    # Filter to only chunks from this specific lesson
-    lesson_chunks = [r for r in search_results if r["lesson_id"] == lesson_id]
 
-    # Fall back to all results if no chunks match this lesson
+# --- Graph Nodes ---
+
+def retrieve(state: ChatState) -> dict:
+    """Search pgvector for relevant chunks."""
+    results = semantic_search(state["question"], top_k=5)
+
+    # Filter to this lesson's chunks
+    lesson_chunks = [r for r in results if r["lesson_id"] == state["lesson_id"]]
     if not lesson_chunks:
-        lesson_chunks = search_results
+        lesson_chunks = results
 
-    # 2. Build context string from retrieved chunks
-    context = "\n\n---\n\n".join(chunk["chunk_text"] for chunk in lesson_chunks)
-
-    # 3. Run the RAG chain: prompt → LLM → answer
-    chain = RAG_PROMPT | llm
-    response = chain.invoke({"context": context, "question": question})
-
-    # 4. Return the answer + sources
+    context = "\n\n---\n\n".join(c["chunk_text"] for c in lesson_chunks)
     sources = [
         {"lesson_id": c["lesson_id"], "lesson_title": c["lesson_title"]}
         for c in lesson_chunks
     ]
 
+    return {"context": context, "sources": sources}
+
+
+def generate(state: ChatState) -> dict:
+    """Generate an answer using the LLM with context and chat history."""
+    chain = RAG_PROMPT | llm
+    response = chain.invoke(
+        {
+            "context": state["context"],
+            "chat_history": state["chat_history"],
+            "question": state["question"],
+        }
+    )
+    return {"response": response.content}
+
+
+# --- Build the Graph ---
+
+graph_builder = StateGraph(ChatState)
+graph_builder.add_node("retrieve", retrieve)
+graph_builder.add_node("generate", generate)
+graph_builder.add_edge(START, "retrieve")
+graph_builder.add_edge("retrieve", "generate")
+graph_builder.add_edge("generate", END)
+
+rag_graph = graph_builder.compile()
+
+
+# --- Session Management ---
+
+def load_chat_history(session_id: str) -> list:
+    """Load previous messages from Supabase."""
+    result = (
+        supabase.table("chat_messages")
+        .select("role, content")
+        .eq("session_id", session_id)
+        .order("created_at")
+        .execute()
+    )
+
+    messages = []
+    for msg in result.data:
+        if msg["role"] == "user":
+            messages.append(HumanMessage(content=msg["content"]))
+        else:
+            messages.append(AIMessage(content=msg["content"]))
+    return messages
+
+
+def save_messages(session_id: str, question: str, answer: str):
+    """Save the user question and AI response to Supabase."""
+    supabase.table("chat_messages").insert(
+        [
+            {"session_id": session_id, "role": "user", "content": question},
+            {"session_id": session_id, "role": "assistant", "content": answer},
+        ]
+    ).execute()
+
+
+def rag_chat(session_id: str, lesson_id: str, question: str) -> dict:
+    """Run the RAG graph with conversation history."""
+
+    # Load previous messages for this session
+    chat_history = load_chat_history(session_id)
+
+    # Run the graph
+    result = rag_graph.invoke(
+        {
+            "lesson_id": lesson_id,
+            "question": question,
+            "chat_history": chat_history,
+            "context": "",
+            "response": "",
+            "sources": [],
+        }
+    )
+
+    # Save this exchange to the database
+    save_messages(session_id, question, result["response"])
+
     return {
-        "response": response.content,
-        "sources": sources,
+        "response": result["response"],
+        "sources": result["sources"],
     }
