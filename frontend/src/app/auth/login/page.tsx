@@ -84,10 +84,12 @@ function LoginForm() {
           </div>
           
           <div className="flex items-center gap-4">
-            <img src={Images.avatars.user1} alt="User" className="w-12 h-12 rounded-full border-2 border-white object-cover" />
+            <div className="w-12 h-12 rounded-full bg-amber-500/20 border-2 border-amber-400/40 flex items-center justify-center">
+              <Icons.code />
+            </div>
             <div>
-              <p className="text-white font-medium">"This platform changed my career"</p>
-              <p className="text-white/60 text-sm">- Sarah Chen, Software Engineer</p>
+              <p className="text-white font-medium">Free forever for individual learners</p>
+              <p className="text-white/60 text-sm">Courses, problems, and a full code playground</p>
             </div>
           </div>
         </div>
@@ -206,8 +208,8 @@ function LoginForm() {
 
           <p className="text-center text-sm text-slate-500 mt-6">
             By signing in, you agree to our{" "}
-            <a href="#" className="text-amber-600 hover:text-amber-700 underline">Terms</a> and{" "}
-            <a href="#" className="text-amber-600 hover:text-amber-700 underline">Privacy</a>
+            <span className="text-amber-600">Terms</span> and{" "}
+            <span className="text-amber-600">Privacy Policy</span>
           </p>
         </motion.div>
       </div>

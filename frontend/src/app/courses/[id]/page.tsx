@@ -165,8 +165,8 @@ export default async function CourseDetailPage({
                 {typedCourse.description || "Learn modern development with hands-on projects and expert guidance."}
               </p>
 
-              {/* Progress bar (if logged in and has progress) */}
-              {hasProgress && (
+              {/* Progress bar (if logged in) */}
+              {user && totalLessons > 0 && (
                 <div className="mb-6 p-4 rounded-xl bg-slate-50 border border-slate-100">
                   <div className="flex items-center justify-between text-sm mb-2">
                     <span className="text-slate-600 font-medium">Your Progress</span>
@@ -227,7 +227,7 @@ export default async function CourseDetailPage({
                 <div className="mt-6 pt-5 border-t border-slate-100">
                   <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Admin Actions</p>
                   <div className="flex flex-wrap gap-2">
-                    <Link href="/admin/courses">
+                    <Link href={`/admin?course=${id}`}>
                       <Button variant="outline" size="sm" className="rounded-lg text-xs border-amber-200 text-amber-700 hover:bg-amber-50">
                         <svg className="h-3.5 w-3.5 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                           <path strokeLinecap="round" strokeLinejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
@@ -235,7 +235,7 @@ export default async function CourseDetailPage({
                         Edit Course
                       </Button>
                     </Link>
-                    <Link href="/admin/lessons">
+                    <Link href={`/admin?course=${id}&tab=lessons`}>
                       <Button variant="outline" size="sm" className="rounded-lg text-xs border-blue-200 text-blue-700 hover:bg-blue-50">
                         <svg className="h-3.5 w-3.5 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                           <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />

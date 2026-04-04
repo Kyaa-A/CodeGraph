@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { ProblemCard } from "@/components/problem-card";
 import type { Problem, Difficulty } from "@/lib/supabase/types";
@@ -94,7 +95,7 @@ export default async function ProblemsPage({
         <div className="flex flex-wrap items-center gap-6 mb-8">
           <div className="flex items-center gap-2">
             {difficulties.map((d) => (
-              <a
+              <Link
                 key={d.value}
                 href={d.value === "all" ? "/problems" : `/problems?difficulty=${d.value}${tag ? `&tag=${tag}` : ""}`}
                 className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
@@ -105,14 +106,14 @@ export default async function ProblemsPage({
               >
                 {d.label}
                 <span className="opacity-60">{d.count}</span>
-              </a>
+              </Link>
             ))}
           </div>
 
           {allTags.length > 0 && (
             <div className="flex flex-wrap gap-1.5">
               {allTags.map((t) => (
-                <a
+                <Link
                   key={t}
                   href={tag === t ? `/problems${difficulty ? `?difficulty=${difficulty}` : ""}` : `/problems?tag=${t}${difficulty ? `&difficulty=${difficulty}` : ""}`}
                   className={`px-2.5 py-1 rounded-md text-[11px] font-medium transition-all ${
@@ -122,7 +123,7 @@ export default async function ProblemsPage({
                   }`}
                 >
                   {t}
-                </a>
+                </Link>
               ))}
             </div>
           )}

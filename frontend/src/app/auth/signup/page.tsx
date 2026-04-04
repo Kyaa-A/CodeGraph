@@ -223,9 +223,9 @@ export default function SignupPage() {
           </div>
 
           <p className="text-center text-sm text-slate-500 mt-6">
-            By signing up, you agree to{" "}
-            <a href="#" className="text-amber-600 hover:text-amber-700 underline">Terms</a> and{" "}
-            <a href="#" className="text-amber-600 hover:text-amber-700 underline">Privacy</a>
+            By signing up, you agree to our{" "}
+            <span className="text-amber-600">Terms</span> and{" "}
+            <span className="text-amber-600">Privacy Policy</span>
           </p>
         </motion.div>
       </div>
@@ -257,10 +257,12 @@ export default function SignupPage() {
 
           <div className="flex items-center gap-4 self-end">
             <div className="text-right">
-              <p className="text-white font-medium">"Best investment in my career"</p>
-              <p className="text-white/60 text-sm">- Michael Park, ML Engineer</p>
+              <p className="text-white font-medium">Courses, problems, and a full code playground</p>
+              <p className="text-white/60 text-sm">Free forever for individual learners</p>
             </div>
-            <img src={Images.avatars.user3} alt="User" className="w-12 h-12 rounded-full border-2 border-white object-cover" />
+            <div className="w-12 h-12 rounded-full bg-amber-500/20 border-2 border-amber-400/40 flex items-center justify-center text-white">
+              <Icons.rocket />
+            </div>
           </div>
         </div>
       </motion.div>
