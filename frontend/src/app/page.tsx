@@ -46,18 +46,21 @@ const LANGUAGES = [
 ];
 
 const DEFAULT_CODE: Record<string, string> = {
-  python: `class Solution:
-    def twoSum(self, nums: List[int], target: int) -> List[int]:
-        seen = {}
-        for i, num in enumerate(nums):
-            complement = target - num
-            if complement in seen:
-                return [seen[complement], i]
-            seen[num] = i
-        return []`,
+  python: `def two_sum(nums, target):
+    seen = {}
+    for i, num in enumerate(nums):
+        complement = target - num
+        if complement in seen:
+            return [seen[complement], i]
+        seen[num] = i
+    return []
+
+nums = [2, 7, 11, 15]
+target = 9
+print(f"Input: nums={nums}, target={target}")
+print(f"Output: {two_sum(nums, target)}")`,
   javascript: `function twoSum(nums, target) {
     const map = new Map();
-    
     for (let i = 0; i < nums.length; i++) {
         const complement = target - nums[i];
         if (map.has(complement)) {
@@ -65,12 +68,15 @@ const DEFAULT_CODE: Record<string, string> = {
         }
         map.set(nums[i], i);
     }
-    
     return [];
-}`,
+}
+
+const nums = [2, 7, 11, 15];
+const target = 9;
+console.log("Input: nums=" + JSON.stringify(nums) + ", target=" + target);
+console.log("Output:", twoSum(nums, target));`,
   typescript: `function twoSum(nums: number[], target: number): number[] {
     const map = new Map<number, number>();
-    
     for (let i = 0; i < nums.length; i++) {
         const complement = target - nums[i];
         if (map.has(complement)) {
@@ -78,13 +84,18 @@ const DEFAULT_CODE: Record<string, string> = {
         }
         map.set(nums[i], i);
     }
-    
     return [];
-}`,
-  java: `class Solution {
-    public int[] twoSum(int[] nums, int target) {
+}
+
+const nums = [2, 7, 11, 15];
+const target = 9;
+console.log("Input: nums=" + JSON.stringify(nums) + ", target=" + target);
+console.log("Output:", twoSum(nums, target));`,
+  java: `import java.util.*;
+
+class Main {
+    static int[] twoSum(int[] nums, int target) {
         Map<Integer, Integer> map = new HashMap<>();
-        
         for (int i = 0; i < nums.length; i++) {
             int complement = target - nums[i];
             if (map.containsKey(complement)) {
@@ -92,41 +103,60 @@ const DEFAULT_CODE: Record<string, string> = {
             }
             map.put(nums[i], i);
         }
-        
         return new int[0];
     }
-}`,
-  cpp: `class Solution {
-public:
-    vector<int> twoSum(vector<int>& nums, int target) {
-        unordered_map<int, int> map;
-        
-        for (int i = 0; i < nums.size(); i++) {
-            int complement = target - nums[i];
-            if (map.find(complement) != map.end()) {
-                return {map[complement], i};
-            }
-            map[nums[i]] = i;
-        }
-        
-        return {};
-    }
-};`,
-  php: `class Solution {
-    function twoSum($nums, $target) {
-        $map = [];
-        
-        foreach ($nums as $i => $num) {
-            $complement = $target - $num;
-            if (isset($map[$complement])) {
-                return [$map[$complement], $i];
-            }
-            $map[$num] = $i;
-        }
-        
-        return [];
+
+    public static void main(String[] args) {
+        int[] nums = {2, 7, 11, 15};
+        int target = 9;
+        int[] result = twoSum(nums, target);
+        System.out.println("Input: nums=[2,7,11,15], target=9");
+        System.out.println("Output: [" + result[0] + ", " + result[1] + "]");
     }
 }`,
+  cpp: `#include <iostream>
+#include <vector>
+#include <unordered_map>
+using namespace std;
+
+vector<int> twoSum(vector<int>& nums, int target) {
+    unordered_map<int, int> map;
+    for (int i = 0; i < nums.size(); i++) {
+        int complement = target - nums[i];
+        if (map.find(complement) != map.end()) {
+            return {map[complement], i};
+        }
+        map[nums[i]] = i;
+    }
+    return {};
+}
+
+int main() {
+    vector<int> nums = {2, 7, 11, 15};
+    int target = 9;
+    vector<int> result = twoSum(nums, target);
+    cout << "Input: nums=[2,7,11,15], target=9" << endl;
+    cout << "Output: [" << result[0] << ", " << result[1] << "]" << endl;
+    return 0;
+}`,
+  php: `<?php
+function twoSum($nums, $target) {
+    $map = [];
+    foreach ($nums as $i => $num) {
+        $complement = $target - $num;
+        if (isset($map[$complement])) {
+            return [$map[$complement], $i];
+        }
+        $map[$num] = $i;
+    }
+    return [];
+}
+
+$nums = [2, 7, 11, 15];
+$target = 9;
+$result = twoSum($nums, $target);
+echo "Input: nums=[2,7,11,15], target=9\\n";
+echo "Output: [" . $result[0] . ", " . $result[1] . "]\\n";`,
 };
 
 // --- Features data ---
