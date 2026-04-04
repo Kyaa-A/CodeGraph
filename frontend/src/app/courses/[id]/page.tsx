@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import type { Course } from "@/lib/supabase/types";
 import { LessonList } from "./lesson-list";
 import { AdminOnly } from "@/components/admin-only";
+import { LottieAnimation } from "@/components/lottie-animation";
 
 export const metadata = {
   title: "Course | CodeGraph",
@@ -197,12 +198,15 @@ export default async function CourseDetailPage({
                     </Button>
                   </Link>
                 ) : totalLessons > 0 ? (
-                  <Button size="lg" disabled className="rounded-xl px-8 bg-emerald-100 text-emerald-700">
-                    <svg className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                    </svg>
-                    Course Complete!
-                  </Button>
+                  <div className="flex items-center gap-2">
+                    <LottieAnimation
+                      src="https://lottie.host/cc5eb273-523d-40fe-a1ed-ace562c57eaa/Vz6dU46MWi.lottie"
+                      className="w-14 h-14"
+                    />
+                    <Button size="lg" disabled className="rounded-xl px-8 bg-emerald-100 text-emerald-700">
+                      Course Complete!
+                    </Button>
+                  </div>
                 ) : (
                   <Button size="lg" disabled className="rounded-xl px-8">
                     No lessons yet

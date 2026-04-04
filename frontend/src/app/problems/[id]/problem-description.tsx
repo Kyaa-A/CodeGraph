@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 import { Badge } from "@/components/ui/badge";
 import type { Difficulty, ProblemSubmission } from "@/lib/supabase/types";
 
@@ -146,9 +147,17 @@ export function ProblemDescription({
             {/* Hints */}
             {hints.length > 0 && (
               <div>
-                <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">
-                  Hints
-                </p>
+                <div className="flex items-center gap-2 mb-3">
+                  <DotLottieReact
+                    src="https://lottie.host/e7e37b80-60e9-457c-bba6-9316e75839e3/TgVAsNqb9S.lottie"
+                    loop
+                    autoplay
+                    className="w-8 h-8"
+                  />
+                  <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                    Hints
+                  </p>
+                </div>
                 <div className="space-y-2">
                   {hints.map((hint, i) => (
                     <div key={i}>

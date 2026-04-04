@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -213,8 +214,12 @@ export default function SignupPage() {
                 animate={{ opacity: 1, scale: 1 }}
                 className="text-center py-8"
               >
-                <div className="w-20 h-20 mx-auto rounded-full bg-green-100 text-green-600 flex items-center justify-center mb-4">
-                  <Icons.check />
+                <div className="w-28 h-28 mx-auto mb-4">
+                  <DotLottieReact
+                    src="https://lottie.host/d7ccf5c8-cba7-41a7-b5fe-c39238aaf512/cdHuCUZYri.lottie"
+                    autoplay
+                    className="w-full h-full"
+                  />
                 </div>
                 <h3 className="text-xl font-bold text-slate-900 mb-2">Account created!</h3>
                 <p className="text-slate-500">Redirecting you to the dashboard...</p>

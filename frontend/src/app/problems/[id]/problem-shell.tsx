@@ -5,6 +5,7 @@ import dynamic from "next/dynamic";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { AuthModal } from "@/components/auth-modal";
+import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 import { ProblemDescription } from "./problem-description";
 import type { Problem, ProblemSubmission } from "@/lib/supabase/types";
 
@@ -353,16 +354,27 @@ export function ProblemShell({ problem, submissions: initialSubmissions, isAuthe
                         ? "bg-emerald-500/20 text-emerald-400"
                         : "bg-red-500/20 text-red-400"
                     }`}>
-                      <div className="text-sm font-semibold">
-                        {submitResult.passed
-                          ? "All Tests Passed!"
-                          : `${submitResult.passedCount}/${submitResult.total} Tests Passed`}
-                      </div>
-                      {submitResult.passed && submitResult.solveTime && (
-                        <div className="text-xs mt-1 text-emerald-400/70">
-                          Solved in {formatTime(submitResult.solveTime)}
+                      <div className="flex items-center gap-2">
+                        {submitResult.passed && (
+                          <DotLottieReact
+                            src="https://lottie.host/49aa1eee-3c18-4d9a-9792-139e222839bb/jH7cKeQa9r.lottie"
+                            autoplay
+                            className="w-10 h-10 shrink-0"
+                          />
+                        )}
+                        <div>
+                          <div className="text-sm font-semibold">
+                            {submitResult.passed
+                              ? "All Tests Passed!"
+                              : `${submitResult.passedCount}/${submitResult.total} Tests Passed`}
+                          </div>
+                          {submitResult.passed && submitResult.solveTime && (
+                            <div className="text-xs mt-0.5 text-emerald-400/70">
+                              Solved in {formatTime(submitResult.solveTime)}
+                            </div>
+                          )}
                         </div>
-                      )}
+                      </div>
                     </div>
                   )}
                   {testResults.map((t, i) => (
