@@ -49,8 +49,16 @@ export function LessonClientShell({
   const [completing, setCompleting] = useState(false);
   const [splitPosition, setSplitPosition] = useState(50);
   const [isDragging, setIsDragging] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const supabase = createClient();
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
 
   // Handle split-screen resize
   useEffect(() => {
@@ -99,28 +107,28 @@ export function LessonClientShell({
       <div className="min-h-screen bg-[#fafafa] pt-20">
         {/* Top bar */}
         <div className="fixed top-[72px] left-0 right-0 z-30 bg-white/80 backdrop-blur-xl border-b border-black/5">
-          <div className="flex items-center justify-between px-4 h-12">
-            <div className="flex items-center gap-3">
+          <div className="flex items-center justify-between px-2 sm:px-4 h-12">
+            <div className="flex items-center gap-2 sm:gap-3 min-w-0">
               <button
                 onClick={() => setSidebarOpen(!sidebarOpen)}
-                className="p-1.5 rounded-lg hover:bg-black/5 transition-colors"
+                className="p-1.5 rounded-lg hover:bg-black/5 transition-colors shrink-0"
               >
                 <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
                 </svg>
               </button>
-              <nav className="flex items-center gap-1.5 text-sm">
-                <Link href={`/courses/${courseId}`} className="text-muted-foreground hover:text-foreground transition-colors">
+              <nav className="flex items-center gap-1.5 text-sm min-w-0">
+                <Link href={`/courses/${courseId}`} className="text-muted-foreground hover:text-foreground transition-colors shrink-0 hidden sm:inline">
                   Course
                 </Link>
-                <span className="text-black/20">/</span>
-                <span className="font-medium truncate max-w-[300px]">
+                <span className="text-black/20 hidden sm:inline">/</span>
+                <span className="font-medium truncate max-w-[150px] sm:max-w-[300px]">
                   {currentIndex + 1}. {lessons[currentIndex]?.title}
                 </span>
               </nav>
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1 sm:gap-2">
               {/* Mark Complete - hidden when lesson has tests (must pass tests) */}
               {hasTests ? (
                 completed && (
@@ -155,14 +163,14 @@ export function LessonClientShell({
                     <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
                     </svg>
-                    Prev
+                    <span className="hidden sm:inline">Prev</span>
                   </Button>
                 </Link>
               )}
               {nextLesson && (
                 <Link href={`/courses/${courseId}/${nextLesson.id}`}>
                   <Button variant="ghost" size="sm" className="rounded-lg text-xs gap-1">
-                    Next
+                    <span className="hidden sm:inline">Next</span>
                     <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                     </svg>
@@ -170,29 +178,29 @@ export function LessonClientShell({
                 </Link>
               )}
 
-              <div className="h-4 w-px bg-border" />
+              <div className="h-4 w-px bg-border hidden sm:block" />
 
               <Button
                 onClick={() => setQuizOpen(true)}
                 variant="ghost"
                 size="sm"
-                className="rounded-lg text-xs gap-1.5 text-amber-600"
+                className="rounded-lg text-xs gap-1 sm:gap-1.5 text-emerald-600"
               >
                 <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                Quiz
+                <span className="hidden sm:inline">Quiz</span>
               </Button>
               <Button
                 onClick={() => setChatOpen(true)}
                 variant="ghost"
                 size="sm"
-                className="rounded-lg text-xs gap-1.5 text-amber-600"
+                className="rounded-lg text-xs gap-1 sm:gap-1.5 text-emerald-600"
               >
                 <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
                 </svg>
-                AI Tutor
+                <span className="hidden sm:inline">AI Tutor</span>
               </Button>
             </div>
           </div>
@@ -200,7 +208,7 @@ export function LessonClientShell({
           {/* Progress bar */}
           <div className="h-0.5 bg-black/5">
             <div
-              className="h-full bg-gradient-to-r from-amber-400 to-amber-500 transition-all duration-500"
+              className="h-full bg-gradient-to-r from-emerald-400 to-emerald-500 transition-all duration-500"
               style={{ width: `${progressPercent}%` }}
             />
           </div>
@@ -219,12 +227,12 @@ export function LessonClientShell({
                   <Link key={l.id} href={`/courses/${courseId}/${l.id}`} onClick={() => setSidebarOpen(false)}>
                     <div className={`flex items-center gap-2.5 p-2.5 rounded-xl transition-colors ${
                       l.id === lessonId
-                        ? "bg-amber-500/10 border border-amber-500/20"
+                        ? "bg-emerald-500/10 border border-emerald-500/20"
                         : "hover:bg-black/5"
                     }`}>
                       <div className={`h-6 w-6 rounded-lg flex items-center justify-center text-xs font-bold ${
                         l.id === lessonId
-                          ? "bg-amber-500 text-white"
+                          ? "bg-emerald-500 text-white"
                           : completedSet.has(l.id)
                             ? "bg-emerald-500 text-white"
                             : "bg-slate-100 text-slate-500"
@@ -248,11 +256,11 @@ export function LessonClientShell({
           </>
         )}
 
-        {/* Split-screen content */}
-        <div ref={containerRef} className="fixed top-[120px] left-0 right-0 bottom-0 flex" style={{ userSelect: isDragging ? "none" : "auto" }}>
+        {/* Split-screen content - stacks vertically on mobile */}
+        <div ref={containerRef} className="fixed top-[120px] left-0 right-0 bottom-0 flex flex-col md:flex-row" style={{ userSelect: isDragging ? "none" : "auto" }}>
           {/* Left: Lesson Content */}
-          <div className="overflow-y-auto" style={{ width: `${splitPosition}%` }}>
-            <div className="p-6 max-w-3xl">
+          <div className="overflow-y-auto h-[50vh] md:h-auto shrink-0 md:shrink" style={{ width: isMobile ? undefined : `${splitPosition}%` }}>
+            <div className="p-4 sm:p-6 max-w-3xl">
               <LessonViewer content={lessonContent} />
 
               <Separator className="my-8" />
@@ -289,16 +297,19 @@ export function LessonClientShell({
             </div>
           </div>
 
-          {/* Drag handle */}
+          {/* Drag handle - hidden on mobile */}
           <div
-            className="w-1.5 bg-black/5 hover:bg-amber-400/50 active:bg-amber-500/50 cursor-col-resize transition-colors flex-shrink-0 relative group"
+            className="hidden md:block w-1.5 bg-black/5 hover:bg-emerald-400/50 active:bg-emerald-500/50 cursor-col-resize transition-colors flex-shrink-0 relative group"
             onMouseDown={() => setIsDragging(true)}
           >
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1 h-8 rounded-full bg-black/20 group-hover:bg-amber-500 transition-colors" />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1 h-8 rounded-full bg-black/20 group-hover:bg-emerald-500 transition-colors" />
           </div>
 
+          {/* Horizontal divider on mobile */}
+          <div className="md:hidden h-1 bg-black/5 shrink-0" />
+
           {/* Right: Code Editor */}
-          <div className="flex-1 min-w-0 p-3">
+          <div className="flex-1 min-w-0 p-2 sm:p-3">
             <CodeEditor
               initialCode={starterCode}
               initialLanguage={language}

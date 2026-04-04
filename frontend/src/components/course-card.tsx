@@ -54,7 +54,7 @@ export function CourseCard({ course }: CourseCardProps) {
 
         {/* Content */}
         <div className="p-6 flex-grow flex flex-col">
-          <h3 className="text-lg font-bold text-slate-900 group-hover:text-amber-600 transition-colors line-clamp-2 mb-2">
+          <h3 className="text-lg font-bold text-slate-900 group-hover:text-emerald-600 transition-colors line-clamp-2 mb-2">
             {course.title}
           </h3>
           <p className="text-slate-600 text-sm line-clamp-2 mb-4 flex-grow">
@@ -69,7 +69,7 @@ export function CourseCard({ course }: CourseCardProps) {
                 {new Date(course.created_at).toLocaleDateString(undefined, { month: 'short', year: 'numeric' })}
               </span>
             </div>
-            <span className="text-amber-600 font-medium flex items-center gap-1 group-hover:gap-2 transition-all">
+            <span className="text-emerald-600 font-medium flex items-center gap-1 group-hover:gap-2 transition-all">
               View
               <Icons.arrow />
             </span>

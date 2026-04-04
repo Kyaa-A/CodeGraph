@@ -81,8 +81,8 @@ export default async function ProblemsPage({
   };
 
   return (
-    <div className="min-h-screen bg-white pt-24 pb-16">
-      <div className="max-w-7xl mx-auto px-4">
+    <div className="min-h-screen bg-white pt-20 sm:pt-24 pb-12 sm:pb-16">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4">
         <div className="flex gap-6">
 
           {/* ===== MAIN CONTENT ===== */}
@@ -112,9 +112,9 @@ export default async function ProblemsPage({
 
             {/* Filter Tabs + Search */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
-              <div className="flex items-center gap-1 bg-slate-100 rounded-lg p-1">
+              <div className="flex items-center gap-1 bg-slate-100 rounded-lg p-1 overflow-x-auto scrollbar-none">
                 {([
-                  { value: "all", label: "All Topics" },
+                  { value: "all", label: "All" },
                   { value: "easy", label: "Easy" },
                   { value: "medium", label: "Medium" },
                   { value: "hard", label: "Hard" },
@@ -126,7 +126,7 @@ export default async function ProblemsPage({
                         ? `/problems${tag ? `?tag=${tag}` : ""}${search ? `${tag ? "&" : "?"}search=${search}` : ""}`
                         : `/problems?difficulty=${d.value}${tag ? `&tag=${tag}` : ""}${search ? `&search=${search}` : ""}`
                     }
-                    className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+                    className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-md text-xs sm:text-sm font-medium transition-all whitespace-nowrap ${
                       (d.value === "all" && !difficulty) || difficulty === d.value
                         ? "bg-white text-slate-900 shadow-sm"
                         : "text-slate-500 hover:text-slate-700"
@@ -148,13 +148,13 @@ export default async function ProblemsPage({
                   name="search"
                   defaultValue={search || ""}
                   placeholder="Search questions..."
-                  className="w-56 pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-400"
+                  className="w-full sm:w-56 pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-400"
                 />
               </form>
             </div>
 
             {/* Problem Table */}
-            <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+            <div className="bg-white rounded-xl border border-slate-200 overflow-hidden overflow-x-auto">
               {/* Header */}
               <div className="grid grid-cols-[36px_1fr_90px_80px] sm:grid-cols-[36px_1fr_140px_90px_80px] px-4 py-3 text-[11px] font-semibold text-slate-400 uppercase tracking-wider border-b border-slate-100 bg-slate-50/50">
                 <div></div>

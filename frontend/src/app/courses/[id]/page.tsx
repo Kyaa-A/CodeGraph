@@ -158,11 +158,11 @@ export default async function CourseDetailPage({
                 )}
               </div>
 
-              <h1 className="text-3xl lg:text-4xl font-bold text-slate-900 mb-4 leading-tight">
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-900 mb-3 sm:mb-4 leading-tight">
                 {typedCourse.title}
               </h1>
               
-              <p className="text-lg text-slate-600 leading-relaxed mb-6">
+              <p className="text-base sm:text-lg text-slate-600 leading-relaxed mb-4 sm:mb-6">
                 {typedCourse.description || "Learn modern development with hands-on projects and expert guidance."}
               </p>
 
@@ -255,7 +255,7 @@ export default async function CourseDetailPage({
         </div>
 
         {/* Lessons Section */}
-        <div className="bg-white rounded-3xl shadow-lg shadow-slate-200/50 border border-slate-100 p-8 lg:p-12">
+        <div className="bg-white rounded-2xl sm:rounded-3xl shadow-lg shadow-slate-200/50 border border-slate-100 p-4 sm:p-8 lg:p-12">
           <LessonList courseId={id} />
         </div>
       </div>

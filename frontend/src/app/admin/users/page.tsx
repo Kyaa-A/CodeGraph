@@ -14,6 +14,7 @@ export default function AdminUsersPage() {
   const [users, setUsers] = useState<UserWithProgress[]>([]);
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState<string | null>(null);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const supabase = createClient();
 
   async function fetchUsers() {
@@ -50,11 +51,27 @@ export default function AdminUsersPage() {
   }
 
   useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => {
+      setCurrentUserId(data.user?.id ?? null);
+    });
     fetchUsers();
   }, []);
 
   async function toggleRole(userId: string, currentRole: UserRole) {
     const newRole: UserRole = currentRole === "admin" ? "student" : "admin";
+
+    // Prevent self-demotion if you're the only admin
+    if (userId === currentUserId && currentRole === "admin") {
+      const adminCount = users.filter((u) => u.role === "admin").length;
+      if (adminCount <= 1) {
+        alert("You are the only admin. Promote another user to admin before demoting yourself.");
+        return;
+      }
+      if (!confirm("You are about to remove your own admin access. You won't be able to access this page anymore. Continue?")) {
+        return;
+      }
+    }
+
     setUpdating(userId);
 
     const { error } = await supabase
@@ -71,12 +88,12 @@ export default function AdminUsersPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-amber-50/10 via-white to-white pt-28 pb-16">
+    <div className="min-h-screen bg-gradient-to-b from-emerald-50/10 via-white to-white pt-28 pb-16">
       <div className="fixed inset-0 bg-grid opacity-30 pointer-events-none" />
 
       <div className="container mx-auto px-4 relative z-10">
         {/* Header */}
-        <div className="flex items-center justify-between mb-10">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 sm:mb-10">
           <div>
             <Link
               href="/admin"
@@ -87,14 +104,14 @@ export default function AdminUsersPage() {
               </svg>
               Back to Admin
             </Link>
-            <h1 className="font-heading text-4xl font-bold tracking-tight">
+            <h1 className="font-heading text-2xl sm:text-4xl font-bold tracking-tight">
               User Management
             </h1>
-            <p className="mt-2 text-muted-foreground text-lg">
+            <p className="mt-2 text-muted-foreground text-base sm:text-lg">
               View and manage user roles
             </p>
           </div>
-          <div className="glass-card rounded-xl px-5 py-3 text-center">
+          <div className="glass-card rounded-xl px-5 py-3 text-center shrink-0">
             <p className="text-3xl font-heading font-bold">{users.length}</p>
             <p className="text-xs text-muted-foreground">Total Users</p>
           </div>
@@ -112,7 +129,7 @@ export default function AdminUsersPage() {
             </div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="w-full">
+              <table className="w-full min-w-[600px]">
                 <thead>
                   <tr className="border-b bg-slate-50/50">
                     <th className="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
@@ -141,12 +158,15 @@ export default function AdminUsersPage() {
                       {/* User info */}
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
-                          <div className="h-10 w-10 rounded-full bg-gradient-to-br from-amber-400 to-amber-500 flex items-center justify-center text-white font-bold text-sm shrink-0">
+                          <div className="h-10 w-10 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-500 flex items-center justify-center text-white font-bold text-sm shrink-0">
                             {(user.name || "U").charAt(0).toUpperCase()}
                           </div>
                           <div className="min-w-0">
                             <p className="font-medium text-sm truncate">
                               {user.name || "Unnamed User"}
+                              {user.id === currentUserId && (
+                                <span className="ml-2 text-xs text-emerald-600 font-normal">(You)</span>
+                              )}
                             </p>
                             <p className="text-xs text-muted-foreground truncate">
                               {user.id.slice(0, 8)}...

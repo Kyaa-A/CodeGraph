@@ -92,8 +92,8 @@ export function AIChatPanel({ lessonId }: AIChatPanelProps) {
   return (
     <div className="flex flex-col h-full glass-card rounded-2xl overflow-hidden border border-black/5 shadow-lg shadow-black/5">
       {/* Header */}
-      <div className="flex items-center gap-3 p-4 border-b border-black/5 bg-gradient-to-r from-amber-50/50 to-transparent">
-        <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-amber-400 to-amber-500 flex items-center justify-center text-white shadow-lg shadow-amber-500/20">
+      <div className="flex items-center gap-3 p-4 border-b border-black/5 bg-gradient-to-r from-emerald-50/50 to-transparent">
+        <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-500 flex items-center justify-center text-white shadow-lg shadow-emerald-500/20">
           <Icons.bot />
         </div>
         <div>
@@ -120,7 +120,7 @@ export function AIChatPanel({ lessonId }: AIChatPanelProps) {
                 }`}
               >
                 {message.role !== "user" && (
-                  <div className="h-8 w-8 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center shrink-0">
+                  <div className="h-8 w-8 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0">
                     <Icons.bot />
                   </div>
                 )}
@@ -146,14 +146,14 @@ export function AIChatPanel({ lessonId }: AIChatPanelProps) {
                 animate={{ opacity: 1, y: 0 }}
                 className="flex gap-3"
               >
-                <div className="h-8 w-8 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center shrink-0">
+                <div className="h-8 w-8 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0">
                   <Icons.bot />
                 </div>
                 <div className="bg-muted/50 rounded-2xl rounded-bl-md px-4 py-3 border border-black/5">
                   <div className="flex gap-1.5">
-                    <span className="w-2 h-2 rounded-full bg-amber-400 animate-bounce" style={{ animationDelay: '0ms' }} />
-                    <span className="w-2 h-2 rounded-full bg-amber-400 animate-bounce" style={{ animationDelay: '150ms' }} />
-                    <span className="w-2 h-2 rounded-full bg-amber-400 animate-bounce" style={{ animationDelay: '300ms' }} />
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-bounce" style={{ animationDelay: '0ms' }} />
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-bounce" style={{ animationDelay: '150ms' }} />
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-bounce" style={{ animationDelay: '300ms' }} />
                   </div>
                 </div>
               </motion.div>
@@ -175,7 +175,7 @@ export function AIChatPanel({ lessonId }: AIChatPanelProps) {
               }
             }}
             placeholder="Ask about the lesson..."
-            className="min-h-[60px] max-h-[120px] resize-none rounded-xl border-black/10 bg-white/50 focus:bg-white focus:border-amber-500 focus:ring-amber-500/20"
+            className="min-h-[60px] max-h-[120px] resize-none rounded-xl border-black/10 bg-white/50 focus:bg-white focus:border-emerald-500 focus:ring-emerald-500/20"
             disabled={loading || !sessionId}
           />
           <Button

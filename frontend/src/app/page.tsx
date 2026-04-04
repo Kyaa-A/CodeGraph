@@ -5,11 +5,10 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import dynamic from "next/dynamic";
 import { Button } from "@/components/ui/button";
-import { AuthModal } from "@/components/auth-modal";
+
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 import { ChatbotWidget } from "@/components/chatbot-widget";
 import {
-  Code2,
   BookOpen,
   Terminal,
   Play,
@@ -17,7 +16,8 @@ import {
   Globe,
   ArrowRight,
   Laptop,
-  CheckCircle2
+  CheckCircle2,
+  Code2
 } from "lucide-react";
 
 const MonacoEditor = dynamic(() => import("@monaco-editor/react").then(m => m.default), {
@@ -178,9 +178,9 @@ const FEATURES = [
   },
   {
     icon: <Globe className="h-6 w-6" />,
-    title: "Active Community",
-    description: "Join thousands of developers and grow together",
-    href: "/",
+    title: "Code Playground",
+    description: "Write, run, and test code in 13+ languages right in your browser",
+    href: "/playground",
     color: "bg-blue-100 text-blue-600",
   },
 ];
@@ -217,7 +217,7 @@ export default function HomePage() {
   const [editorCode, setEditorCode] = useState(DEFAULT_CODE.python);
   const [output, setOutput] = useState("");
   const [running, setRunning] = useState(false);
-  const [showAuthModal, setShowAuthModal] = useState(false);
+
 
   const handleLangChange = (langId: string) => {
     setEditorLang(langId);
@@ -253,32 +253,32 @@ export default function HomePage() {
 
       {/* ===== HERO SECTION ===== */}
       <section className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
-        <div className="max-w-6xl mx-auto px-4 py-20 sm:py-28">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
+        <div className="max-w-7xl mx-auto px-6 py-16 sm:py-24 md:py-32">
+          <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
             {/* Left - Content */}
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5 }}
             >
-              <h1 className="text-4xl sm:text-5xl font-bold text-white tracking-tight leading-tight">
+              <h1 className="text-5xl sm:text-6xl font-bold text-white tracking-tight leading-tight">
                 A New Way to
                 <span className="block text-emerald-400">Learn Coding</span>
               </h1>
-              <p className="mt-6 text-lg text-slate-300 leading-relaxed">
-                CodeGraph is the best platform to help you enhance your skills, expand 
-                your knowledge and prepare for technical interviews. Interactive courses, 
+              <p className="mt-7 text-lg sm:text-xl text-slate-300 leading-relaxed">
+                CodeGraph is the best platform to help you enhance your skills, expand
+                your knowledge and prepare for technical interviews. Interactive courses,
                 coding problems, and a powerful playground — all in your browser.
               </p>
-              <div className="mt-8 flex flex-col sm:flex-row gap-3">
+              <div className="mt-10 flex flex-col sm:flex-row gap-3">
                 <Link href="/auth/signup">
-                  <Button size="lg" className="bg-emerald-500 hover:bg-emerald-600 text-white font-semibold text-base px-6 h-12 rounded-full">
+                  <Button size="lg" className="bg-emerald-500 hover:bg-emerald-600 text-white font-semibold text-base px-8 h-13 rounded-full">
                     Create Account
                     <ChevronRight className="ml-1 h-4 w-4" />
                   </Button>
                 </Link>
                 <Link href="#playground">
-                  <Button size="lg" variant="outline" className="border-slate-600 text-slate-300 hover:bg-slate-800 hover:text-white text-base px-6 h-12 rounded-full">
+                  <Button size="lg" variant="outline" className="border-slate-600 text-slate-300 hover:bg-slate-800 hover:text-white text-base px-8 h-13 rounded-full">
                     Start Exploring
                   </Button>
                 </Link>
@@ -294,7 +294,7 @@ export default function HomePage() {
             >
               {/* Code mockup card */}
               <div className="relative rounded-2xl bg-white shadow-2xl overflow-hidden transform rotate-[-2deg] hover:rotate-0 transition-transform duration-500">
-                <div className="bg-slate-100 px-4 py-3 border-b border-slate-200 flex items-center gap-2">
+                <div className="bg-slate-100 px-5 py-3.5 border-b border-slate-200 flex items-center gap-2">
                   <div className="flex gap-1.5">
                     <div className="w-3 h-3 rounded-full bg-red-400" />
                     <div className="w-3 h-3 rounded-full bg-amber-400" />
@@ -302,22 +302,22 @@ export default function HomePage() {
                   </div>
                   <div className="ml-4 text-sm text-slate-500">solution.py</div>
                 </div>
-                <div className="p-6 bg-white">
-                  <div className="space-y-2">
-                    <div className="h-2 w-3/4 bg-slate-100 rounded" />
-                    <div className="h-2 w-1/2 bg-slate-100 rounded" />
-                    <div className="h-2 w-5/6 bg-slate-100 rounded" />
-                    <div className="h-2 w-2/3 bg-slate-100 rounded" />
-                    <div className="h-2 w-4/5 bg-slate-100 rounded" />
+                <div className="p-7 bg-white">
+                  <div className="space-y-2.5">
+                    <div className="h-2.5 w-3/4 bg-slate-100 rounded" />
+                    <div className="h-2.5 w-1/2 bg-slate-100 rounded" />
+                    <div className="h-2.5 w-5/6 bg-slate-100 rounded" />
+                    <div className="h-2.5 w-2/3 bg-slate-100 rounded" />
+                    <div className="h-2.5 w-4/5 bg-slate-100 rounded" />
                   </div>
-                  <div className="mt-6 flex items-center gap-3">
-                    <div className="h-8 w-20 bg-emerald-100 rounded flex items-center justify-center">
+                  <div className="mt-7 flex items-center gap-3">
+                    <div className="h-9 w-22 bg-emerald-100 rounded flex items-center justify-center">
                       <span className="text-xs text-emerald-600 font-medium">Easy</span>
                     </div>
-                    <div className="h-8 w-20 bg-amber-100 rounded flex items-center justify-center">
+                    <div className="h-9 w-22 bg-amber-100 rounded flex items-center justify-center">
                       <span className="text-xs text-amber-600 font-medium">Medium</span>
                     </div>
-                    <div className="h-8 w-20 bg-red-100 rounded flex items-center justify-center">
+                    <div className="h-9 w-22 bg-red-100 rounded flex items-center justify-center">
                       <span className="text-xs text-red-600 font-medium">Hard</span>
                     </div>
                   </div>
@@ -325,7 +325,7 @@ export default function HomePage() {
               </div>
 
               {/* Developer animation overlaid */}
-              <div className="absolute -top-8 -right-8 w-48 h-48 pointer-events-none">
+              <div className="absolute -top-6 -right-6 sm:-top-10 sm:-right-10 w-32 h-32 sm:w-52 sm:h-52 pointer-events-none">
                 <DotLottieReact
                   src="https://lottie.host/a28e7daa-5ade-4ac1-9c91-7353c3cd8f19/brFveAcB21.lottie"
                   loop
@@ -335,8 +335,8 @@ export default function HomePage() {
               </div>
 
               {/* Floating checkmark */}
-              <div className="absolute -bottom-4 -left-4 w-20 h-20 bg-emerald-500 rounded-2xl flex items-center justify-center shadow-lg transform -rotate-12">
-                <CheckCircle2 className="h-8 w-8 text-white" />
+              <div className="absolute -bottom-3 -left-3 sm:-bottom-5 sm:-left-5 w-16 h-16 sm:w-22 sm:h-22 bg-emerald-500 rounded-2xl flex items-center justify-center shadow-lg transform -rotate-12">
+                <CheckCircle2 className="h-7 w-7 sm:h-9 sm:w-9 text-white" />
               </div>
             </motion.div>
           </div>
@@ -354,8 +354,8 @@ export default function HomePage() {
       </section>
 
       {/* ===== FEATURES SECTION ===== */}
-      <section id="explore" className="py-16 bg-white">
-        <div className="max-w-6xl mx-auto px-4">
+      <section id="explore" className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-6">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -400,12 +400,12 @@ export default function HomePage() {
             >
               <HexIcon icon={<Laptop className="h-6 w-6" />} color="text-amber-500" />
               <div className="flex-1">
-                <h3 className="text-xl font-semibold text-slate-900 mb-2">Companies & Candidates</h3>
+                <h3 className="text-xl font-semibold text-slate-900 mb-2">Interview Prep</h3>
                 <p className="text-slate-500 leading-relaxed">
-                  Not only does CodeGraph prepare candidates for technical interviews, we also help identify top technical talent. From coding challenges to assessments and training.
+                  Sharpen your skills with LeetCode-style problems across multiple difficulty levels. Track your progress, build streaks, and time your solutions to prepare for technical interviews.
                 </p>
-                <Link href="/courses" className="inline-flex items-center mt-4 text-emerald-600 hover:text-emerald-700 font-medium text-sm">
-                  Browse Opportunities
+                <Link href="/problems" className="inline-flex items-center mt-4 text-emerald-600 hover:text-emerald-700 font-medium text-sm">
+                  Start Practicing
                   <ChevronRight className="ml-1 h-4 w-4" />
                 </Link>
               </div>
@@ -415,8 +415,8 @@ export default function HomePage() {
       </section>
 
       {/* ===== DEVELOPER SECTION ===== */}
-      <section className="py-16 bg-slate-50">
-        <div className="max-w-6xl mx-auto px-4">
+      <section className="py-20 bg-slate-50">
+        <div className="max-w-7xl mx-auto px-6">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -436,21 +436,21 @@ export default function HomePage() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             id="playground"
-            className="max-w-4xl mx-auto"
+            className="max-w-5xl mx-auto"
           >
             {/* Left Panel - Code Editor */}
             <div className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden">
               {/* Tabs */}
-              <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200 bg-slate-50">
-                <div className="flex items-center gap-1">
+              <div className="flex items-center justify-between px-2 sm:px-4 py-2 sm:py-3 border-b border-slate-200 bg-slate-50 gap-2">
+                <div className="flex items-center gap-1 overflow-x-auto scrollbar-none">
                   {LANGUAGES.slice(0, 5).map((lang) => (
                     <button
                       key={lang.id}
                       onClick={() => handleLangChange(lang.id)}
                       disabled={lang.disabled}
-                      className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
-                        lang.disabled 
-                          ? "text-slate-400 cursor-not-allowed" 
+                      className={`px-2 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium rounded-md transition-colors whitespace-nowrap ${
+                        lang.disabled
+                          ? "text-slate-400 cursor-not-allowed"
                           : editorLang === lang.id
                             ? "bg-white text-slate-900 shadow-sm border border-slate-200"
                             : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
@@ -484,7 +484,7 @@ export default function HomePage() {
               </div>
 
               {/* Editor */}
-              <div className="h-[320px]">
+              <div className="h-[280px] sm:h-[360px]">
                 <MonacoEditor
                   height="100%"
                   language={editorLang === "cpp" ? "cpp" : editorLang}
@@ -538,22 +538,22 @@ export default function HomePage() {
 
           {/* Open Full Playground link */}
           <div className="flex justify-center mt-6">
-            <button
-              onClick={() => setShowAuthModal(true)}
+            <Link
+              href="/playground"
               className="inline-flex items-center gap-2 text-emerald-600 hover:text-emerald-700 font-medium text-sm transition-colors"
             >
               <Terminal className="h-4 w-4" />
               Open Full Playground
               <ChevronRight className="h-4 w-4" />
-            </button>
+            </Link>
           </div>
         </div>
       </section>
 
       {/* ===== STATS SECTION ===== */}
-      <section className="py-16 bg-white">
-        <div className="max-w-4xl mx-auto px-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+      <section className="py-20 bg-white">
+        <div className="max-w-5xl mx-auto px-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-10">
             {STATS.map((stat, i) => (
               <motion.div
                 key={stat.label}
@@ -563,11 +563,11 @@ export default function HomePage() {
                 transition={{ duration: 0.4, delay: i * 0.1 }}
                 className="text-center"
               >
-                <div className="inline-flex items-center justify-center h-12 w-12 rounded-2xl bg-emerald-100 text-emerald-600 mb-3">
+                <div className="inline-flex items-center justify-center h-14 w-14 rounded-2xl bg-emerald-100 text-emerald-600 mb-4">
                   {stat.icon}
                 </div>
-                <div className="text-3xl font-bold text-slate-900">{stat.value}</div>
-                <div className="text-sm text-slate-500 mt-1">{stat.label}</div>
+                <div className="text-3xl sm:text-4xl font-bold text-slate-900">{stat.value}</div>
+                <div className="text-sm sm:text-base text-slate-500 mt-1">{stat.label}</div>
               </motion.div>
             ))}
           </div>
@@ -575,8 +575,8 @@ export default function HomePage() {
       </section>
 
       {/* ===== CTA SECTION ===== */}
-      <section className="py-20 bg-slate-50">
-        <div className="max-w-3xl mx-auto px-4 text-center">
+      <section className="py-24 bg-slate-50">
+        <div className="max-w-3xl mx-auto px-6 text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -599,16 +599,23 @@ export default function HomePage() {
 
       {/* ===== FOOTER ===== */}
       <footer className="bg-white border-t border-slate-200">
-        <div className="max-w-6xl mx-auto px-4 py-8">
+        <div className="max-w-7xl mx-auto px-6 py-10">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-2">
-              <Code2 className="h-6 w-6 text-emerald-500" />
+            <Link href="/" className="flex items-center gap-2.5">
+              <svg viewBox="0 0 32 32" fill="none" className="h-8 w-8">
+                <rect width="32" height="32" rx="8" fill="#171717" />
+                <path d="M8 12L12 16L8 20" stroke="#10b981" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M16 20H24" stroke="white" strokeWidth="2" strokeLinecap="round" />
+                <circle cx="20" cy="11" r="2" fill="#10b981" />
+              </svg>
               <span className="font-bold text-slate-900">CodeGraph</span>
-            </div>
-            <div className="flex items-center gap-6 text-sm text-slate-500">
+            </Link>
+            <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 text-sm text-slate-500">
               <Link href="/courses" className="hover:text-slate-700 transition-colors">Courses</Link>
               <Link href="/problems" className="hover:text-slate-700 transition-colors">Problems</Link>
               <Link href="/playground" className="hover:text-slate-700 transition-colors">Playground</Link>
+              <Link href="/terms" className="hover:text-slate-700 transition-colors">Terms</Link>
+              <Link href="/privacy" className="hover:text-slate-700 transition-colors">Privacy</Link>
             </div>
             <p className="text-xs text-slate-400">
               &copy; {new Date().getFullYear()} CodeGraph
@@ -616,13 +623,6 @@ export default function HomePage() {
           </div>
         </div>
       </footer>
-
-      {/* Auth Modal */}
-      <AuthModal
-        open={showAuthModal}
-        onClose={() => setShowAuthModal(false)}
-        message="Sign in to save your code and access the full playground"
-      />
 
       {/* Chatbot Widget */}
       <ChatbotWidget />

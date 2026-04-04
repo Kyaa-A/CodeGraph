@@ -174,7 +174,7 @@ export function QuizModal({ open, onOpenChange, lessonId }: QuizModalProps) {
       <DialogContent className="sm:max-w-lg glass-modal border-0 shadow-2xl shadow-black/10">
         <DialogHeader className="pb-2">
           <div className="flex items-center gap-2">
-            <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-amber-400 to-amber-500 flex items-center justify-center text-white">
+            <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-emerald-400 to-emerald-500 flex items-center justify-center text-white">
               <Icons.question />
             </div>
             <DialogTitle className="font-heading text-xl">
@@ -193,7 +193,7 @@ export function QuizModal({ open, onOpenChange, lessonId }: QuizModalProps) {
               transition={{ duration: 0.3 }}
               className="space-y-6 py-6 text-center"
             >
-              <div className="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-br from-amber-100 to-amber-50 flex items-center justify-center">
+              <div className="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-br from-emerald-100 to-emerald-50 flex items-center justify-center">
                 <span className="text-3xl">
                   <Icons.sparkles />
                 </span>
@@ -224,9 +224,9 @@ export function QuizModal({ open, onOpenChange, lessonId }: QuizModalProps) {
               className="flex flex-col items-center gap-4 py-12"
             >
               <div className="relative">
-                <div className="h-12 w-12 rounded-xl border-4 border-amber-200 border-t-amber-500 animate-spin" />
+                <div className="h-12 w-12 rounded-xl border-4 border-emerald-200 border-t-emerald-500 animate-spin" />
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-xs font-bold text-amber-600">AI</span>
+                  <span className="text-xs font-bold text-emerald-600">AI</span>
                 </div>
               </div>
               <p className="text-sm text-muted-foreground animate-pulse">
@@ -249,7 +249,7 @@ export function QuizModal({ open, onOpenChange, lessonId }: QuizModalProps) {
                   <span className="text-muted-foreground">
                     Question {currentIndex + 1} of {questions.length}
                   </span>
-                  <span className="text-amber-600 font-medium">
+                  <span className="text-emerald-600 font-medium">
                     {score}/{answers.length} correct
                   </span>
                 </div>
@@ -283,8 +283,8 @@ export function QuizModal({ open, onOpenChange, lessonId }: QuizModalProps) {
                           : isWrong
                             ? "border-red-500 bg-red-50"
                             : isSelected
-                              ? "border-amber-500 bg-amber-50"
-                              : "border-black/5 hover:border-amber-200 hover:bg-amber-50/30"
+                              ? "border-emerald-500 bg-emerald-50"
+                              : "border-black/5 hover:border-emerald-200 hover:bg-emerald-50/30"
                       }`}
                       onClick={() => !showExplanation && setSelectedAnswer(option)}
                     >
@@ -294,7 +294,7 @@ export function QuizModal({ open, onOpenChange, lessonId }: QuizModalProps) {
                           : isWrong
                             ? "bg-red-500 text-white"
                             : isSelected
-                              ? "bg-amber-500 text-white"
+                              ? "bg-emerald-500 text-white"
                               : "bg-slate-100 text-slate-500"
                       }`}>
                         {isCorrect ? <Icons.check /> : isWrong ? <Icons.close /> : optionLetters[i]}
@@ -314,10 +314,10 @@ export function QuizModal({ open, onOpenChange, lessonId }: QuizModalProps) {
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: "auto" }}
                     exit={{ opacity: 0, height: 0 }}
-                    className="rounded-xl bg-amber-50/70 border border-amber-200 p-4 overflow-hidden"
+                    className="rounded-xl bg-emerald-50/70 border border-emerald-200 p-4 overflow-hidden"
                   >
                     <div className="flex items-start gap-2">
-                      <div className="h-5 w-5 rounded-full bg-amber-500 flex items-center justify-center text-white text-xs mt-0.5 shrink-0">
+                      <div className="h-5 w-5 rounded-full bg-emerald-500 flex items-center justify-center text-white text-xs mt-0.5 shrink-0">
                         i
                       </div>
                       <div>

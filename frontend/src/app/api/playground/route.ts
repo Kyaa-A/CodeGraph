@@ -1,31 +1,31 @@
 import { NextRequest, NextResponse } from "next/server";
-
-const WANDBOX_URL = "https://wandbox.org/api/compile.json";
-
-const COMPILER_MAP: Record<string, string> = {
-  python: "cpython-3.12.7",
-  javascript: "nodejs-20.17.0",
-  typescript: "nodejs-20.17.0",
-  java: "openjdk-jdk-22+36",
-  c: "gcc-13.2.0-c",
-  cpp: "gcc-13.2.0",
-  csharp: "mono-6.12.0.199",
-  go: "go-1.23.2",
-  rust: "rust-1.82.0",
-  ruby: "ruby-3.4.1",
-  php: "php-8.3.12",
-  swift: "swift-6.0.1",
-  kotlin: "openjdk-jdk-22+36",
-  sql: "sqlite-3.46.1",
-};
+import { WANDBOX_URL, COMPILER_MAP, MAX_CODE_LENGTH } from "@/lib/compiler-map";
+import { rateLimit } from "@/lib/rate-limit";
 
 export async function POST(request: NextRequest) {
   try {
+    // Rate limit by IP — 15 requests per minute for unauthenticated playground
+    const ip = request.headers.get("x-forwarded-for") ?? request.headers.get("x-real-ip") ?? "anonymous";
+    const { success } = rateLimit(`playground:${ip}`, 15, 60_000);
+    if (!success) {
+      return NextResponse.json(
+        { error: "Too many requests. Please wait a moment and try again." },
+        { status: 429 }
+      );
+    }
+
     const { code, language } = await request.json();
 
     if (!code || !language) {
       return NextResponse.json(
         { error: "Missing code or language" },
+        { status: 400 }
+      );
+    }
+
+    if (typeof code !== "string" || code.length > MAX_CODE_LENGTH) {
+      return NextResponse.json(
+        { error: "Code exceeds maximum length" },
         { status: 400 }
       );
     }
@@ -47,6 +47,7 @@ export async function POST(request: NextRequest) {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ code: finalCode, compiler }),
+      signal: AbortSignal.timeout(30_000),
     });
 
     if (!res.ok) {

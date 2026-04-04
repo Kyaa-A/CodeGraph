@@ -71,14 +71,14 @@ export default function AdminLessonsPage() {
   }));
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-amber-50/10 via-white to-white pt-28 pb-16">
+    <div className="min-h-screen bg-gradient-to-b from-emerald-50/10 via-white to-white pt-28 pb-16">
       <div className="fixed inset-0 bg-grid opacity-30 pointer-events-none" />
       
       <div className="container mx-auto px-4 relative z-10">
         {/* Header */}
         <div className="mb-8 flex items-center justify-between flex-wrap gap-4">
           <div>
-            <h1 className="font-heading text-3xl font-bold tracking-tight">Manage Lessons</h1>
+            <h1 className="font-heading text-2xl sm:text-3xl font-bold tracking-tight">Manage Lessons</h1>
             <p className="mt-2 text-muted-foreground">Create and organize lessons within courses</p>
           </div>
           <Button 
@@ -121,7 +121,7 @@ export default function AdminLessonsPage() {
                       id="course"
                       value={courseId}
                       onChange={(e) => setCourseId(e.target.value)}
-                      className="w-full h-12 rounded-xl border border-black/10 bg-white/70 px-4 text-sm focus:bg-white focus:border-amber-500 focus:outline-none"
+                      className="w-full h-12 rounded-xl border border-black/10 bg-white/70 px-4 text-sm focus:bg-white focus:border-emerald-500 focus:outline-none"
                       required
                     >
                       <option value="">Select a course</option>
@@ -140,7 +140,7 @@ export default function AdminLessonsPage() {
                       onChange={(e) => setTitle(e.target.value)}
                       placeholder="Enter lesson title"
                       required
-                      className="h-12 rounded-xl border-black/10 bg-white/70 focus:bg-white focus:border-amber-500"
+                      className="h-12 rounded-xl border-black/10 bg-white/70 focus:bg-white focus:border-emerald-500"
                     />
                   </div>
                   <div className="space-y-2">
@@ -151,7 +151,7 @@ export default function AdminLessonsPage() {
                       value={orderIndex}
                       onChange={(e) => setOrderIndex(Number(e.target.value))}
                       min={0}
-                      className="h-12 rounded-xl border-black/10 bg-white/70 focus:bg-white focus:border-amber-500"
+                      className="h-12 rounded-xl border-black/10 bg-white/70 focus:bg-white focus:border-emerald-500"
                     />
                   </div>
                   <div className="space-y-2">
@@ -162,7 +162,7 @@ export default function AdminLessonsPage() {
                       onChange={(e) => setContent(e.target.value)}
                       placeholder="# Lesson content in Markdown..."
                       rows={10}
-                      className="rounded-xl border-black/10 bg-white/70 focus:bg-white focus:border-amber-500 font-mono text-sm"
+                      className="rounded-xl border-black/10 bg-white/70 focus:bg-white focus:border-emerald-500 font-mono text-sm"
                     />
                   </div>
                   <div className="flex gap-3 pt-2">
@@ -199,13 +199,13 @@ export default function AdminLessonsPage() {
         {/* Lessons List */}
         {loading ? (
           <div className="flex items-center justify-center py-12">
-            <div className="h-8 w-8 rounded-xl border-4 border-amber-200 border-t-amber-500 animate-spin" />
+            <div className="h-8 w-8 rounded-xl border-4 border-emerald-200 border-t-emerald-500 animate-spin" />
             <span className="ml-3 text-muted-foreground">Loading lessons...</span>
           </div>
         ) : lessonsByCourse.length === 0 ? (
           <div className="glass-card rounded-2xl p-16 text-center">
-            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-amber-100 flex items-center justify-center">
-              <svg className="h-8 w-8 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-emerald-100 flex items-center justify-center">
+              <svg className="h-8 w-8 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
               </svg>
             </div>
@@ -217,7 +217,7 @@ export default function AdminLessonsPage() {
             {lessonsByCourse.map(({ course, lessons: courseLessons }) => (
               <div key={course.id} className="glass-card rounded-2xl p-6">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-amber-500 to-amber-400 flex items-center justify-center text-white shadow-lg shadow-amber-500/20">
+                  <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-400 flex items-center justify-center text-white shadow-lg shadow-emerald-500/20">
                     <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                     </svg>
@@ -252,7 +252,7 @@ export default function AdminLessonsPage() {
                         className="flex items-center justify-between rounded-xl p-3 transition-colors hover:bg-black/5"
                       >
                         <div className="flex items-center gap-3 flex-1 min-w-0">
-                          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-100 text-amber-600 text-xs font-bold shrink-0">
+                          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-100 text-emerald-600 text-xs font-bold shrink-0">
                             {lesson.order_index}
                           </span>
                           <p className="text-sm font-medium truncate">{lesson.title}</p>

@@ -16,7 +16,7 @@ const Icons = {
       <rect width="32" height="32" rx="8" fill="#171717" />
       <path
         d="M8 12L12 16L8 20"
-        stroke="#D4AF37"
+        stroke="#10b981"
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -27,12 +27,7 @@ const Icons = {
         strokeWidth="2"
         strokeLinecap="round"
       />
-      <circle cx="20" cy="11" r="2" fill="#D4AF37" />
-    </svg>
-  ),
-  search: () => (
-    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+      <circle cx="20" cy="11" r="2" fill="#10b981" />
     </svg>
   ),
   menu: () => (
@@ -171,6 +166,9 @@ export function Navbar() {
     router.refresh();
   }
 
+  // Hide navbar on auth pages (they have their own logo)
+  if (pathname.startsWith("/auth")) return null;
+
   const navLinks = [
     { href: "/courses", label: "Courses", icon: Icons.courses },
     { href: "/problems", label: "Problems", icon: Icons.problems },
@@ -215,7 +213,7 @@ export function Navbar() {
                   size="sm"
                   className={`gap-2 rounded-lg transition-all ${
                     pathname.startsWith(link.href)
-                      ? "bg-black text-white hover:bg-black/90"
+                      ? "bg-black text-white hover:bg-black/90 hover:text-white"
                       : "text-muted-foreground hover:text-foreground hover:bg-black/5"
                   }`}
                 >
@@ -244,27 +242,6 @@ export function Navbar() {
                 </Button>
               </Link>
             )}
-
-            {/* Search trigger */}
-            <Button
-              variant="ghost"
-              size="sm"
-              className="hidden gap-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-black/5 sm:flex"
-              onClick={() => {
-                document.dispatchEvent(
-                  new KeyboardEvent("keydown", {
-                    key: "k",
-                    metaKey: true,
-                  })
-                );
-              }}
-            >
-              <Icons.search />
-              <span className="text-xs">Search</span>
-              <kbd className="pointer-events-none hidden rounded-md border bg-muted/50 px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground sm:inline-block">
-                ⌘K
-              </kbd>
-            </Button>
 
             <div className="h-4 w-px bg-border hidden sm:block" />
 
@@ -338,7 +315,7 @@ function MobileNav({
                     variant="ghost"
                     className={`w-full justify-start gap-3 rounded-lg ${
                       pathname.startsWith(link.href)
-                        ? "bg-black text-white hover:bg-black/90"
+                        ? "bg-black text-white hover:bg-black/90 hover:text-white"
                         : "text-muted-foreground hover:text-foreground hover:bg-black/5"
                     }`}
                     size="sm"

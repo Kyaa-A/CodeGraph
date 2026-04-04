@@ -36,7 +36,7 @@ export default async function AdminPage() {
           <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
         </svg>
       ),
-      color: "from-amber-500 to-amber-600"
+      color: "from-emerald-500 to-emerald-600"
     },
     { 
       label: "Lessons", 
@@ -74,36 +74,36 @@ export default async function AdminPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-amber-50/10 via-white to-white pt-28 pb-16">
+    <div className="min-h-screen bg-gradient-to-b from-emerald-50/10 via-white to-white pt-28 pb-16">
       <div className="fixed inset-0 bg-grid opacity-30 pointer-events-none" />
       
       <div className="container mx-auto px-4 relative z-10">
         {/* Header */}
-        <div className="mb-10">
-          <h1 className="font-heading text-4xl font-bold tracking-tight">Admin Dashboard</h1>
-          <p className="mt-2 text-muted-foreground text-lg">
+        <div className="mb-6 sm:mb-10">
+          <h1 className="font-heading text-2xl sm:text-4xl font-bold tracking-tight">Admin Dashboard</h1>
+          <p className="mt-2 text-muted-foreground text-base sm:text-lg">
             Manage courses, lessons, and user analytics
           </p>
         </div>
 
         {/* Stats Grid */}
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-3 sm:gap-6 lg:grid-cols-4">
           {stats.map((stat) => (
             <Link key={stat.label} href={stat.href}>
-              <div className="glass-card rounded-2xl p-6 transition-all duration-300 hover:shadow-lg hover:shadow-black/5 hover:-translate-y-1 cursor-pointer group">
-                <div className="flex items-start justify-between mb-4">
-                  <div className={`h-12 w-12 rounded-xl bg-gradient-to-br ${stat.color} flex items-center justify-center text-white shadow-lg shadow-black/10 group-hover:scale-110 transition-transform`}>
+              <div className="glass-card rounded-2xl p-4 sm:p-6 transition-all duration-300 hover:shadow-lg hover:shadow-black/5 hover:-translate-y-1 cursor-pointer group">
+                <div className="flex items-start justify-between mb-3 sm:mb-4">
+                  <div className={`h-10 w-10 sm:h-12 sm:w-12 rounded-xl bg-gradient-to-br ${stat.color} flex items-center justify-center text-white shadow-lg shadow-black/10 group-hover:scale-110 transition-transform`}>
                     <stat.icon />
                   </div>
-                  <Button variant="ghost" size="sm" className="opacity-0 group-hover:opacity-100 transition-opacity">
+                  <Button variant="ghost" size="sm" className="opacity-0 group-hover:opacity-100 transition-opacity hidden sm:flex">
                     Manage
                     <svg className="ml-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
                     </svg>
                   </Button>
                 </div>
-                <p className="text-sm text-muted-foreground font-medium">{stat.label}</p>
-                <p className="text-4xl font-heading font-bold mt-1">{stat.value}</p>
+                <p className="text-xs sm:text-sm text-muted-foreground font-medium">{stat.label}</p>
+                <p className="text-2xl sm:text-4xl font-heading font-bold mt-1">{stat.value}</p>
               </div>
             </Link>
           ))}
@@ -112,10 +112,10 @@ export default async function AdminPage() {
         {/* Quick Actions */}
         <div className="mt-12">
           <h2 className="font-heading text-xl font-semibold mb-6">Quick Actions</h2>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
             <Link href="/admin/courses">
-              <div className="glass-card rounded-xl p-5 transition-all duration-200 hover:bg-amber-50/30 hover:border-amber-200 cursor-pointer flex items-center gap-4">
-                <div className="h-10 w-10 rounded-lg bg-amber-100 text-amber-600 flex items-center justify-center">
+              <div className="glass-card rounded-xl p-5 transition-all duration-200 hover:bg-emerald-50/30 hover:border-emerald-200 cursor-pointer flex items-center gap-4">
+                <div className="h-10 w-10 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center">
                   <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
                   </svg>

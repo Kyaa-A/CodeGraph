@@ -1,24 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-
-const WANDBOX_URL = "https://wandbox.org/api/compile.json";
-
-const COMPILER_MAP: Record<string, string> = {
-  python: "cpython-3.12.7",
-  javascript: "nodejs-20.17.0",
-  typescript: "nodejs-20.17.0",
-  java: "openjdk-jdk-22+36",
-  c: "gcc-13.2.0-c",
-  cpp: "gcc-13.2.0",
-  csharp: "mono-6.12.0.199",
-  go: "go-1.23.2",
-  rust: "rust-1.82.0",
-  ruby: "ruby-3.4.1",
-  php: "php-8.3.12",
-  swift: "swift-6.0.1",
-  kotlin: "openjdk-jdk-22+36",
-  sql: "sqlite-3.46.1",
-};
+import { WANDBOX_URL, COMPILER_MAP, MAX_CODE_LENGTH } from "@/lib/compiler-map";
+import { rateLimit } from "@/lib/rate-limit";
 
 function buildTestCode(userCode: string, testCode: string, language: string): string {
   if (!testCode) return userCode;
@@ -52,11 +35,26 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
     }
 
+    const { success } = rateLimit(`submit:${user.id}`, 10, 60_000);
+    if (!success) {
+      return NextResponse.json(
+        { error: "Too many submissions. Please wait a moment." },
+        { status: 429 }
+      );
+    }
+
     const { code, problemId, language } = await request.json();
 
     if (!code || !problemId || !language) {
       return NextResponse.json(
         { error: "Missing code, problemId, or language" },
+        { status: 400 }
+      );
+    }
+
+    if (typeof code !== "string" || code.length > MAX_CODE_LENGTH) {
+      return NextResponse.json(
+        { error: "Code exceeds maximum length" },
         { status: 400 }
       );
     }
@@ -100,6 +98,7 @@ export async function POST(request: NextRequest) {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ code: finalCode, compiler }),
+      signal: AbortSignal.timeout(30_000),
     });
 
     const runtimeMs = Date.now() - startTime;

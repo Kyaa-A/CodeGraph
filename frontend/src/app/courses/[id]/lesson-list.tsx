@@ -115,7 +115,7 @@ export async function LessonList({ courseId }: LessonListProps) {
                       </svg>
                     </div>
                   ) : (
-                    <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-amber-100 to-amber-50 text-amber-600 flex items-center justify-center shrink-0 font-heading font-bold text-lg group-hover:from-amber-500 group-hover:to-amber-400 group-hover:text-white transition-all">
+                    <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-emerald-100 to-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 font-heading font-bold text-lg group-hover:from-emerald-500 group-hover:to-emerald-400 group-hover:text-white transition-all">
                       {index + 1}
                     </div>
                   )}
@@ -125,7 +125,7 @@ export async function LessonList({ courseId }: LessonListProps) {
                     <h3 className={`font-semibold transition-colors truncate ${
                       isCompleted
                         ? "text-emerald-800"
-                        : "text-foreground group-hover:text-amber-600"
+                        : "text-foreground group-hover:text-emerald-600"
                     }`}>
                       {lesson.title}
                     </h3>
@@ -145,7 +145,7 @@ export async function LessonList({ courseId }: LessonListProps) {
                     className={`rounded-xl transition-all shrink-0 ${
                       isCompleted
                         ? "text-emerald-600 hover:bg-emerald-100"
-                        : "group-hover:bg-amber-500 group-hover:text-white"
+                        : "group-hover:bg-emerald-500 group-hover:text-white"
                     }`}
                   >
                     {isCompleted ? "Review" : "Start"}

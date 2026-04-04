@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Navbar } from "@/components/navbar";
-import { SearchPalette } from "@/components/search-palette";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -15,9 +14,15 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "CodeGraph - AI-Powered Learning Platform",
+  title: "CodeGraph - Learn to Code with Interactive Courses & Problems",
   description:
-    "Learn LangChain, LangGraph, embeddings, and Python by building a real product.",
+    "Master programming with interactive courses, LeetCode-style coding problems, and a built-in code playground. Free courses in Python, JavaScript, React, Next.js, and more.",
+  keywords: ["coding", "programming", "courses", "problems", "playground", "learn to code"],
+  openGraph: {
+    title: "CodeGraph - Learn to Code with Interactive Courses & Problems",
+    description: "Master programming with interactive courses, coding problems, and a built-in code playground.",
+    type: "website",
+  },
 };
 
 export default function RootLayout({
@@ -33,7 +38,6 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col">
         <Navbar />
         <main className="flex-1">{children}</main>
-        <SearchPalette />
       </body>
     </html>
   );

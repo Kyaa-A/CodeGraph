@@ -69,44 +69,24 @@ export default async function DashboardPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // Fetch courses
-  const { data: courses } = await supabase
-    .from("courses")
-    .select("*")
-    .order("created_at", { ascending: false });
+  // Fetch all data in parallel for better performance
+  const [coursesResult, lessonsResult, progressResult, submissionsResult] = await Promise.all([
+    supabase.from("courses").select("*").order("created_at", { ascending: false }),
+    supabase.from("lessons").select("*").order("order_index", { ascending: true }),
+    user
+      ? supabase.from("user_progress").select("*").eq("user_id", user.id).eq("completed", true)
+      : Promise.resolve({ data: null }),
+    user
+      ? supabase.from("problem_submissions").select("problem_id").eq("user_id", user.id).eq("passed", true)
+      : Promise.resolve({ data: null }),
+  ]);
 
-  const typedCourses = (courses ?? []) as Course[];
-
-  // Fetch all lessons
-  const { data: allLessons } = await supabase
-    .from("lessons")
-    .select("*")
-    .order("order_index", { ascending: true });
-
-  const typedLessons = (allLessons ?? []) as Lesson[];
-
-  // Fetch user progress if logged in
-  let userProgress: UserProgress[] = [];
-  if (user) {
-    const { data: progress } = await supabase
-      .from("user_progress")
-      .select("*")
-      .eq("user_id", user.id)
-      .eq("completed", true);
-
-    userProgress = (progress ?? []) as UserProgress[];
-  }
-
-  let problemsSolved = 0;
-  if (user) {
-    const { data: solvedProblems } = await supabase
-      .from("problem_submissions")
-      .select("problem_id")
-      .eq("user_id", user.id)
-      .eq("passed", true);
-
-    problemsSolved = new Set((solvedProblems ?? []).map((s: { problem_id: string }) => s.problem_id)).size;
-  }
+  const typedCourses = (coursesResult.data ?? []) as Course[];
+  const typedLessons = (lessonsResult.data ?? []) as Lesson[];
+  const userProgress = (progressResult.data ?? []) as UserProgress[];
+  const problemsSolved = new Set(
+    (submissionsResult.data ?? []).map((s: { problem_id: string }) => s.problem_id)
+  ).size;
 
   const completedLessonIds = new Set(userProgress.map((p) => p.lesson_id));
 
@@ -194,10 +174,10 @@ export default async function DashboardPage() {
     .filter(Boolean) as Lesson[];
 
   return (
-    <div className="container mx-auto px-4 py-8 pt-28">
+    <div className="container mx-auto px-4 py-6 sm:py-8 pt-24 sm:pt-28">
       {/* Header */}
-      <div className="mb-10">
-        <h1 className="font-heading text-4xl font-bold tracking-tight">
+      <div className="mb-6 sm:mb-10">
+        <h1 className="font-heading text-2xl sm:text-4xl font-bold tracking-tight">
           Dashboard
         </h1>
         <p className="mt-2 text-muted-foreground">
@@ -208,7 +188,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5 mb-10">
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-5 mb-6 sm:mb-10">
         {[
           {
             label: "Lessons Completed",
@@ -243,15 +223,15 @@ export default async function DashboardPage() {
         ].map((stat) => (
           <div
             key={stat.label}
-            className="glass-card rounded-2xl p-5 transition-all hover:shadow-lg hover:shadow-black/5"
+            className="glass-card rounded-2xl p-3 sm:p-5 transition-all hover:shadow-lg hover:shadow-black/5"
           >
-            <div className="flex items-center gap-4">
-              <div className={`h-12 w-12 rounded-xl ${stat.color} flex items-center justify-center`}>
+            <div className="flex items-center gap-3 sm:gap-4">
+              <div className={`h-10 w-10 sm:h-12 sm:w-12 rounded-xl ${stat.color} flex items-center justify-center shrink-0`}>
                 <stat.icon />
               </div>
-              <div>
-                <p className="text-sm text-muted-foreground">{stat.label}</p>
-                <p className="text-2xl font-heading font-bold">{stat.value}</p>
+              <div className="min-w-0">
+                <p className="text-xs sm:text-sm text-muted-foreground truncate">{stat.label}</p>
+                <p className="text-xl sm:text-2xl font-heading font-bold">{stat.value}</p>
               </div>
             </div>
           </div>
@@ -259,7 +239,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* Course Progress Cards */}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mb-10">
+      <div className="grid gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-3 mb-6 sm:mb-10">
         {coursesWithProgress.map(
           ({ course, totalLessons, completedLessons, nextLessonId }) => {
             const progressPercent =
@@ -275,7 +255,7 @@ export default async function DashboardPage() {
                 {/* Progress indicator line at top */}
                 <div className="absolute top-0 left-0 right-0 h-1 bg-muted">
                   <div
-                    className="h-full bg-gradient-to-r from-amber-400 to-amber-500 transition-all"
+                    className="h-full bg-gradient-to-r from-emerald-400 to-emerald-500 transition-all"
                     style={{ width: `${progressPercent}%` }}
                   />
                 </div>
@@ -301,7 +281,7 @@ export default async function DashboardPage() {
                       <span className="text-muted-foreground">
                         {completedLessons} of {totalLessons} lessons
                       </span>
-                      <span className="font-semibold text-amber-600">
+                      <span className="font-semibold text-emerald-600">
                         {progressPercent}%
                       </span>
                     </div>
@@ -344,8 +324,8 @@ export default async function DashboardPage() {
       </div>
 
       {coursesWithProgress.length === 0 && (
-        <div className="glass-card rounded-2xl p-12 text-center">
-          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-amber-100 flex items-center justify-center">
+        <div className="glass-card rounded-2xl p-8 sm:p-12 text-center">
+          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-emerald-100 flex items-center justify-center">
             <Icons.sparkles />
           </div>
           <h3 className="font-heading text-xl font-semibold mb-2">

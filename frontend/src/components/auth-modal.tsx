@@ -64,9 +64,9 @@ export function AuthModal({ open, onClose, message }: AuthModalProps) {
                 <div className="inline-flex items-center justify-center mb-4">
                   <svg viewBox="0 0 32 32" fill="none" className="h-12 w-12">
                     <rect width="32" height="32" rx="8" fill="#171717" />
-                    <path d="M8 12L12 16L8 20" stroke="#D4AF37" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                    <path d="M8 12L12 16L8 20" stroke="#10b981" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                     <path d="M16 20H24" stroke="white" strokeWidth="2" strokeLinecap="round" />
-                    <circle cx="20" cy="11" r="2" fill="#D4AF37" />
+                    <circle cx="20" cy="11" r="2" fill="#10b981" />
                   </svg>
                 </div>
 

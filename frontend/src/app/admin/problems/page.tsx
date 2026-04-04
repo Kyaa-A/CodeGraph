@@ -112,12 +112,12 @@ export default function AdminProblemsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-amber-50/10 via-white to-white pt-28 pb-16">
+    <div className="min-h-screen bg-gradient-to-b from-emerald-50/10 via-white to-white pt-28 pb-16">
       <div className="fixed inset-0 bg-grid opacity-30 pointer-events-none" />
 
       <div className="container mx-auto px-4 relative z-10">
         {/* Header */}
-        <div className="flex items-center justify-between mb-10">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 sm:mb-10">
           <div>
             <Link
               href="/admin"
@@ -128,10 +128,10 @@ export default function AdminProblemsPage() {
               </svg>
               Back to Admin
             </Link>
-            <h1 className="font-heading text-4xl font-bold tracking-tight">
+            <h1 className="font-heading text-2xl sm:text-4xl font-bold tracking-tight">
               Manage Problems
             </h1>
-            <p className="mt-2 text-muted-foreground text-lg">
+            <p className="mt-2 text-muted-foreground text-base sm:text-lg">
               Create and manage coding challenges
             </p>
           </div>
@@ -290,9 +290,9 @@ export default function AdminProblemsPage() {
               <motion.div
                 key={problem.id}
                 layout
-                className="glass-card rounded-2xl p-5 flex items-center justify-between gap-4"
+                className="glass-card rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4"
               >
-                <div className="flex items-center gap-4 min-w-0">
+                <div className="flex items-center gap-3 sm:gap-4 min-w-0">
                   <Badge className={`text-xs font-semibold px-2.5 py-0.5 border-0 shrink-0 ${difficultyColors[problem.difficulty]}`}>
                     {problem.difficulty}
                   </Badge>
@@ -307,7 +307,7 @@ export default function AdminProblemsPage() {
                     </div>
                   </div>
                 </div>
-                <div className="flex items-center gap-2 shrink-0">
+                <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
                   <Link href={`/problems/${problem.id}`}>
                     <Button variant="outline" size="sm" className="rounded-lg text-xs">
                       Preview

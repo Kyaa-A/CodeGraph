@@ -42,7 +42,7 @@ export function LessonViewer({ content }: LessonViewerProps) {
               </div>
             ) : (
               <code
-                className="bg-amber-100/50 text-amber-800 px-1.5 py-0.5 rounded-md text-sm font-mono"
+                className="bg-emerald-100/50 text-emerald-800 px-1.5 py-0.5 rounded-md text-sm font-mono"
                 {...props}
               >
                 {children}
@@ -84,7 +84,7 @@ export function LessonViewer({ content }: LessonViewerProps) {
           ),
           // Blockquotes
           blockquote: ({ children }) => (
-            <blockquote className="border-l-4 border-amber-400 bg-amber-50/50 pl-6 pr-4 py-3 my-6 rounded-r-lg italic text-muted-foreground">
+            <blockquote className="border-l-4 border-emerald-400 bg-emerald-50/50 pl-6 pr-4 py-3 my-6 rounded-r-lg italic text-muted-foreground">
               {children}
             </blockquote>
           ),
@@ -92,7 +92,7 @@ export function LessonViewer({ content }: LessonViewerProps) {
           a: ({ children, href }) => (
             <a
               href={href}
-              className="text-amber-600 hover:text-amber-700 underline underline-offset-4 transition-colors"
+              className="text-emerald-600 hover:text-emerald-700 underline underline-offset-4 transition-colors"
               target={href?.startsWith("http") ? "_blank" : undefined}
               rel={href?.startsWith("http") ? "noopener noreferrer" : undefined}
             >

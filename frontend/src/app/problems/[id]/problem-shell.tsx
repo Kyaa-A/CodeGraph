@@ -53,6 +53,14 @@ export function ProblemShell({ problem, submissions: initialSubmissions, isAuthe
   const [activePanel, setActivePanel] = useState<"output" | "tests">("tests");
   const [showAuthModal, setShowAuthModal] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
 
   // Timer state
   const [timerRunning, setTimerRunning] = useState(false);
@@ -169,25 +177,105 @@ export function ProblemShell({ problem, submissions: initialSubmissions, isAuthe
 
   const currentLang = LANGUAGE_OPTIONS.find((l) => l.id === language);
 
+  // Shared output/test panel
+  const outputPanel = (
+    <>
+      <div className="flex border-b border-slate-700 shrink-0">
+        <button
+          onClick={() => setActivePanel("tests")}
+          className={`px-4 py-2 text-xs font-medium ${
+            activePanel === "tests" ? "text-emerald-400 border-b border-emerald-400" : "text-slate-500"
+          }`}
+        >
+          Test Results
+        </button>
+        <button
+          onClick={() => setActivePanel("output")}
+          className={`px-4 py-2 text-xs font-medium ${
+            activePanel === "output" ? "text-emerald-400 border-b border-emerald-400" : "text-slate-500"
+          }`}
+        >
+          Output
+        </button>
+      </div>
+
+      <div className="flex-1 overflow-y-auto p-3">
+        {activePanel === "tests" ? (
+          <div className="space-y-1.5">
+            {submitResult && (
+              <div className={`rounded-lg px-3 py-2 mb-2 ${
+                submitResult.passed
+                  ? "bg-emerald-500/20 text-emerald-400"
+                  : "bg-red-500/20 text-red-400"
+              }`}>
+                <div className="flex items-center gap-2">
+                  {submitResult.passed && (
+                    <DotLottieReact
+                      src="https://lottie.host/49aa1eee-3c18-4d9a-9792-139e222839bb/jH7cKeQa9r.lottie"
+                      autoplay
+                      className="w-10 h-10 shrink-0"
+                    />
+                  )}
+                  <div>
+                    <div className="text-sm font-semibold">
+                      {submitResult.passed
+                        ? "All Tests Passed!"
+                        : `${submitResult.passedCount}/${submitResult.total} Tests Passed`}
+                    </div>
+                    {submitResult.passed && submitResult.solveTime && (
+                      <div className="text-xs mt-0.5 text-emerald-400/70">
+                        Solved in {formatTime(submitResult.solveTime)}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+            {testResults.map((t, i) => (
+              <div key={i} className="flex items-center gap-2 text-xs">
+                <span className={t.passed ? "text-emerald-400" : "text-red-400"}>
+                  {t.passed ? "PASS" : "FAIL"}
+                </span>
+                <span className="text-slate-300">{t.name}</span>
+                {t.message && <span className="text-slate-500">- {t.message}</span>}
+              </div>
+            ))}
+            {testResults.length === 0 && !submitResult && (
+              <p className="text-xs text-slate-500">
+                {isAuthenticated
+                  ? "Submit your solution to see test results"
+                  : "Sign in to submit solutions and see test results"}
+              </p>
+            )}
+          </div>
+        ) : (
+          <pre className="text-xs text-slate-300 font-mono whitespace-pre-wrap">
+            {output || "Run your code to see output"}
+          </pre>
+        )}
+      </div>
+    </>
+  );
+
   return (
     <div className="h-screen flex flex-col bg-slate-50">
       {/* Top bar */}
-      <div className="h-14 border-b border-slate-200 bg-white flex items-center justify-between px-4 shrink-0 mt-[72px]">
-        <div className="flex items-center gap-3">
+      <div className="h-14 border-b border-slate-200 bg-white flex items-center justify-between px-2 sm:px-4 shrink-0 mt-[72px]">
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
           <Link
             href="/problems"
-            className="text-slate-400 hover:text-slate-600 transition-colors"
+            className="text-slate-400 hover:text-slate-600 transition-colors shrink-0"
           >
             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
             </svg>
           </Link>
-          <span className="text-sm font-semibold text-slate-700 truncate max-w-[200px]">
+          <span className="text-xs sm:text-sm font-semibold text-slate-700 truncate max-w-[100px] sm:max-w-[200px]">
             {problem.title}
           </span>
 
-          {/* Timer */}
-          <div className="flex items-center gap-1.5 ml-3 pl-3 border-l border-slate-200">
+          {/* Timer - hidden on small screens */}
+          <div className="hidden sm:flex items-center gap-1.5 ml-3 pl-3 border-l border-slate-200">
             <button
               onClick={() => {
                 if (timerRunning) {
@@ -227,17 +315,17 @@ export function ProblemShell({ problem, submissions: initialSubmissions, isAuthe
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 sm:gap-2">
           {/* Language picker */}
           <div className="relative">
             <Button
               variant="outline"
               size="sm"
-              className="rounded-lg text-xs gap-1.5 border-slate-200"
+              className="rounded-lg text-xs gap-1 sm:gap-1.5 border-slate-200"
               onClick={() => setShowLanguages(!showLanguages)}
             >
               <span>{currentLang?.icon}</span>
-              {currentLang?.name}
+              <span className="hidden sm:inline">{currentLang?.name}</span>
               <svg className="h-3 w-3 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
               </svg>
@@ -249,7 +337,7 @@ export function ProblemShell({ problem, submissions: initialSubmissions, isAuthe
                     key={l.id}
                     onClick={() => handleLanguageChange(l.id)}
                     className={`w-full text-left px-3 py-2 text-sm flex items-center gap-2 hover:bg-slate-50 ${
-                      l.id === language ? "bg-amber-50 text-amber-700" : "text-slate-600"
+                      l.id === language ? "bg-emerald-50 text-emerald-700" : "text-slate-600"
                     }`}
                   >
                     <span>{l.icon}</span>
@@ -267,7 +355,7 @@ export function ProblemShell({ problem, submissions: initialSubmissions, isAuthe
             onClick={handleRun}
             disabled={running || submitting}
           >
-            {running ? "Running..." : "Run"}
+            {running ? "..." : "Run"}
           </Button>
 
           <Button
@@ -276,15 +364,18 @@ export function ProblemShell({ problem, submissions: initialSubmissions, isAuthe
             onClick={handleSubmit}
             disabled={submitting || running}
           >
-            {submitting ? "Submitting..." : "Submit"}
+            {submitting ? "..." : "Submit"}
           </Button>
         </div>
       </div>
 
-      {/* Split pane */}
-      <div ref={containerRef} className="flex-1 flex overflow-hidden" style={{ userSelect: isDragging ? "none" : "auto" }}>
+      {/* Split pane - stacks vertically on mobile, side-by-side on md+ */}
+      <div ref={containerRef} className="flex-1 flex flex-col md:flex-row overflow-hidden" style={{ userSelect: isDragging ? "none" : "auto" }}>
         {/* Left: Problem description */}
-        <div className="bg-white border-r border-slate-200 overflow-hidden" style={{ width: `${splitPosition}%` }}>
+        <div
+          className="bg-white border-b md:border-b-0 md:border-r border-slate-200 overflow-hidden h-[40vh] md:h-auto shrink-0 md:shrink"
+          style={{ width: isMobile ? undefined : `${splitPosition}%` }}
+        >
           <ProblemDescription
             title={problem.title}
             difficulty={problem.difficulty}
@@ -297,18 +388,21 @@ export function ProblemShell({ problem, submissions: initialSubmissions, isAuthe
           />
         </div>
 
-        {/* Drag handle */}
+        {/* Drag handle - hidden on mobile */}
         <div
-          className="w-1.5 bg-slate-100 hover:bg-amber-300 cursor-col-resize transition-colors shrink-0 relative group"
+          className="hidden md:block w-1.5 bg-slate-100 hover:bg-emerald-300 cursor-col-resize transition-colors shrink-0 relative group"
           onMouseDown={handleMouseDown}
         >
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1 h-8 rounded-full bg-slate-300 group-hover:bg-amber-500 transition-colors" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1 h-8 rounded-full bg-slate-300 group-hover:bg-emerald-500 transition-colors" />
         </div>
 
         {/* Right: Editor + Output */}
-        <div className="flex flex-col overflow-hidden" style={{ width: `${100 - splitPosition}%` }}>
+        <div
+          className="flex flex-col overflow-hidden flex-1"
+          style={{ width: isMobile ? undefined : `${100 - splitPosition}%` }}
+        >
           {/* Editor */}
-          <div className="flex-1 min-h-0">
+          <div className="flex-1 min-h-[200px] md:min-h-0">
             <MonacoEditor
               language={language === "cpp" ? "cpp" : language}
               value={code}
@@ -325,81 +419,8 @@ export function ProblemShell({ problem, submissions: initialSubmissions, isAuthe
           </div>
 
           {/* Output / Test Results */}
-          <div className="h-48 border-t border-slate-700 bg-[#1e1e1e] flex flex-col shrink-0">
-            <div className="flex border-b border-slate-700 shrink-0">
-              <button
-                onClick={() => setActivePanel("tests")}
-                className={`px-4 py-2 text-xs font-medium ${
-                  activePanel === "tests" ? "text-amber-400 border-b border-amber-400" : "text-slate-500"
-                }`}
-              >
-                Test Results
-              </button>
-              <button
-                onClick={() => setActivePanel("output")}
-                className={`px-4 py-2 text-xs font-medium ${
-                  activePanel === "output" ? "text-amber-400 border-b border-amber-400" : "text-slate-500"
-                }`}
-              >
-                Output
-              </button>
-            </div>
-
-            <div className="flex-1 overflow-y-auto p-3">
-              {activePanel === "tests" ? (
-                <div className="space-y-1.5">
-                  {submitResult && (
-                    <div className={`rounded-lg px-3 py-2 mb-2 ${
-                      submitResult.passed
-                        ? "bg-emerald-500/20 text-emerald-400"
-                        : "bg-red-500/20 text-red-400"
-                    }`}>
-                      <div className="flex items-center gap-2">
-                        {submitResult.passed && (
-                          <DotLottieReact
-                            src="https://lottie.host/49aa1eee-3c18-4d9a-9792-139e222839bb/jH7cKeQa9r.lottie"
-                            autoplay
-                            className="w-10 h-10 shrink-0"
-                          />
-                        )}
-                        <div>
-                          <div className="text-sm font-semibold">
-                            {submitResult.passed
-                              ? "All Tests Passed!"
-                              : `${submitResult.passedCount}/${submitResult.total} Tests Passed`}
-                          </div>
-                          {submitResult.passed && submitResult.solveTime && (
-                            <div className="text-xs mt-0.5 text-emerald-400/70">
-                              Solved in {formatTime(submitResult.solveTime)}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                  {testResults.map((t, i) => (
-                    <div key={i} className="flex items-center gap-2 text-xs">
-                      <span className={t.passed ? "text-emerald-400" : "text-red-400"}>
-                        {t.passed ? "PASS" : "FAIL"}
-                      </span>
-                      <span className="text-slate-300">{t.name}</span>
-                      {t.message && <span className="text-slate-500">- {t.message}</span>}
-                    </div>
-                  ))}
-                  {testResults.length === 0 && !submitResult && (
-                    <p className="text-xs text-slate-500">
-                      {isAuthenticated
-                        ? "Submit your solution to see test results"
-                        : "Sign in to submit solutions and see test results"}
-                    </p>
-                  )}
-                </div>
-              ) : (
-                <pre className="text-xs text-slate-300 font-mono whitespace-pre-wrap">
-                  {output || "Run your code to see output"}
-                </pre>
-              )}
-            </div>
+          <div className="h-36 md:h-48 border-t border-slate-700 bg-[#1e1e1e] flex flex-col shrink-0">
+            {outputPanel}
           </div>
         </div>
       </div>

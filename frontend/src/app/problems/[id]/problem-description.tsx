@@ -71,7 +71,7 @@ export function ProblemDescription({
           onClick={() => setActiveTab("description")}
           className={`px-5 py-2.5 text-sm font-medium transition-colors ${
             activeTab === "description"
-              ? "text-amber-600 border-b-2 border-amber-500"
+              ? "text-emerald-600 border-b-2 border-emerald-500"
               : "text-slate-500 hover:text-slate-700"
           }`}
         >
@@ -81,7 +81,7 @@ export function ProblemDescription({
           onClick={() => setActiveTab("submissions")}
           className={`px-5 py-2.5 text-sm font-medium transition-colors ${
             activeTab === "submissions"
-              ? "text-amber-600 border-b-2 border-amber-500"
+              ? "text-emerald-600 border-b-2 border-emerald-500"
               : "text-slate-500 hover:text-slate-700"
           }`}
         >
@@ -95,7 +95,7 @@ export function ProblemDescription({
           <div className="space-y-6">
             {/* Problem statement */}
             <div className="prose prose-slate prose-sm max-w-none">
-              <div dangerouslySetInnerHTML={{ __html: description.replace(/\n/g, "<br/>") }} />
+              <div className="whitespace-pre-line">{description}</div>
             </div>
 
             {/* Examples */}
@@ -167,7 +167,7 @@ export function ProblemDescription({
                             prev.map((v, j) => (j === i ? !v : v))
                           )
                         }
-                        className="text-sm text-amber-600 hover:text-amber-700 font-medium flex items-center gap-1.5"
+                        className="text-sm text-emerald-600 hover:text-emerald-700 font-medium flex items-center gap-1.5"
                       >
                         <svg
                           className={`h-3.5 w-3.5 transition-transform ${showHints[i] ? "rotate-90" : ""}`}
@@ -178,7 +178,7 @@ export function ProblemDescription({
                         Hint {i + 1}
                       </button>
                       {showHints[i] && (
-                        <p className="text-sm text-slate-600 mt-1 ml-5 p-3 rounded-lg bg-amber-50 border border-amber-100">
+                        <p className="text-sm text-slate-600 mt-1 ml-5 p-3 rounded-lg bg-emerald-50 border border-emerald-100">
                           {hint}
                         </p>
                       )}

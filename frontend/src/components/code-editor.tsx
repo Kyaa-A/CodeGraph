@@ -199,7 +199,7 @@ export function CodeEditor({
                       onClick={() => handleLanguageChange(lang.id)}
                       className={`w-full flex items-center gap-2 px-3 py-2 text-sm transition-colors ${
                         lang.id === language
-                          ? "bg-amber-500/20 text-amber-400"
+                          ? "bg-emerald-500/20 text-emerald-400"
                           : "text-gray-300 hover:bg-white/5"
                       }`}
                     >

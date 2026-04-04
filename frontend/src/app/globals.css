@@ -10,7 +10,7 @@
    CodeGraph Design System
    - Minimal Single Column Pattern
    - Glassmorphism Style
-   - Color: Black (#171717) + Gold (#D4AF37) + White
+   - Color: Black (#171717) + Emerald (#10B981) + White
    - Typography: Space Grotesk / DM Sans
    ======================================================================= */
 
@@ -49,7 +49,6 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
-  --color-gold: var(--gold);
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -65,9 +64,7 @@
   --primary-foreground: #FFFFFF;
   --secondary: #404040;
   --secondary-foreground: #FFFFFF;
-  --gold: #D4AF37;
-  --gold-muted: #E8D5A3;
-  
+
   /* Background & Surfaces */
   --background: #FAFAFA;
   --foreground: #171717;
@@ -75,33 +72,33 @@
   --card-foreground: #171717;
   --popover: #FFFFFF;
   --popover-foreground: #171717;
-  
+
   /* Muted States */
   --muted: #F5F5F5;
   --muted-foreground: #6B7280;
-  
-  /* Accent (Gold for CTAs) */
-  --accent: #D4AF37;
-  --accent-foreground: #171717;
-  
+
+  /* Accent (Emerald for CTAs) */
+  --accent: #10B981;
+  --accent-foreground: #FFFFFF;
+
   /* Borders & Effects */
   --border: rgba(23, 23, 23, 0.1);
   --border-strong: rgba(23, 23, 23, 0.2);
   --input: rgba(23, 23, 23, 0.1);
-  --ring: #D4AF37;
-  
+  --ring: #10B981;
+
   /* Destructive */
   --destructive: #EF4444;
-  
+
   /* Chart Colors */
   --chart-1: #171717;
   --chart-2: #404040;
-  --chart-3: #D4AF37;
+  --chart-3: #10B981;
   --chart-4: #6B7280;
   --chart-5: #F5F5F5;
-  
+
   --radius: 0.75rem;
-  
+
   /* Sidebar */
   --sidebar: #FFFFFF;
   --sidebar-foreground: #171717;
@@ -110,7 +107,7 @@
   --sidebar-accent: #F5F5F5;
   --sidebar-accent-foreground: #171717;
   --sidebar-border: rgba(23, 23, 23, 0.1);
-  --sidebar-ring: #D4AF37;
+  --sidebar-ring: #10B981;
 }
 
 .dark {
@@ -126,12 +123,12 @@
   --secondary-foreground: #FAFAFA;
   --muted: rgba(255, 255, 255, 0.1);
   --muted-foreground: #9CA3AF;
-  --accent: #D4AF37;
-  --accent-foreground: #171717;
+  --accent: #10B981;
+  --accent-foreground: #FFFFFF;
   --border: rgba(255, 255, 255, 0.1);
   --border-strong: rgba(255, 255, 255, 0.2);
   --input: rgba(255, 255, 255, 0.15);
-  --ring: #D4AF37;
+  --ring: #10B981;
   --destructive: #F87171;
   --sidebar: #171717;
   --sidebar-foreground: #FAFAFA;
@@ -140,23 +137,23 @@
   --sidebar-accent: rgba(255, 255, 255, 0.1);
   --sidebar-accent-foreground: #FAFAFA;
   --sidebar-border: rgba(255, 255, 255, 0.1);
-  --sidebar-ring: #D4AF37;
+  --sidebar-ring: #10B981;
 }
 
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
-  
+
   html {
     scroll-behavior: smooth;
   }
-  
+
   body {
     @apply bg-background text-foreground antialiased;
     font-family: 'DM Sans', system-ui, sans-serif;
   }
-  
+
   h1, h2, h3, h4, h5, h6 {
     font-family: 'Space Grotesk', system-ui, sans-serif;
   }
@@ -170,35 +167,35 @@
     -webkit-backdrop-filter: blur(12px);
     border: 1px solid rgba(255, 255, 255, 0.3);
   }
-  
+
   .glass-dark {
     background: rgba(23, 23, 23, 0.7);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     border: 1px solid rgba(255, 255, 255, 0.1);
   }
-  
+
   .glass-card {
     background: rgba(255, 255, 255, 0.6);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
     border: 1px solid rgba(23, 23, 23, 0.08);
-    box-shadow: 
+    box-shadow:
       0 4px 6px -1px rgba(0, 0, 0, 0.05),
       0 2px 4px -1px rgba(0, 0, 0, 0.03);
   }
-  
+
   .glass-card-hover {
     background: rgba(255, 255, 255, 0.8);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border: 1px solid rgba(23, 23, 23, 0.12);
-    box-shadow: 
+    box-shadow:
       0 10px 15px -3px rgba(0, 0, 0, 0.08),
       0 4px 6px -2px rgba(0, 0, 0, 0.04);
     transform: translateY(-2px);
   }
-  
+
   /* Glass Modal */
   .glass-modal {
     background: rgba(255, 255, 255, 0.85);
@@ -210,21 +207,21 @@
       0 10px 25px -5px rgba(0, 0, 0, 0.08);
   }
 
-  /* Gold Accent Button */
+  /* Emerald Accent Button */
   .btn-gold {
-    background: linear-gradient(135deg, #D4AF37 0%, #C4A030 100%);
-    color: #171717;
+    background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+    color: #FFFFFF;
     font-weight: 600;
-    box-shadow: 0 4px 14px rgba(212, 175, 55, 0.4);
+    box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4);
     transition: all 0.2s ease;
   }
-  
+
   .btn-gold:hover {
-    background: linear-gradient(135deg, #E8C547 0%, #D4AF37 100%);
-    box-shadow: 0 6px 20px rgba(212, 175, 55, 0.5);
+    background: linear-gradient(135deg, #34D399 0%, #10B981 100%);
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.5);
     transform: translateY(-1px);
   }
-  
+
   /* Gradient Text */
   .text-gradient {
     background: linear-gradient(135deg, #171717 0%, #404040 100%);
@@ -232,44 +229,44 @@
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
-  
+
   .text-gradient-gold {
-    background: linear-gradient(135deg, #D4AF37 0%, #B8941F 100%);
+    background: linear-gradient(135deg, #10B981 0%, #059669 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
-  
+
   /* Subtle Background Pattern */
   .bg-grid {
-    background-image: 
+    background-image:
       linear-gradient(rgba(23, 23, 23, 0.03) 1px, transparent 1px),
       linear-gradient(90deg, rgba(23, 23, 23, 0.03) 1px, transparent 1px);
     background-size: 24px 24px;
   }
-  
+
   .bg-grid-dark {
-    background-image: 
+    background-image:
       linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
       linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
     background-size: 24px 24px;
   }
-  
+
   /* Floating Animation */
   .floating {
     animation: floating 6s ease-in-out infinite;
   }
-  
+
   @keyframes floating {
     0%, 100% { transform: translateY(0px); }
     50% { transform: translateY(-10px); }
   }
-  
+
   /* Glow Effects */
   .glow-gold {
-    box-shadow: 0 0 40px rgba(212, 175, 55, 0.3);
+    box-shadow: 0 0 40px rgba(16, 185, 129, 0.3);
   }
-  
+
   .glow-subtle {
     box-shadow: 0 0 60px rgba(23, 23, 23, 0.08);
   }
