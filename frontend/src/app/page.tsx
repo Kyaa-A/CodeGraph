@@ -6,19 +6,15 @@ import { motion } from "framer-motion";
 import dynamic from "next/dynamic";
 import { Button } from "@/components/ui/button";
 import { AuthModal } from "@/components/auth-modal";
-import { 
-  Code2, 
-  BookOpen, 
-  Terminal, 
-  Play, 
-  ChevronRight, 
-  Zap, 
-  Shield, 
-  Globe, 
-  Rocket, 
+import { ChatbotWidget } from "@/components/chatbot-widget";
+import {
+  Code2,
+  BookOpen,
+  Terminal,
+  Play,
+  ChevronRight,
+  Globe,
   ArrowRight,
-  Users,
-  Award,
   Laptop,
   CheckCircle2
 } from "lucide-react";
@@ -150,7 +146,7 @@ const FEATURES = [
     color: "bg-amber-100 text-amber-600",
   },
   {
-    icon: <Users className="h-6 w-6" />,
+    icon: <Globe className="h-6 w-6" />,
     title: "Active Community",
     description: "Join thousands of developers and grow together",
     href: "/",
@@ -392,60 +388,61 @@ export default function HomePage() {
             </p>
           </motion.div>
 
-          {/* Interactive Playground */}
+          {/* Interactive Playground - Side by Side Layout */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             id="playground"
-            className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden"
+            className="max-w-4xl mx-auto"
           >
-            {/* Tabs */}
-            <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200 bg-slate-50">
-              <div className="flex items-center gap-1">
-                {LANGUAGES.slice(0, 5).map((lang) => (
-                  <button
-                    key={lang.id}
-                    onClick={() => handleLangChange(lang.id)}
-                    disabled={lang.disabled}
-                    className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
-                      lang.disabled 
-                        ? "text-slate-400 cursor-not-allowed" 
-                        : editorLang === lang.id
-                          ? "bg-white text-slate-900 shadow-sm border border-slate-200"
-                          : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
-                    }`}
-                  >
-                    {lang.name}
-                  </button>
-                ))}
+            {/* Left Panel - Code Editor */}
+            <div className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden">
+              {/* Tabs */}
+              <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200 bg-slate-50">
+                <div className="flex items-center gap-1">
+                  {LANGUAGES.slice(0, 5).map((lang) => (
+                    <button
+                      key={lang.id}
+                      onClick={() => handleLangChange(lang.id)}
+                      disabled={lang.disabled}
+                      className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+                        lang.disabled 
+                          ? "text-slate-400 cursor-not-allowed" 
+                          : editorLang === lang.id
+                            ? "bg-white text-slate-900 shadow-sm border border-slate-200"
+                            : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+                      }`}
+                    >
+                      {lang.name}
+                    </button>
+                  ))}
+                </div>
+                <button
+                  onClick={handleRun}
+                  disabled={running}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                    running
+                      ? "bg-slate-200 text-slate-500 cursor-not-allowed"
+                      : "bg-emerald-500 hover:bg-emerald-600 text-white"
+                  }`}
+                >
+                  {running ? (
+                    <>
+                      <div className="h-4 w-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                      Running...
+                    </>
+                  ) : (
+                    <>
+                      <Play className="h-4 w-4 fill-current" />
+                      Run
+                    </>
+                  )}
+                </button>
               </div>
-              <button
-                onClick={handleRun}
-                disabled={running}
-                className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                  running
-                    ? "bg-slate-200 text-slate-500 cursor-not-allowed"
-                    : "bg-emerald-500 hover:bg-emerald-600 text-white"
-                }`}
-              >
-                {running ? (
-                  <>
-                    <div className="h-4 w-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                    Running...
-                  </>
-                ) : (
-                  <>
-                    <Play className="h-4 w-4 fill-current" />
-                    Run
-                  </>
-                )}
-              </button>
-            </div>
 
-            {/* Editor */}
-            <div className="grid lg:grid-cols-[1fr,280px]">
-              <div className="h-[360px]">
+              {/* Editor */}
+              <div className="h-[320px]">
                 <MonacoEditor
                   height="100%"
                   language={editorLang === "cpp" ? "cpp" : editorLang}
@@ -467,59 +464,47 @@ export default function HomePage() {
                 />
               </div>
 
-              {/* Sidebar */}
-              <div className="border-t lg:border-t-0 lg:border-l border-slate-200 bg-slate-50">
-                <div className="p-4">
-                  <h4 className="text-sm font-semibold text-slate-900 mb-3">Popular Topics</h4>
-                  <div className="space-y-2">
-                    <button className="w-full flex items-center gap-3 px-3 py-2 rounded-lg bg-white border border-slate-200 text-sm text-slate-700 hover:border-emerald-300 hover:bg-emerald-50 transition-colors">
-                      <Code2 className="h-4 w-4 text-emerald-500" />
-                      Linked List
+              {/* Output Panel */}
+              <div className="border-t border-slate-200 bg-slate-50 p-3">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs font-semibold text-slate-500 uppercase">Console Output</span>
+                  {output && (
+                    <button 
+                      onClick={() => setOutput("")}
+                      className="text-xs text-slate-400 hover:text-slate-600"
+                    >
+                      Clear
                     </button>
-                    <button className="w-full flex items-center gap-3 px-3 py-2 rounded-lg bg-white border border-slate-200 text-sm text-slate-700 hover:border-emerald-300 hover:bg-emerald-50 transition-colors">
-                      <Code2 className="h-4 w-4 text-emerald-500" />
-                      Binary Tree
-                    </button>
-                    <button className="w-full flex items-center gap-3 px-3 py-2 rounded-lg bg-white border border-slate-200 text-sm text-slate-700 hover:border-emerald-300 hover:bg-emerald-50 transition-colors">
-                      <Code2 className="h-4 w-4 text-emerald-500" />
-                      Fibonacci
-                    </button>
-                  </div>
-                  <Link href="/playground" className="flex items-center mt-4 text-emerald-600 hover:text-emerald-700 font-medium text-sm">
-                    Create Playground
-                    <ChevronRight className="ml-1 h-4 w-4" />
-                  </Link>
+                  )}
                 </div>
-
-                {/* Output */}
-                <div className="border-t border-slate-200 p-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs font-semibold text-slate-500 uppercase">Output</span>
-                    {output && (
-                      <button 
-                        onClick={() => setOutput("")}
-                        className="text-xs text-slate-400 hover:text-slate-600"
-                      >
-                        Clear
-                      </button>
-                    )}
-                  </div>
-                  <div className="bg-white border border-slate-200 rounded-lg p-3 min-h-[100px]">
-                    {running ? (
-                      <div className="flex items-center gap-2 text-sm text-slate-500">
-                        <div className="h-4 w-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                        Executing...
-                      </div>
-                    ) : output ? (
-                      <pre className="text-sm font-mono text-slate-700 whitespace-pre-wrap">{output}</pre>
-                    ) : (
-                      <span className="text-sm text-slate-400 italic">Click Run to execute your code</span>
-                    )}
-                  </div>
+                <div className="bg-white border border-slate-200 rounded-lg p-3 min-h-[80px]">
+                  {running ? (
+                    <div className="flex items-center gap-2 text-sm text-slate-500">
+                      <div className="h-4 w-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                      Executing...
+                    </div>
+                  ) : output ? (
+                    <pre className="text-sm font-mono text-slate-700 whitespace-pre-wrap">{output}</pre>
+                  ) : (
+                    <span className="text-sm text-slate-400 italic">Click Run to see output</span>
+                  )}
                 </div>
               </div>
             </div>
+
           </motion.div>
+
+          {/* Open Full Playground link */}
+          <div className="flex justify-center mt-6">
+            <button
+              onClick={() => setShowAuthModal(true)}
+              className="inline-flex items-center gap-2 text-emerald-600 hover:text-emerald-700 font-medium text-sm transition-colors"
+            >
+              <Terminal className="h-4 w-4" />
+              Open Full Playground
+              <ChevronRight className="h-4 w-4" />
+            </button>
+          </div>
         </div>
       </section>
 
@@ -596,6 +581,9 @@ export default function HomePage() {
         onClose={() => setShowAuthModal(false)}
         message="Sign in to save your code and access the full playground"
       />
+
+      {/* Chatbot Widget */}
+      <ChatbotWidget />
     </div>
   );
 }
