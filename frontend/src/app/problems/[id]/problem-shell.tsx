@@ -4,6 +4,7 @@ import { useState, useCallback, useRef, useEffect } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { AuthModal } from "@/components/auth-modal";
 import { ProblemDescription } from "./problem-description";
 import type { Problem, ProblemSubmission } from "@/lib/supabase/types";
 
@@ -22,9 +23,18 @@ const LANGUAGE_OPTIONS = [
 interface ProblemShellProps {
   problem: Problem;
   submissions: ProblemSubmission[];
+  isAuthenticated: boolean;
 }
 
-export function ProblemShell({ problem, submissions: initialSubmissions }: ProblemShellProps) {
+function formatTime(seconds: number): string {
+  const h = Math.floor(seconds / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
+  const s = seconds % 60;
+  if (h > 0) return `${h}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+  return `${m}:${String(s).padStart(2, "0")}`;
+}
+
+export function ProblemShell({ problem, submissions: initialSubmissions, isAuthenticated }: ProblemShellProps) {
   const availableLanguages = LANGUAGE_OPTIONS.filter((l) => problem.starter_code[l.id]);
   const defaultLang = availableLanguages[0]?.id || "python";
 
@@ -40,7 +50,22 @@ export function ProblemShell({ problem, submissions: initialSubmissions }: Probl
   const [submitResult, setSubmitResult] = useState<{ passed: boolean; total: number; passedCount: number } | null>(null);
   const [submissions, setSubmissions] = useState(initialSubmissions);
   const [activePanel, setActivePanel] = useState<"output" | "tests">("tests");
+  const [showAuthModal, setShowAuthModal] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+
+  // Timer state
+  const [timerRunning, setTimerRunning] = useState(false);
+  const [timerSeconds, setTimerSeconds] = useState(0);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    if (timerRunning) {
+      timerRef.current = setInterval(() => setTimerSeconds((s) => s + 1), 1000);
+    } else if (timerRef.current) {
+      clearInterval(timerRef.current);
+    }
+    return () => { if (timerRef.current) clearInterval(timerRef.current); };
+  }, [timerRunning]);
 
   function handleLanguageChange(langId: string) {
     setLanguage(langId);
@@ -73,8 +98,13 @@ export function ProblemShell({ problem, submissions: initialSubmissions }: Probl
     setRunning(true);
     setOutput("");
     setActivePanel("output");
+    // Auto-start timer on first run
+    if (!timerRunning && timerSeconds === 0) {
+      setTimerRunning(true);
+    }
     try {
-      const res = await fetch("/api/execute", {
+      // Use public endpoint so unauthenticated users can run code
+      const res = await fetch("/api/playground", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ code, language }),
@@ -88,6 +118,10 @@ export function ProblemShell({ problem, submissions: initialSubmissions }: Probl
   }
 
   async function handleSubmit() {
+    if (!isAuthenticated) {
+      setShowAuthModal(true);
+      return;
+    }
     setSubmitting(true);
     setTestResults([]);
     setSubmitResult(null);
@@ -106,6 +140,10 @@ export function ProblemShell({ problem, submissions: initialSubmissions }: Probl
         passedCount: data.passedTests,
       });
       setOutput(data.output || "");
+      // Stop timer on successful submission
+      if (data.passed) {
+        setTimerRunning(false);
+      }
       if (data.testResults) {
         const newSub: ProblemSubmission = {
           id: crypto.randomUUID(),
@@ -144,6 +182,46 @@ export function ProblemShell({ problem, submissions: initialSubmissions }: Probl
           <span className="text-sm font-semibold text-slate-700 truncate max-w-[200px]">
             {problem.title}
           </span>
+
+          {/* Timer */}
+          <div className="flex items-center gap-1.5 ml-3 pl-3 border-l border-slate-200">
+            <button
+              onClick={() => {
+                if (timerRunning) {
+                  setTimerRunning(false);
+                } else {
+                  setTimerRunning(true);
+                }
+              }}
+              className="text-slate-400 hover:text-slate-600 transition-colors"
+              title={timerRunning ? "Pause timer" : "Start timer"}
+            >
+              {timerRunning ? (
+                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              ) : (
+                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              )}
+            </button>
+            <span className={`text-xs font-mono tabular-nums ${timerRunning ? "text-emerald-600" : "text-slate-400"}`}>
+              {formatTime(timerSeconds)}
+            </span>
+            {timerSeconds > 0 && (
+              <button
+                onClick={() => { setTimerRunning(false); setTimerSeconds(0); }}
+                className="text-slate-300 hover:text-slate-500 transition-colors"
+                title="Reset timer"
+              >
+                <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+              </button>
+            )}
+          </div>
         </div>
 
         <div className="flex items-center gap-2">
@@ -274,7 +352,7 @@ export function ProblemShell({ problem, submissions: initialSubmissions }: Probl
                         : "bg-red-500/20 text-red-400"
                     }`}>
                       {submitResult.passed
-                        ? "All Tests Passed!"
+                        ? `All Tests Passed! (${formatTime(timerSeconds)})`
                         : `${submitResult.passedCount}/${submitResult.total} Tests Passed`}
                     </div>
                   )}
@@ -288,7 +366,11 @@ export function ProblemShell({ problem, submissions: initialSubmissions }: Probl
                     </div>
                   ))}
                   {testResults.length === 0 && !submitResult && (
-                    <p className="text-xs text-slate-500">Submit your solution to see test results</p>
+                    <p className="text-xs text-slate-500">
+                      {isAuthenticated
+                        ? "Submit your solution to see test results"
+                        : "Sign in to submit solutions and see test results"}
+                    </p>
                   )}
                 </div>
               ) : (
@@ -300,6 +382,13 @@ export function ProblemShell({ problem, submissions: initialSubmissions }: Probl
           </div>
         </div>
       </div>
+
+      {/* Auth Modal */}
+      <AuthModal
+        open={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        message="Sign in to submit solutions and track your progress"
+      />
     </div>
   );
 }

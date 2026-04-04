@@ -65,8 +65,9 @@ export default async function ProblemsPage({
     }
 
     // Collect submission dates for calendar
+    // Use the raw ISO date from postgres (YYYY-MM-DD prefix) to avoid timezone issues
     submissionDates = (submissions ?? []).map((s: { created_at: string }) =>
-      new Date(s.created_at).toISOString().split("T")[0]
+      s.created_at.substring(0, 10)
     );
   }
 
@@ -77,16 +78,17 @@ export default async function ProblemsPage({
   const solvedCount = [...solvedMap.values()].filter((v) => v.solved).length;
 
   // Calculate streak
-  const uniqueDates = [...new Set(submissionDates)].sort().reverse();
+  const uniqueDateSet = new Set(submissionDates);
   let streak = 0;
-  const today = new Date();
+  const now = new Date();
   for (let i = 0; i < 365; i++) {
-    const d = new Date(today);
+    const d = new Date(now);
     d.setDate(d.getDate() - i);
-    const dateStr = d.toISOString().split("T")[0];
-    if (uniqueDates.includes(dateStr)) {
+    const dateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+    if (uniqueDateSet.has(dateStr)) {
       streak++;
     } else if (i > 0) {
+      // Allow today to have no submission (streak from yesterday still counts)
       break;
     }
   }

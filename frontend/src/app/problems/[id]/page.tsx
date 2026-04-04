@@ -54,5 +54,5 @@ export default async function ProblemPage({ params }: { params: Promise<{ id: st
     test_code: {},
   };
 
-  return <ProblemShell problem={clientProblem} submissions={submissions} />;
+  return <ProblemShell problem={clientProblem} submissions={submissions} isAuthenticated={!!user} />;
 }

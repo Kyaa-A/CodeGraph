@@ -20,7 +20,7 @@ export function StreakCalendar({ activeDates }: StreakCalendarProps) {
   const daysInMonth = new Date(year, month + 1, 0).getDate();
 
   const today = new Date();
-  const todayStr = today.toISOString().split("T")[0];
+  const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
 
   const prevMonth = () => setViewDate(new Date(year, month - 1, 1));
   const nextMonth = () => setViewDate(new Date(year, month + 1, 1));
