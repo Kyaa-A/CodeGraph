@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { Course } from "@/lib/supabase/types";
 import { LessonList } from "./lesson-list";
+import { AdminOnly } from "@/components/admin-only";
 
 export const metadata = {
   title: "Course | CodeGraph",
@@ -56,16 +57,39 @@ export default async function CourseDetailPage({
   const typedCourse = course as Course;
   const courseImage = getCourseImage(typedCourse);
 
-  // Get first lesson for "Start Learning" button
-  const { data: firstLesson } = await supabase
+  // Get user progress for this course
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  let completedLessonIds = new Set<string>();
+  if (user) {
+    const { data: progress } = await supabase
+      .from("user_progress")
+      .select("lesson_id")
+      .eq("user_id", user.id)
+      .eq("completed", true);
+
+    completedLessonIds = new Set(
+      (progress ?? []).map((p: { lesson_id: string }) => p.lesson_id)
+    );
+  }
+
+  // Get lessons ordered by index
+  const { data: allLessons } = await supabase
     .from("lessons")
     .select("id")
     .eq("course_id", id)
-    .order("order_index", { ascending: true })
-    .limit(1)
-    .single();
+    .order("order_index", { ascending: true });
 
-  const firstLessonId = firstLesson?.id;
+  const lessonIds = (allLessons ?? []).map((l: { id: string }) => l.id);
+  const totalLessons = lessonIds.length;
+  const completedCount = lessonIds.filter((lid: string) => completedLessonIds.has(lid)).length;
+  const hasProgress = completedCount > 0;
+
+  // Next uncompleted lesson, or first lesson
+  const nextLessonId = lessonIds.find((lid: string) => !completedLessonIds.has(lid)) ?? lessonIds[0];
+  const progressPercent = totalLessons > 0 ? Math.round((completedCount / totalLessons) * 100) : 0;
 
   return (
     <div className="min-h-screen bg-slate-50 pt-28 pb-16">
@@ -137,14 +161,30 @@ export default async function CourseDetailPage({
                 {typedCourse.title}
               </h1>
               
-              <p className="text-lg text-slate-600 leading-relaxed mb-8">
+              <p className="text-lg text-slate-600 leading-relaxed mb-6">
                 {typedCourse.description || "Learn modern development with hands-on projects and expert guidance."}
               </p>
 
+              {/* Progress bar (if logged in and has progress) */}
+              {hasProgress && (
+                <div className="mb-6 p-4 rounded-xl bg-slate-50 border border-slate-100">
+                  <div className="flex items-center justify-between text-sm mb-2">
+                    <span className="text-slate-600 font-medium">Your Progress</span>
+                    <span className="font-bold text-emerald-600">{completedCount}/{totalLessons} lessons ({progressPercent}%)</span>
+                  </div>
+                  <div className="h-2.5 rounded-full bg-slate-200 overflow-hidden">
+                    <div
+                      className="h-full rounded-full bg-gradient-to-r from-emerald-400 to-emerald-500 transition-all"
+                      style={{ width: `${progressPercent}%` }}
+                    />
+                  </div>
+                </div>
+              )}
+
               {/* Action Buttons */}
               <div className="flex flex-wrap gap-3">
-                {firstLessonId ? (
-                  <Link href={`/courses/${id}/${firstLessonId}`}>
+                {nextLessonId ? (
+                  <Link href={`/courses/${id}/${nextLessonId}`}>
                     <Button
                       size="lg"
                       className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl px-8 shadow-lg shadow-emerald-500/25 transition-all hover:shadow-xl hover:shadow-emerald-500/30"
@@ -153,17 +193,24 @@ export default async function CourseDetailPage({
                         <path strokeLinecap="round" strokeLinejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
                         <path strokeLinecap="round" strokeLinejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
-                      Start Learning
+                      {hasProgress ? "Continue Learning" : "Start Learning"}
                     </Button>
                   </Link>
+                ) : totalLessons > 0 ? (
+                  <Button size="lg" disabled className="rounded-xl px-8 bg-emerald-100 text-emerald-700">
+                    <svg className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                    Course Complete!
+                  </Button>
                 ) : (
                   <Button size="lg" disabled className="rounded-xl px-8">
                     No lessons yet
                   </Button>
                 )}
-                <Link href={`/dashboard`}>
-                  <Button 
-                    variant="outline" 
+                <Link href="/dashboard">
+                  <Button
+                    variant="outline"
                     size="lg"
                     className="rounded-xl border-slate-200 hover:bg-slate-50 hover:border-slate-300 transition-all"
                   >
@@ -174,12 +221,37 @@ export default async function CourseDetailPage({
                   </Button>
                 </Link>
               </div>
+
+              {/* Admin actions */}
+              <AdminOnly>
+                <div className="mt-6 pt-5 border-t border-slate-100">
+                  <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Admin Actions</p>
+                  <div className="flex flex-wrap gap-2">
+                    <Link href="/admin/courses">
+                      <Button variant="outline" size="sm" className="rounded-lg text-xs border-amber-200 text-amber-700 hover:bg-amber-50">
+                        <svg className="h-3.5 w-3.5 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                        </svg>
+                        Edit Course
+                      </Button>
+                    </Link>
+                    <Link href="/admin/lessons">
+                      <Button variant="outline" size="sm" className="rounded-lg text-xs border-blue-200 text-blue-700 hover:bg-blue-50">
+                        <svg className="h-3.5 w-3.5 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+                        </svg>
+                        Manage Lessons
+                      </Button>
+                    </Link>
+                  </div>
+                </div>
+              </AdminOnly>
             </div>
           </div>
         </div>
 
         {/* Lessons Section */}
-        <div className="bg-white rounded-3xl shadow-lg shadow-slate-200/50 border border-slate-100 p-6 lg:p-10">
+        <div className="bg-white rounded-3xl shadow-lg shadow-slate-200/50 border border-slate-100 p-8 lg:p-12">
           <LessonList courseId={id} />
         </div>
       </div>

@@ -36,23 +36,49 @@ const DEFAULT_CODE: Record<string, string> = {
   sql: '-- Write your SQL here\nSELECT "Hello, World!" AS greeting;\n',
 };
 
+interface TestResult {
+  name: string;
+  passed: boolean;
+  message: string;
+}
+
 interface CodeEditorProps {
   initialCode?: string;
   initialLanguage?: string;
+  lessonId?: string;
+  hasTests?: boolean;
+  onComplete?: () => void;
 }
 
-export function CodeEditor({ initialCode, initialLanguage }: CodeEditorProps) {
+export function CodeEditor({
+  initialCode,
+  initialLanguage,
+  lessonId,
+  hasTests,
+  onComplete,
+}: CodeEditorProps) {
   const [language, setLanguage] = useState(initialLanguage || "python");
-  const [code, setCode] = useState(initialCode || DEFAULT_CODE[initialLanguage || "python"] || DEFAULT_CODE.python);
+  const [code, setCode] = useState(
+    initialCode || DEFAULT_CODE[initialLanguage || "python"] || DEFAULT_CODE.python
+  );
   const [output, setOutput] = useState("");
   const [running, setRunning] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [exitCode, setExitCode] = useState<number | null>(null);
   const [showLanguages, setShowLanguages] = useState(false);
+  const [testResults, setTestResults] = useState<TestResult[]>([]);
+  const [submitResult, setSubmitResult] = useState<{
+    passed: boolean;
+    passedTests: number;
+    totalTests: number;
+  } | null>(null);
 
   const handleRun = useCallback(async () => {
     setRunning(true);
     setOutput("");
     setExitCode(null);
+    setTestResults([]);
+    setSubmitResult(null);
 
     try {
       const res = await fetch("/api/execute", {
@@ -79,6 +105,48 @@ export function CodeEditor({ initialCode, initialLanguage }: CodeEditorProps) {
     }
   }, [code, language]);
 
+  const handleSubmit = useCallback(async () => {
+    if (!lessonId) return;
+    setSubmitting(true);
+    setOutput("");
+    setExitCode(null);
+    setTestResults([]);
+    setSubmitResult(null);
+
+    try {
+      const res = await fetch("/api/submit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code, lessonId }),
+      });
+
+      const data = await res.json();
+
+      if (data.error) {
+        setOutput(data.error);
+        setExitCode(1);
+      } else {
+        setOutput(data.output || "");
+        setTestResults(data.testResults || []);
+        setSubmitResult({
+          passed: data.passed,
+          passedTests: data.passedTests,
+          totalTests: data.totalTests,
+        });
+        setExitCode(data.passed ? 0 : 1);
+
+        if (data.passed && onComplete) {
+          onComplete();
+        }
+      }
+    } catch {
+      setOutput("Failed to submit code.");
+      setExitCode(1);
+    } finally {
+      setSubmitting(false);
+    }
+  }, [code, lessonId, onComplete]);
+
   const handleLanguageChange = (newLang: string) => {
     setLanguage(newLang);
     if (code === DEFAULT_CODE[language] || code === "") {
@@ -91,9 +159,12 @@ export function CodeEditor({ initialCode, initialLanguage }: CodeEditorProps) {
     setCode(initialCode || DEFAULT_CODE[language] || "");
     setOutput("");
     setExitCode(null);
+    setTestResults([]);
+    setSubmitResult(null);
   };
 
   const currentLang = LANGUAGES.find((l) => l.id === language);
+  const isWorking = running || submitting;
 
   return (
     <div className="flex flex-col h-full bg-[#1e1e1e] rounded-2xl overflow-hidden border border-white/10">
@@ -107,7 +178,13 @@ export function CodeEditor({ initialCode, initialLanguage }: CodeEditorProps) {
             >
               <span>{currentLang?.icon}</span>
               <span>{currentLang?.name}</span>
-              <svg className="h-3 w-3 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <svg
+                className="h-3 w-3 text-gray-500"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
                 <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
               </svg>
             </button>
@@ -145,9 +222,9 @@ export function CodeEditor({ initialCode, initialLanguage }: CodeEditorProps) {
           </button>
           <Button
             onClick={handleRun}
-            disabled={running}
+            disabled={isWorking}
             size="sm"
-            className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg px-4 gap-2 shadow-lg shadow-emerald-500/20"
+            className="bg-white/10 hover:bg-white/15 text-gray-200 rounded-lg px-4 gap-2"
           >
             {running ? (
               <>
@@ -166,6 +243,31 @@ export function CodeEditor({ initialCode, initialLanguage }: CodeEditorProps) {
               </>
             )}
           </Button>
+          {hasTests && (
+            <Button
+              onClick={handleSubmit}
+              disabled={isWorking}
+              size="sm"
+              className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg px-4 gap-2 shadow-lg shadow-emerald-500/20"
+            >
+              {submitting ? (
+                <>
+                  <svg className="h-3.5 w-3.5 animate-spin" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                  </svg>
+                  Checking...
+                </>
+              ) : (
+                <>
+                  <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  Submit
+                </>
+              )}
+            </Button>
+          )}
         </div>
       </div>
 
@@ -194,42 +296,130 @@ export function CodeEditor({ initialCode, initialLanguage }: CodeEditorProps) {
         />
       </div>
 
-      {/* Output Panel */}
+      {/* Output / Test Results Panel */}
       <div className="border-t border-white/10">
         <div className="flex items-center justify-between px-4 py-2 bg-[#252526]">
           <div className="flex items-center gap-2">
-            <span className="text-xs font-medium text-gray-400 uppercase tracking-wider">Output</span>
-            {exitCode !== null && (
-              <span className={`text-xs px-2 py-0.5 rounded-full ${
-                exitCode === 0 ? "bg-emerald-500/20 text-emerald-400" : "bg-red-500/20 text-red-400"
-              }`}>
+            <span className="text-xs font-medium text-gray-400 uppercase tracking-wider">
+              {submitResult ? "Test Results" : "Output"}
+            </span>
+            {exitCode !== null && !submitResult && (
+              <span
+                className={`text-xs px-2 py-0.5 rounded-full ${
+                  exitCode === 0 ? "bg-emerald-500/20 text-emerald-400" : "bg-red-500/20 text-red-400"
+                }`}
+              >
                 {exitCode === 0 ? "Success" : `Exit: ${exitCode}`}
               </span>
             )}
+            {submitResult && (
+              <span
+                className={`text-xs px-2 py-0.5 rounded-full font-medium ${
+                  submitResult.passed
+                    ? "bg-emerald-500/20 text-emerald-400"
+                    : "bg-red-500/20 text-red-400"
+                }`}
+              >
+                {submitResult.passed
+                  ? "All Tests Passed!"
+                  : `${submitResult.passedTests}/${submitResult.totalTests} Passed`}
+              </span>
+            )}
           </div>
-          {output && (
+          {(output || testResults.length > 0) && (
             <button
-              onClick={() => { setOutput(""); setExitCode(null); }}
+              onClick={() => {
+                setOutput("");
+                setExitCode(null);
+                setTestResults([]);
+                setSubmitResult(null);
+              }}
               className="text-xs text-gray-500 hover:text-gray-300 transition-colors"
             >
               Clear
             </button>
           )}
         </div>
-        <div className="h-32 overflow-y-auto px-4 py-3 bg-[#1a1a1a]">
-          {running ? (
-            <div className="flex items-center gap-2 text-sm text-gray-500">
-              <svg className="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-              </svg>
-              Executing...
+
+        <div className="max-h-48 overflow-y-auto">
+          {/* Test Results */}
+          {testResults.length > 0 && (
+            <div className="px-4 py-2 space-y-1 border-b border-white/5">
+              {testResults.map((test, i) => (
+                <div
+                  key={i}
+                  className={`flex items-start gap-2 text-sm py-1 px-2 rounded-lg ${
+                    test.passed ? "bg-emerald-500/5" : "bg-red-500/5"
+                  }`}
+                >
+                  <span className="flex-shrink-0 mt-0.5">
+                    {test.passed ? (
+                      <svg className="h-4 w-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                      </svg>
+                    ) : (
+                      <svg className="h-4 w-4 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    )}
+                  </span>
+                  <div>
+                    <span className={`font-mono ${test.passed ? "text-emerald-300" : "text-red-300"}`}>
+                      {test.name}
+                    </span>
+                    {test.message && (
+                      <p className="text-xs text-gray-500 mt-0.5">{test.message}</p>
+                    )}
+                  </div>
+                </div>
+              ))}
             </div>
-          ) : output ? (
-            <pre className="text-sm font-mono text-gray-300 whitespace-pre-wrap leading-relaxed">{output}</pre>
-          ) : (
-            <p className="text-sm text-gray-600 italic">Click "Run" to execute your code</p>
           )}
+
+          {/* Success celebration */}
+          {submitResult?.passed && (
+            <div className="px-4 py-3 bg-emerald-500/10 border-b border-emerald-500/20">
+              <div className="flex items-center gap-2">
+                <div className="h-8 w-8 rounded-full bg-emerald-500/20 flex items-center justify-center">
+                  <svg className="h-5 w-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-emerald-300">Lesson Complete!</p>
+                  <p className="text-xs text-emerald-400/70">All tests passed. Great work!</p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Raw output */}
+          <div className="px-4 py-3 bg-[#1a1a1a]">
+            {isWorking ? (
+              <div className="flex items-center gap-2 text-sm text-gray-500">
+                <svg className="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                </svg>
+                {submitting ? "Running tests..." : "Executing..."}
+              </div>
+            ) : output ? (
+              <pre className="text-sm font-mono text-gray-300 whitespace-pre-wrap leading-relaxed">
+                {/* Filter out test framework lines from display */}
+                {output
+                  .split("\n")
+                  .filter((line) => !line.startsWith("PASS: ") && !line.startsWith("FAIL: ") && line !== "ALL_TESTS_PASSED")
+                  .join("\n")
+                  .trim() || "(tests only - no program output)"}
+              </pre>
+            ) : (
+              <p className="text-sm text-gray-600 italic">
+                {hasTests
+                  ? 'Click "Run" to test your code, or "Submit" to check your answer'
+                  : 'Click "Run" to execute your code'}
+              </p>
+            )}
+          </div>
         </div>
       </div>
     </div>

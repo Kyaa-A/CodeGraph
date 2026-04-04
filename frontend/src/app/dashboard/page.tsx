@@ -43,6 +43,11 @@ const Icons = {
       <path strokeLinecap="round" strokeLinejoin="round" d="M9.879 16.121A3 3 0 1012.015 11L11 14H9c0 .768.293 1.536.879 2.121z" />
     </svg>
   ),
+  code: () => (
+    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+    </svg>
+  ),
 };
 
 export const metadata = {
@@ -90,6 +95,17 @@ export default async function DashboardPage() {
       .eq("completed", true);
 
     userProgress = (progress ?? []) as UserProgress[];
+  }
+
+  let problemsSolved = 0;
+  if (user) {
+    const { data: solvedProblems } = await supabase
+      .from("problem_submissions")
+      .select("problem_id")
+      .eq("user_id", user.id)
+      .eq("passed", true);
+
+    problemsSolved = new Set((solvedProblems ?? []).map((s: { problem_id: string }) => s.problem_id)).size;
   }
 
   const completedLessonIds = new Set(userProgress.map((p) => p.lesson_id));
@@ -192,7 +208,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-10">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5 mb-10">
         {[
           {
             label: "Lessons Completed",
@@ -217,6 +233,12 @@ export default async function DashboardPage() {
             value: currentStreak,
             icon: Icons.fire,
             color: "text-orange-600 bg-orange-100",
+          },
+          {
+            label: "Problems Solved",
+            value: problemsSolved,
+            icon: Icons.code,
+            color: "text-blue-600 bg-blue-100",
           },
         ].map((stat) => (
           <div

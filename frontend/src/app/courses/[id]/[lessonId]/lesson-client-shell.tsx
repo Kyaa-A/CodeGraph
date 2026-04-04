@@ -17,6 +17,7 @@ interface LessonClientShellProps {
   lessonContent: string;
   starterCode: string;
   language: string;
+  hasTests: boolean;
   lessons: { id: string; title: string; order_index: number }[];
   currentIndex: number;
   prevLesson: { id: string; title: string } | null;
@@ -32,6 +33,7 @@ export function LessonClientShell({
   lessonContent,
   starterCode,
   language,
+  hasTests,
   lessons,
   currentIndex,
   prevLesson,
@@ -119,19 +121,30 @@ export function LessonClientShell({
             </div>
 
             <div className="flex items-center gap-2">
-              {/* Mark Complete */}
-              <Button
-                onClick={handleMarkComplete}
-                disabled={completed || completing}
-                variant="ghost"
-                size="sm"
-                className={`rounded-lg text-xs gap-1.5 ${completed ? "text-emerald-600" : "text-muted-foreground"}`}
-              >
-                <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                </svg>
-                {completed ? "Completed" : completing ? "Saving..." : "Mark Complete"}
-              </Button>
+              {/* Mark Complete - hidden when lesson has tests (must pass tests) */}
+              {hasTests ? (
+                completed && (
+                  <span className="flex items-center gap-1.5 text-xs text-emerald-600 px-2">
+                    <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                    Completed
+                  </span>
+                )
+              ) : (
+                <Button
+                  onClick={handleMarkComplete}
+                  disabled={completed || completing}
+                  variant="ghost"
+                  size="sm"
+                  className={`rounded-lg text-xs gap-1.5 ${completed ? "text-emerald-600" : "text-muted-foreground"}`}
+                >
+                  <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                  {completed ? "Completed" : completing ? "Saving..." : "Mark Complete"}
+                </Button>
+              )}
 
               <div className="h-4 w-px bg-border" />
 
@@ -286,7 +299,13 @@ export function LessonClientShell({
 
           {/* Right: Code Editor */}
           <div className="flex-1 min-w-0 p-3">
-            <CodeEditor initialCode={starterCode} initialLanguage={language} />
+            <CodeEditor
+              initialCode={starterCode}
+              initialLanguage={language}
+              lessonId={lessonId}
+              hasTests={hasTests}
+              onComplete={() => setCompleted(true)}
+            />
           </div>
         </div>
       </div>

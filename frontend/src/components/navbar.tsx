@@ -61,6 +61,11 @@ const Icons = {
       <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
     </svg>
   ),
+  problems: () => (
+    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+    </svg>
+  ),
 };
 
 export function Navbar() {
@@ -158,7 +163,7 @@ export function Navbar() {
         }
         setStreak(count);
       });
-  }, [user, supabase]);
+  }, [user, supabase, pathname]);
 
   async function handleSignOut() {
     await supabase.auth.signOut();
@@ -168,6 +173,7 @@ export function Navbar() {
 
   const navLinks = [
     { href: "/courses", label: "Courses", icon: Icons.courses },
+    { href: "/problems", label: "Problems", icon: Icons.problems },
     ...(user
       ? [
           { href: "/dashboard", label: "Dashboard", icon: Icons.dashboard },

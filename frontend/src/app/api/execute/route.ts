@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { createClient } from "@/lib/supabase/server";
 
 const WANDBOX_URL = "https://wandbox.org/api/compile.json";
 
@@ -21,6 +22,12 @@ const COMPILER_MAP: Record<string, string> = {
 
 export async function POST(request: NextRequest) {
   try {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+    }
+
     const { code, language } = await request.json();
 
     if (!code || !language) {

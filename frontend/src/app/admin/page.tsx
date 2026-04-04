@@ -22,6 +22,10 @@ export default async function AdminPage() {
     .from("profiles")
     .select("*", { count: "exact", head: true });
 
+  const { count: problemCount } = await supabase
+    .from("problems")
+    .select("*", { count: "exact", head: true });
+
   const stats = [
     { 
       label: "Courses", 
@@ -48,13 +52,24 @@ export default async function AdminPage() {
     { 
       label: "Users", 
       value: userCount ?? 0, 
-      href: "#",
+      href: "/admin/users",
       icon: () => (
         <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
         </svg>
       ),
       color: "from-green-500 to-green-600"
+    },
+    {
+      label: "Problems",
+      value: problemCount ?? 0,
+      href: "/admin/problems",
+      icon: () => (
+        <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+        </svg>
+      ),
+      color: "from-purple-500 to-purple-600"
     },
   ];
 
@@ -72,7 +87,7 @@ export default async function AdminPage() {
         </div>
 
         {/* Stats Grid */}
-        <div className="grid gap-6 md:grid-cols-3">
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
           {stats.map((stat) => (
             <Link key={stat.label} href={stat.href}>
               <div className="glass-card rounded-2xl p-6 transition-all duration-300 hover:shadow-lg hover:shadow-black/5 hover:-translate-y-1 cursor-pointer group">
@@ -137,17 +152,29 @@ export default async function AdminPage() {
                 </div>
               </div>
             </Link>
-            <Link href="/courses">
-              <div className="glass-card rounded-xl p-5 transition-all duration-200 hover:bg-green-50/30 hover:border-green-200 cursor-pointer flex items-center gap-4">
-                <div className="h-10 w-10 rounded-lg bg-green-100 text-green-600 flex items-center justify-center">
+            <Link href="/admin/problems">
+              <div className="glass-card rounded-xl p-5 transition-all duration-200 hover:bg-purple-50/30 hover:border-purple-200 cursor-pointer flex items-center gap-4">
+                <div className="h-10 w-10 rounded-lg bg-purple-100 text-purple-600 flex items-center justify-center">
                   <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
                   </svg>
                 </div>
                 <div>
-                  <p className="font-medium">Preview Site</p>
-                  <p className="text-xs text-muted-foreground">View as user</p>
+                  <p className="font-medium">Add Problem</p>
+                  <p className="text-xs text-muted-foreground">Create coding challenge</p>
+                </div>
+              </div>
+            </Link>
+            <Link href="/admin/users">
+              <div className="glass-card rounded-xl p-5 transition-all duration-200 hover:bg-green-50/30 hover:border-green-200 cursor-pointer flex items-center gap-4">
+                <div className="h-10 w-10 rounded-lg bg-green-100 text-green-600 flex items-center justify-center">
+                  <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                  </svg>
+                </div>
+                <div>
+                  <p className="font-medium">Manage Users</p>
+                  <p className="text-xs text-muted-foreground">Roles & permissions</p>
                 </div>
               </div>
             </Link>

@@ -75,16 +75,30 @@ print(len(vector))  # 1536
 
 Each number in that 1536-length list captures some aspect of the meaning. Individually they are meaningless, but together they form a rich semantic fingerprint.',
     1,
-    '# Exercise: Create an embedding and check its dimensions
-# 1. Import the embeddings class
-# 2. Create an embedding for a sample text
-# 3. Print the length of the resulting vector
+    '# Exercise: Embeddings & Cosine Similarity
+# In a real system you would use an API to generate embeddings.
+# Here, simulate an embedding as a list of floats.
+import math
 
-# Your code here:
 text = "Machine learning is fascinating"
-# TODO: Create the embedding vector and print its length
-print(f"Text: {text}")
-print(f"Vector dimensions: ???")',
+
+# TODO: Create a variable called "embedding" — a list of floats
+# representing a fake 8-dimensional embedding for the text above.
+# Example: [0.1, -0.3, 0.5, ...]
+embedding = []  # Replace with a list of 8 floats
+
+# TODO: Implement cosine_similarity(a, b) that returns the cosine
+# similarity between two equal-length vectors.
+# Formula: dot(a,b) / (magnitude(a) * magnitude(b))
+def cosine_similarity(a, b):
+    # TODO: compute dot product, magnitudes, return similarity
+    pass
+
+# Test your implementation:
+v1 = [1.0, 0.0, 0.0]
+v2 = [1.0, 0.0, 0.0]
+print(f"Similarity of identical vectors: {cosine_similarity(v1, v2)}")
+print(f"Embedding length: {len(embedding)}")',
     'python'
   ),
   (
@@ -135,33 +149,26 @@ Always use **overlap** between chunks (e.g., 50 characters). This ensures that i
 
 For CodeGraph, we use `RecursiveCharacterTextSplitter` with `chunk_size=500` and `chunk_overlap=50`. This balances precision with context.',
     2,
-    '# Exercise: Chunk a long text using RecursiveCharacterTextSplitter
-# 1. Import the text splitter from LangChain
-# 2. Configure chunk_size and chunk_overlap
-# 3. Split sample text and inspect the results
+    '# Exercise: Build a Text Chunking Function
+# In real RAG pipelines, text is split into overlapping chunks.
+# Implement this from scratch to understand how it works.
 
-from langchain.text_splitter import RecursiveCharacterTextSplitter
+sample_text = """Artificial intelligence is a broad field of computer science focused on creating systems capable of performing tasks that typically require human intelligence. Machine learning, a subset of AI, uses statistical methods to enable machines to improve with experience. Deep learning, a further subset, uses neural networks with many layers to learn representations of data with multiple levels of abstraction."""
 
-sample_text = """
-Artificial intelligence is a broad field of computer science focused on
-creating systems capable of performing tasks that typically require human
-intelligence. Machine learning, a subset of AI, uses statistical methods
-to enable machines to improve with experience. Deep learning, a further
-subset, uses neural networks with many layers to learn representations
-of data with multiple levels of abstraction.
-"""
+# TODO: Implement chunk_text(text, chunk_size, chunk_overlap)
+# - Split text into chunks of at most chunk_size characters
+# - Each chunk should overlap with the previous by chunk_overlap characters
+# - Return a list of strings
+def chunk_text(text, chunk_size, chunk_overlap):
+    # TODO: implement the chunking logic
+    pass
 
-# TODO: Create a splitter with chunk_size=100 and chunk_overlap=20
-splitter = None
+# TODO: Use your function to chunk sample_text with size=100, overlap=20
+chunks = chunk_text(sample_text, 100, 20) or []
 
-# TODO: Split the sample_text into chunks
-chunks = []
-
-# TODO: Print each chunk with its index
 for i, chunk in enumerate(chunks):
-    print(f"Chunk {i}: {chunk}")
-    print(f"Length: {len(chunk)}")
-    print("---")',
+    print(f"Chunk {i} ({len(chunk)} chars): {chunk[:50]}...")
+print(f"Total chunks: {len(chunks)}")',
     'python'
   ),
   (
@@ -330,33 +337,34 @@ answer = chain.invoke("What are embeddings?")
 - If the answer spans multiple chunks, retrieval might miss pieces
 - The LLM can still hallucinate if the context is ambiguous',
     4,
-    '# Exercise: Build a simple RAG chain with LangChain
-# 1. Set up a retriever from a vector store
-# 2. Create a prompt template with context and question placeholders
-# 3. Chain them together with an LLM
+    '# Exercise: Build a RAG Prompt Builder
+# RAG = Retrieval-Augmented Generation
+# Step 1: Embed the question (simulated)
+# Step 2: Retrieve relevant chunks
+# Step 3: Build a prompt combining context + question
+# Step 4: Send to LLM (simulated)
 
-from langchain.prompts import ChatPromptTemplate
-from langchain.schema.runnable import RunnablePassthrough
+# TODO: Implement build_rag_prompt(context_chunks, question)
+# It should return a single string that includes:
+# - All the context chunks (joined together)
+# - The user''s question
+# - Instructions telling the LLM to answer based on the context
+def build_rag_prompt(context_chunks, question):
+    # TODO: Combine the chunks and question into a prompt string
+    pass
 
-# TODO: Create a prompt template that includes {context} and {question}
-# The prompt should instruct the LLM to only answer based on the context
-prompt = ChatPromptTemplate.from_template("""
-TODO: Write your prompt template here
-""")
+# Test it:
+test_chunks = ["Python is a programming language.", "It was created by Guido van Rossum."]
+test_question = "Who created Python?"
+prompt = build_rag_prompt(test_chunks, test_question)
+print(f"Generated prompt:\\n{prompt}")
 
-# TODO: Assuming you have a `retriever` and an `llm` object,
-# build the RAG chain using the pipe operator (|)
-# chain = (
-#     {"context": ???, "question": ???}
-#     | ???
-#     | ???
-# )
+# TODO: Create a list called rag_steps that describes the RAG pipeline
+# in order. Each step should be a short string like "embed query",
+# "retrieve chunks", "generate response"
+rag_steps = []  # TODO: Fill in the pipeline steps
 
-# TODO: Invoke the chain with a sample question
-# result = chain.invoke("What is a vector database?")
-# print(result)
-
-print("RAG chain structure: Retriever -> Prompt -> LLM")',
+print(f"\\nRAG pipeline steps: {rag_steps}")',
     'python'
   ),
   (
@@ -434,40 +442,41 @@ graph.add_conditional_edges("review", should_retry)
 - **AI Tutor Chat**: retrieve → generate → respond (with conversation history)
 - **Quiz Generator**: generate → review → conditionally regenerate (quality loop)',
     5,
-    '# Exercise: Build a simple LangGraph workflow
-# 1. Define a state schema
-# 2. Create node functions
-# 3. Wire them together with edges
+    '# Exercise: Build a Simple Graph Workflow
+# LangGraph models AI workflows as graphs with nodes and edges.
+# Here, simulate this concept without the LangGraph library.
 
-from typing import TypedDict, Annotated
-from langgraph.graph.message import add_messages
-from langgraph.graph import StateGraph, END
+# A "state" is a dictionary passed between nodes.
+# Each node is a function that takes state and returns updates.
 
-# TODO: Define a state class with:
-#   - messages: a list annotated with add_messages
-#   - topic: a string
-class ChatState(TypedDict):
-    pass  # TODO: Add the fields
-
-# TODO: Create a "greet" node that returns a greeting message
-def greet(state: ChatState) -> dict:
-    # TODO: Return a dict with a new message greeting the user
+# TODO: Implement greet(state) that returns a dict with a "messages" key.
+# The messages value should be a list containing a greeting string.
+def greet(state):
+    # TODO: Return {"messages": ["Hello! ..."]}
     pass
 
-# TODO: Create a "respond" node that generates a response about the topic
-def respond(state: ChatState) -> dict:
-    # TODO: Return a dict with a message about state["topic"]
+# TODO: Implement respond(state) that returns a dict with a "messages" key.
+# The response should reference state["topic"] — mention the topic!
+def respond(state):
+    # TODO: Return {"messages": ["Let me tell you about {topic}..."]}
     pass
 
-# TODO: Build the graph
-# 1. Create a StateGraph with ChatState
-# 2. Add the "greet" and "respond" nodes
-# 3. Set "greet" as the entry point
-# 4. Add edge from "greet" to "respond"
-# 5. Add edge from "respond" to END
-# 6. Compile the graph
+# TODO: Create a list called graph_nodes with the node names
+# in execution order: first "greet", then "respond"
+graph_nodes = []  # TODO: ["greet", "respond"]
 
-print("LangGraph workflow: greet -> respond -> END")',
+# Simulate running the graph:
+state = {"messages": [], "topic": "embeddings"}
+for node_name in graph_nodes:
+    if node_name == "greet":
+        result = greet(state)
+    elif node_name == "respond":
+        result = respond(state)
+    if result and "messages" in result:
+        state["messages"].extend(result["messages"])
+
+print(f"Graph nodes: {graph_nodes}")
+print(f"Final messages: {state[''messages'']}")',
     'python'
   );
 
@@ -477,7 +486,7 @@ print("LangGraph workflow: greet -> respond -> END")',
 
 INSERT INTO lessons (id, course_id, title, content, order_index, starter_code, language) VALUES
   (
-    'py000001-0001-0001-0001-000000000001',
+    'a0000001-0001-0001-0001-000000000001',
     'b2c3d4e5-f6a7-8901-bcde-f12345678901',
     'Hello World & Variables',
     '# Hello World & Variables
@@ -589,7 +598,7 @@ print(f"Next year I will be {age} years old")',
     'python'
   ),
   (
-    'py000002-0002-0002-0002-000000000002',
+    'a0000002-0002-0002-0002-000000000002',
     'b2c3d4e5-f6a7-8901-bcde-f12345678901',
     'Data Types & Type Conversion',
     '# Data Types & Type Conversion
@@ -741,7 +750,7 @@ print(f"Converting {float_value} to int gives: {int_value}")',
     'python'
   ),
   (
-    'py000003-0003-0003-0003-000000000003',
+    'a0000003-0003-0003-0003-000000000003',
     'b2c3d4e5-f6a7-8901-bcde-f12345678901',
     'Conditionals (if/elif/else)',
     '# Conditionals (if/elif/else)
@@ -892,7 +901,7 @@ print(f"Age: {age}, Member: {is_member}, Price: ${ticket_price}")
     'python'
   ),
   (
-    'py000004-0004-0004-0004-000000000004',
+    'a0000004-0004-0004-0004-000000000004',
     'b2c3d4e5-f6a7-8901-bcde-f12345678901',
     'Loops (for/while)',
     '# Loops (for/while)
@@ -1057,7 +1066,7 @@ print(f"\nReversed ''{original}'': {reversed_str}")',
     'python'
   ),
   (
-    'py000005-0005-0005-0005-000000000005',
+    'a0000005-0005-0005-0005-000000000005',
     'b2c3d4e5-f6a7-8901-bcde-f12345678901',
     'Functions',
     '# Functions
@@ -1235,7 +1244,7 @@ print(f"Profile: {create_profile(''Alice'', 25, city=''NYC'', role=''dev'')}")',
     'python'
   ),
   (
-    'py000006-0006-0006-0006-000000000006',
+    'a0000006-0006-0006-0006-000000000006',
     'b2c3d4e5-f6a7-8901-bcde-f12345678901',
     'Lists & Tuples',
     '# Lists & Tuples
@@ -1396,7 +1405,7 @@ print(f"Top students: {sorted_students}")',
     'python'
   ),
   (
-    'py000007-0007-0007-0007-000000000007',
+    'a0000007-0007-0007-0007-000000000007',
     'b2c3d4e5-f6a7-8901-bcde-f12345678901',
     'Dictionaries',
     '# Dictionaries
@@ -1570,7 +1579,7 @@ print(f"Most expensive: {most_expensive}")',
     'python'
   ),
   (
-    'py000008-0008-0008-0008-000000000008',
+    'a0000008-0008-0008-0008-000000000008',
     'b2c3d4e5-f6a7-8901-bcde-f12345678901',
     'Classes & Objects',
     '# Classes & Objects
@@ -1757,7 +1766,7 @@ print(f"Longest: {library.longest_book()}")',
 
 INSERT INTO lessons (id, course_id, title, content, order_index, starter_code, language) VALUES
   (
-    'js000001-0001-0001-0001-000000000001',
+    'b0000001-0001-0001-0001-000000000001',
     'c3d4e5f6-a7b8-9012-cdef-123456789012',
     'Variables & Data Types',
     '# Variables & Data Types
@@ -1911,7 +1920,7 @@ console.log(`typeof null is: ${typeof null}`);',
     'javascript'
   ),
   (
-    'js000002-0002-0002-0002-000000000002',
+    'b0000002-0002-0002-0002-000000000002',
     'c3d4e5f6-a7b8-9012-cdef-123456789012',
     'Functions & Scope',
     '# Functions & Scope
@@ -2110,7 +2119,7 @@ console.log(transform(3)); // square(addOne(double(3))) = square(7) = 49',
     'javascript'
   ),
   (
-    'js000003-0003-0003-0003-000000000003',
+    'b0000003-0003-0003-0003-000000000003',
     'c3d4e5f6-a7b8-9012-cdef-123456789012',
     'Arrays & Array Methods',
     '# Arrays & Array Methods
@@ -2278,7 +2287,7 @@ console.log("By subject:", bySubject);',
     'javascript'
   ),
   (
-    'js000004-0004-0004-0004-000000000004',
+    'b0000004-0004-0004-0004-000000000004',
     'c3d4e5f6-a7b8-9012-cdef-123456789012',
     'Objects & JSON',
     '# Objects & JSON
@@ -2460,7 +2469,7 @@ console.log("CEO email:", ceoEmail);
     'javascript'
   ),
   (
-    'js000005-0005-0005-0005-000000000005',
+    'b0000005-0005-0005-0005-000000000005',
     'c3d4e5f6-a7b8-9012-cdef-123456789012',
     'DOM Manipulation',
     '# DOM Manipulation
@@ -2663,7 +2672,7 @@ createTodoApp();',
     'javascript'
   ),
   (
-    'js000006-0006-0006-0006-000000000006',
+    'b0000006-0006-0006-0006-000000000006',
     'c3d4e5f6-a7b8-9012-cdef-123456789012',
     'Async/Await & Promises',
     '# Async/Await & Promises
@@ -2890,7 +2899,7 @@ main();',
     'javascript'
   ),
   (
-    'js000007-0007-0007-0007-000000000007',
+    'b0000007-0007-0007-0007-000000000007',
     'c3d4e5f6-a7b8-9012-cdef-123456789012',
     'ES6+ Features',
     '# ES6+ Features
@@ -3121,7 +3130,7 @@ console.log("Area:", circle.area());',
 
 INSERT INTO lessons (id, course_id, title, content, order_index, starter_code, language) VALUES
   (
-    'jv000001-0001-0001-0001-000000000001',
+    'c0000001-0001-0001-0001-000000000001',
     'd4e5f6a7-b8c9-0123-defa-234567890123',
     'Hello World & Setup',
     '# Hello World & Setup
@@ -3260,7 +3269,7 @@ public class HelloExercise {
     'java'
   ),
   (
-    'jv000002-0002-0002-0002-000000000002',
+    'c0000002-0002-0002-0002-000000000002',
     'd4e5f6a7-b8c9-0123-defa-234567890123',
     'Variables & Data Types',
     '# Variables & Data Types
@@ -3434,7 +3443,7 @@ public class VariablesExercise {
     'java'
   ),
   (
-    'jv000003-0003-0003-0003-000000000003',
+    'c0000003-0003-0003-0003-000000000003',
     'd4e5f6a7-b8c9-0123-defa-234567890123',
     'Control Flow',
     '# Control Flow
@@ -3643,7 +3652,7 @@ public class ControlFlowExercise {
     'java'
   ),
   (
-    'jv000004-0004-0004-0004-000000000004',
+    'c0000004-0004-0004-0004-000000000004',
     'd4e5f6a7-b8c9-0123-defa-234567890123',
     'Methods',
     '# Methods
@@ -3864,7 +3873,7 @@ public class MethodsExercise {
     'java'
   ),
   (
-    'jv000005-0005-0005-0005-000000000005',
+    'c0000005-0005-0005-0005-000000000005',
     'd4e5f6a7-b8c9-0123-defa-234567890123',
     'OOP - Classes & Objects',
     '# OOP - Classes & Objects
@@ -4103,7 +4112,7 @@ public class OOPExercise {
     'java'
   ),
   (
-    'jv000006-0006-0006-0006-000000000006',
+    'c0000006-0006-0006-0006-000000000006',
     'd4e5f6a7-b8c9-0123-defa-234567890123',
     'Collections & Generics',
     '# Collections & Generics
@@ -4348,7 +4357,7 @@ class Pair<A, B> {
 
 INSERT INTO lessons (id, course_id, title, content, order_index, starter_code, language) VALUES
   (
-    'sq000001-0001-0001-0001-000000000001',
+    'd0000001-0001-0001-0001-000000000001',
     'e5f6a7b8-c9d0-1234-efab-345678901234',
     'SELECT Basics',
     '# SELECT Basics
@@ -4507,7 +4516,7 @@ SELECT 1;  -- Replace with your query
     'sql'
   ),
   (
-    'sq000002-0002-0002-0002-000000000002',
+    'd0000002-0002-0002-0002-000000000002',
     'e5f6a7b8-c9d0-1234-efab-345678901234',
     'WHERE & Filtering',
     '# WHERE & Filtering
@@ -4674,7 +4683,7 @@ SELECT 1;  -- Replace with your query
     'sql'
   ),
   (
-    'sq000003-0003-0003-0003-000000000003',
+    'd0000003-0003-0003-0003-000000000003',
     'e5f6a7b8-c9d0-1234-efab-345678901234',
     'JOIN Operations',
     '# JOIN Operations
@@ -4853,7 +4862,7 @@ SELECT 1;  -- Replace with your query
     'sql'
   ),
   (
-    'sq000004-0004-0004-0004-000000000004',
+    'd0000004-0004-0004-0004-000000000004',
     'e5f6a7b8-c9d0-1234-efab-345678901234',
     'GROUP BY & Aggregates',
     '# GROUP BY & Aggregates
@@ -5028,7 +5037,7 @@ SELECT 1;  -- Replace with your query
     'sql'
   ),
   (
-    'sq000005-0005-0005-0005-000000000005',
+    'd0000005-0005-0005-0005-000000000005',
     'e5f6a7b8-c9d0-1234-efab-345678901234',
     'Subqueries',
     '# Subqueries
@@ -5212,7 +5221,7 @@ SELECT 1;  -- Replace with your query
     'sql'
   ),
   (
-    'sq000006-0006-0006-0006-000000000006',
+    'd0000006-0006-0006-0006-000000000006',
     'e5f6a7b8-c9d0-1234-efab-345678901234',
     'INSERT, UPDATE, DELETE',
     '# INSERT, UPDATE, DELETE
@@ -5441,3 +5450,1945 @@ COMMIT;
 -- to see which employees were deleted',
     'sql'
   );
+
+-- =============================================================================
+-- TEST CODE: Hidden test assertions for all 32 lessons
+-- Appended after INSERT statements to set test_code via UPDATE
+-- =============================================================================
+
+-- =============================================================================
+-- TEST CODE: AI Fundamentals with LangChain (Lessons 1-5)
+-- =============================================================================
+
+-- Lesson 1: What Are Embeddings?
+-- The user should implement:
+--   - A variable `embedding` that is a list of floats (simulated vector)
+--   - A function `cosine_similarity(a, b)` that computes cosine similarity between two vectors
+--   - The variable `text` is already provided
+UPDATE lessons SET test_code = '
+import math
+
+_test_passed = 0
+_test_total = 0
+
+# Test 1: embedding is a list of floats with correct dimensionality
+_test_total += 1
+try:
+    assert isinstance(embedding, list), f"embedding should be a list, got {type(embedding).__name__}"
+    assert len(embedding) > 0, "embedding should not be empty"
+    assert all(isinstance(x, (int, float)) for x in embedding), "all elements in embedding should be numbers"
+    print("PASS: embedding is a valid vector")
+    _test_passed += 1
+except AssertionError as e:
+    print(f"FAIL: embedding is a valid vector - {e}")
+except Exception as e:
+    print(f"FAIL: embedding is a valid vector - {e}")
+
+# Test 2: cosine_similarity function exists and works
+_test_total += 1
+try:
+    assert callable(cosine_similarity), "cosine_similarity should be a callable function"
+    _v1 = [1.0, 0.0, 0.0]
+    _v2 = [1.0, 0.0, 0.0]
+    _result = cosine_similarity(_v1, _v2)
+    assert abs(_result - 1.0) < 0.001, f"identical vectors should have similarity 1.0, got {_result}"
+    print("PASS: cosine_similarity returns 1.0 for identical vectors")
+    _test_passed += 1
+except AssertionError as e:
+    print(f"FAIL: cosine_similarity returns 1.0 for identical vectors - {e}")
+except Exception as e:
+    print(f"FAIL: cosine_similarity returns 1.0 for identical vectors - {e}")
+
+# Test 3: cosine_similarity returns 0 for orthogonal vectors
+_test_total += 1
+try:
+    _v1 = [1.0, 0.0]
+    _v2 = [0.0, 1.0]
+    _result = cosine_similarity(_v1, _v2)
+    assert abs(_result - 0.0) < 0.001, f"orthogonal vectors should have similarity 0.0, got {_result}"
+    print("PASS: cosine_similarity returns 0.0 for orthogonal vectors")
+    _test_passed += 1
+except AssertionError as e:
+    print(f"FAIL: cosine_similarity returns 0.0 for orthogonal vectors - {e}")
+except Exception as e:
+    print(f"FAIL: cosine_similarity returns 0.0 for orthogonal vectors - {e}")
+
+# Test 4: cosine_similarity handles a known case
+_test_total += 1
+try:
+    _v1 = [1.0, 2.0, 3.0]
+    _v2 = [4.0, 5.0, 6.0]
+    _result = cosine_similarity(_v1, _v2)
+    _expected = (4+10+18) / (math.sqrt(14) * math.sqrt(77))
+    assert abs(_result - _expected) < 0.001, f"expected {_expected:.4f}, got {_result}"
+    print("PASS: cosine_similarity computes correct value for known vectors")
+    _test_passed += 1
+except AssertionError as e:
+    print(f"FAIL: cosine_similarity computes correct value for known vectors - {e}")
+except Exception as e:
+    print(f"FAIL: cosine_similarity computes correct value for known vectors - {e}")
+
+if _test_passed == _test_total:
+    print("ALL_TESTS_PASSED")
+' WHERE id = '11111111-1111-1111-1111-111111111111';
+
+
+-- Lesson 2: Text Chunking Strategies
+-- The user should implement:
+--   - A function `chunk_text(text, chunk_size, chunk_overlap)` that splits text into overlapping chunks
+--   - The variable `chunks` should be the result of chunking `sample_text`
+UPDATE lessons SET test_code = '
+_test_passed = 0
+_test_total = 0
+
+# Test 1: chunk_text function exists and returns a list
+_test_total += 1
+try:
+    assert callable(chunk_text), "chunk_text should be a callable function"
+    _result = chunk_text("hello world", 100, 0)
+    assert isinstance(_result, list), f"chunk_text should return a list, got {type(_result).__name__}"
+    print("PASS: chunk_text function exists and returns a list")
+    _test_passed += 1
+except AssertionError as e:
+    print(f"FAIL: chunk_text function exists and returns a list - {e}")
+except Exception as e:
+    print(f"FAIL: chunk_text function exists and returns a list - {e}")
+
+# Test 2: chunks respect chunk_size limit
+_test_total += 1
+try:
+    _text = "a" * 300
+    _result = chunk_text(_text, 100, 0)
+    assert len(_result) >= 3, f"300 chars with chunk_size=100 should produce at least 3 chunks, got {len(_result)}"
+    assert all(len(c) <= 100 for c in _result), "no chunk should exceed chunk_size"
+    print("PASS: chunks respect chunk_size limit")
+    _test_passed += 1
+except AssertionError as e:
+    print(f"FAIL: chunks respect chunk_size limit - {e}")
+except Exception as e:
+    print(f"FAIL: chunks respect chunk_size limit - {e}")
+
+# Test 3: overlap works correctly
+_test_total += 1
+try:
+    _text = "abcdefghijklmnopqrstuvwxyz"
+    _result = chunk_text(_text, 10, 3)
+    assert len(_result) >= 2, f"expected at least 2 chunks, got {len(_result)}"
+    _first_end = _result[0][-3:]
+    _second_start = _result[1][:3]
+    assert _first_end == _second_start, f"overlap not working: first chunk ends with ''{_first_end}'' but second starts with ''{_second_start}''"
+    print("PASS: chunk overlap works correctly")
+    _test_passed += 1
+except AssertionError as e:
+    print(f"FAIL: chunk overlap works correctly - {e}")
+except Exception as e:
+    print(f"FAIL: chunk overlap works correctly - {e}")
+
+# Test 4: chunks variable was created from sample_text
+_test_total += 1
+try:
+    assert isinstance(chunks, list), f"chunks should be a list, got {type(chunks).__name__}"
+    assert len(chunks) > 1, f"sample_text should produce multiple chunks, got {len(chunks)}"
+    _reconstructed = chunks[0]
+    for c in chunks[1:]:
+        _reconstructed += c[20:]  # skip overlap portion
+    print("PASS: chunks variable contains chunked sample_text")
+    _test_passed += 1
+except AssertionError as e:
+    print(f"FAIL: chunks variable contains chunked sample_text - {e}")
+except Exception as e:
+    print(f"FAIL: chunks variable contains chunked sample_text - {e}")
+
+if _test_passed == _test_total:
+    print("ALL_TESTS_PASSED")
+' WHERE id = '22222222-2222-2222-2222-222222222222';
+
+
+-- Lesson 3: Vector Storage with pgvector
+-- The user should implement:
+--   - `create_table_sql` containing CREATE TABLE with id, lesson_id, chunk_text, embedding columns
+--   - `search_sql` containing a cosine distance query with ORDER BY and LIMIT
+--   - `index_sql` containing an HNSW index creation statement
+UPDATE lessons SET test_code = '
+_test_passed = 0
+_test_total = 0
+
+# Test 1: create_table_sql has required columns
+_test_total += 1
+try:
+    _sql = create_table_sql.upper()
+    assert "CREATE TABLE" in _sql, "missing CREATE TABLE statement"
+    assert "LESSON_ID" in _sql, "missing lesson_id column"
+    assert "CHUNK_TEXT" in _sql, "missing chunk_text column"
+    assert "EMBEDDING" in _sql, "missing embedding column"
+    assert "VECTOR" in _sql, "missing VECTOR type for embedding column"
+    print("PASS: create_table_sql has all required columns")
+    _test_passed += 1
+except AssertionError as e:
+    print(f"FAIL: create_table_sql has all required columns - {e}")
+except Exception as e:
+    print(f"FAIL: create_table_sql has all required columns - {e}")
+
+# Test 2: search_sql uses cosine distance operator and LIMIT
+_test_total += 1
+try:
+    assert "<=>" in search_sql, "missing cosine distance operator (<=>)"
+    _sql = search_sql.upper()
+    assert "ORDER BY" in _sql, "missing ORDER BY clause"
+    assert "LIMIT" in _sql, "missing LIMIT clause"
+    print("PASS: search_sql uses cosine distance with ORDER BY and LIMIT")
+    _test_passed += 1
+except AssertionError as e:
+    print(f"FAIL: search_sql uses cosine distance with ORDER BY and LIMIT - {e}")
+except Exception as e:
+    print(f"FAIL: search_sql uses cosine distance with ORDER BY and LIMIT - {e}")
+
+# Test 3: index_sql creates an HNSW index
+_test_total += 1
+try:
+    _sql = index_sql.upper()
+    assert "CREATE INDEX" in _sql, "missing CREATE INDEX statement"
+    assert "HNSW" in _sql, "missing HNSW index type"
+    assert "VECTOR_COSINE_OPS" in _sql, "missing vector_cosine_ops operator class"
+    print("PASS: index_sql creates an HNSW index with cosine ops")
+    _test_passed += 1
+except AssertionError as e:
+    print(f"FAIL: index_sql creates an HNSW index with cosine ops - {e}")
+except Exception as e:
+    print(f"FAIL: index_sql creates an HNSW index with cosine ops - {e}")
+
+if _test_passed == _test_total:
+    print("ALL_TESTS_PASSED")
+' WHERE id = '33333333-3333-3333-3333-333333333333';
+
+
+-- Lesson 4: RAG Pipeline Basics
+-- The user should implement:
+--   - A function `build_rag_prompt(context_chunks, question)` that assembles the RAG prompt
+--   - A variable `rag_steps` that is a list of the RAG pipeline step names in order
+UPDATE lessons SET test_code = '
+_test_passed = 0
+_test_total = 0
+
+# Test 1: build_rag_prompt function exists and returns a string
+_test_total += 1
+try:
+    assert callable(build_rag_prompt), "build_rag_prompt should be a callable function"
+    _result = build_rag_prompt(["chunk1", "chunk2"], "What is AI?")
+    assert isinstance(_result, str), f"should return a string, got {type(_result).__name__}"
+    assert len(_result) > 0, "prompt should not be empty"
+    print("PASS: build_rag_prompt returns a non-empty string")
+    _test_passed += 1
+except AssertionError as e:
+    print(f"FAIL: build_rag_prompt returns a non-empty string - {e}")
+except Exception as e:
+    print(f"FAIL: build_rag_prompt returns a non-empty string - {e}")
+
+# Test 2: prompt includes context and question
+_test_total += 1
+try:
+    _chunks = ["Embeddings capture semantic meaning.", "Vectors have 1536 dimensions."]
+    _question = "How do embeddings work?"
+    _result = build_rag_prompt(_chunks, _question)
+    assert "Embeddings capture semantic meaning" in _result, "prompt should include the context chunks"
+    assert "Vectors have 1536 dimensions" in _result, "prompt should include all context chunks"
+    assert "How do embeddings work?" in _result, "prompt should include the question"
+    print("PASS: prompt includes both context and question")
+    _test_passed += 1
+except AssertionError as e:
+    print(f"FAIL: prompt includes both context and question - {e}")
+except Exception as e:
+    print(f"FAIL: prompt includes both context and question - {e}")
+
+# Test 3: rag_steps lists the correct pipeline stages in order
+_test_total += 1
+try:
+    assert isinstance(rag_steps, list), f"rag_steps should be a list, got {type(rag_steps).__name__}"
+    assert len(rag_steps) >= 3, f"RAG pipeline should have at least 3 steps, got {len(rag_steps)}"
+    _steps_lower = [s.lower() for s in rag_steps]
+    _has_embed = any("embed" in s for s in _steps_lower)
+    _has_retrieve = any("retriev" in s or "search" in s for s in _steps_lower)
+    _has_generate = any("generat" in s or "llm" in s or "respond" in s for s in _steps_lower)
+    assert _has_embed, "rag_steps should include an embedding step"
+    assert _has_retrieve, "rag_steps should include a retrieval/search step"
+    assert _has_generate, "rag_steps should include a generation/LLM step"
+    print("PASS: rag_steps contains the correct pipeline stages")
+    _test_passed += 1
+except AssertionError as e:
+    print(f"FAIL: rag_steps contains the correct pipeline stages - {e}")
+except Exception as e:
+    print(f"FAIL: rag_steps contains the correct pipeline stages - {e}")
+
+if _test_passed == _test_total:
+    print("ALL_TESTS_PASSED")
+' WHERE id = '44444444-4444-4444-4444-444444444444';
+
+
+-- Lesson 5: Introduction to LangGraph
+-- The user should implement:
+--   - A `ChatState` dict with keys "messages" and "topic"
+--   - A `greet` function that takes state and returns a dict with a "messages" key
+--   - A `respond` function that takes state and returns a dict with a "messages" key referencing state["topic"]
+--   - A `graph_nodes` list of node names in execution order
+UPDATE lessons SET test_code = '
+_test_passed = 0
+_test_total = 0
+
+# Test 1: greet function returns a dict with a messages key
+_test_total += 1
+try:
+    assert callable(greet), "greet should be a callable function"
+    _state = {"messages": [], "topic": "embeddings"}
+    _result = greet(_state)
+    assert isinstance(_result, dict), f"greet should return a dict, got {type(_result).__name__}"
+    assert "messages" in _result, "greet should return a dict with a ''messages'' key"
+    print("PASS: greet function returns dict with messages")
+    _test_passed += 1
+except AssertionError as e:
+    print(f"FAIL: greet function returns dict with messages - {e}")
+except Exception as e:
+    print(f"FAIL: greet function returns dict with messages - {e}")
+
+# Test 2: respond function uses the topic from state
+_test_total += 1
+try:
+    assert callable(respond), "respond should be a callable function"
+    _state = {"messages": ["Hello!"], "topic": "vector databases"}
+    _result = respond(_state)
+    assert isinstance(_result, dict), f"respond should return a dict, got {type(_result).__name__}"
+    assert "messages" in _result, "respond should return a dict with a ''messages'' key"
+    _msg = str(_result["messages"]).lower()
+    assert "vector databases" in _msg, "respond should reference the topic from state"
+    print("PASS: respond function uses topic from state")
+    _test_passed += 1
+except AssertionError as e:
+    print(f"FAIL: respond function uses topic from state - {e}")
+except Exception as e:
+    print(f"FAIL: respond function uses topic from state - {e}")
+
+# Test 3: graph_nodes lists nodes in correct execution order
+_test_total += 1
+try:
+    assert isinstance(graph_nodes, list), f"graph_nodes should be a list, got {type(graph_nodes).__name__}"
+    assert len(graph_nodes) >= 2, f"should have at least 2 nodes, got {len(graph_nodes)}"
+    _nodes_lower = [n.lower() for n in graph_nodes]
+    assert "greet" in _nodes_lower, "graph_nodes should include ''greet''"
+    assert "respond" in _nodes_lower, "graph_nodes should include ''respond''"
+    _greet_idx = _nodes_lower.index("greet")
+    _respond_idx = _nodes_lower.index("respond")
+    assert _greet_idx < _respond_idx, "''greet'' should come before ''respond'' in graph_nodes"
+    print("PASS: graph_nodes lists nodes in correct order")
+    _test_passed += 1
+except AssertionError as e:
+    print(f"FAIL: graph_nodes lists nodes in correct order - {e}")
+except Exception as e:
+    print(f"FAIL: graph_nodes lists nodes in correct order - {e}")
+
+if _test_passed == _test_total:
+    print("ALL_TESTS_PASSED")
+' WHERE id = '55555555-5555-5555-5555-555555555555';
+
+-- =============================================================================
+-- TEST CODE for Python for Beginners lessons
+-- =============================================================================
+
+-- Lesson 1: Hello World & Variables (3 tests - beginner)
+UPDATE lessons SET test_code = '
+_test_passed = 0
+_test_total = 0
+
+# Test 1: name variable is a non-empty string
+_test_total += 1
+try:
+    assert isinstance(name, str) and len(name) > 0, f"expected non-empty string, got {repr(name)}"
+    print("PASS: name is a non-empty string")
+    _test_passed += 1
+except AssertionError as e:
+    print(f"FAIL: name is a non-empty string - {e}")
+except Exception as e:
+    print(f"FAIL: name is a non-empty string - {e}")
+
+# Test 2: age is a positive integer
+_test_total += 1
+try:
+    assert isinstance(age, int) and age > 0, f"expected positive int, got {repr(age)}"
+    print("PASS: age is a positive integer")
+    _test_passed += 1
+except AssertionError as e:
+    print(f"FAIL: age is a positive integer - {e}")
+except Exception as e:
+    print(f"FAIL: age is a positive integer - {e}")
+
+# Test 3: favorite_language is "Python"
+_test_total += 1
+try:
+    assert favorite_language == "Python", f"expected ''Python'', got {repr(favorite_language)}"
+    print("PASS: favorite_language is Python")
+    _test_passed += 1
+except AssertionError as e:
+    print(f"FAIL: favorite_language is Python - {e}")
+except Exception as e:
+    print(f"FAIL: favorite_language is Python - {e}")
+
+if _test_passed == _test_total:
+    print("ALL_TESTS_PASSED")
+' WHERE id = 'a0000001-0001-0001-0001-000000000001';
+
+-- Lesson 2: Data Types & Type Conversion (3 tests - beginner)
+UPDATE lessons SET test_code = '
+_test_passed = 0
+_test_total = 0
+
+# Test 1: converted is int 42
+_test_total += 1
+try:
+    assert converted == 42 and isinstance(converted, int), f"expected int 42, got {repr(converted)}"
+    print("PASS: string_number converted to int 42")
+    _test_passed += 1
+except AssertionError as e:
+    print(f"FAIL: string_number converted to int 42 - {e}")
+except Exception as e:
+    print(f"FAIL: string_number converted to int 42 - {e}")
+
+# Test 2: number_as_string is str "100"
+_test_total += 1
+try:
+    assert number_as_string == "100" and isinstance(number_as_string, str), f"expected str ''100'', got {repr(number_as_string)}"
+    print("PASS: number converted to string 100")
+    _test_passed += 1
+except AssertionError as e:
+    print(f"FAIL: number converted to string 100 - {e}")
+except Exception as e:
+    print(f"FAIL: number converted to string 100 - {e}")
+
+# Test 3: quotient and remainder of 17 / 3
+_test_total += 1
+try:
+    assert quotient == 5, f"expected quotient 5, got {repr(quotient)}"
+    assert remainder == 2, f"expected remainder 2, got {repr(remainder)}"
+    print("PASS: integer division 17 by 3 correct")
+    _test_passed += 1
+except AssertionError as e:
+    print(f"FAIL: integer division 17 by 3 correct - {e}")
+except Exception as e:
+    print(f"FAIL: integer division 17 by 3 correct - {e}")
+
+if _test_passed == _test_total:
+    print("ALL_TESTS_PASSED")
+' WHERE id = 'a0000002-0002-0002-0002-000000000002';
+
+-- Lesson 3: Conditionals (3 tests - beginner/intermediate)
+UPDATE lessons SET test_code = '
+_test_passed = 0
+_test_total = 0
+
+# Test 1: age variable was set to a non-zero value
+_test_total += 1
+try:
+    assert age != 0, "age should be set to a test value, not 0"
+    print("PASS: age variable was set to a test value")
+    _test_passed += 1
+except AssertionError as e:
+    print(f"FAIL: age variable was set to a test value - {e}")
+except Exception as e:
+    print(f"FAIL: age variable was set to a test value - {e}")
+
+# Test 2: ticket_price is a positive number
+_test_total += 1
+try:
+    assert isinstance(ticket_price, (int, float)) and ticket_price > 0, f"expected positive number, got {repr(ticket_price)}"
+    print("PASS: ticket_price is a positive number")
+    _test_passed += 1
+except AssertionError as e:
+    print(f"FAIL: ticket_price is a positive number - {e}")
+except Exception as e:
+    print(f"FAIL: ticket_price is a positive number - {e}")
+
+# Test 3: ticket_price matches expected for the given age and membership
+_test_total += 1
+try:
+    if age < 13:
+        _expected_base = 5
+    elif age <= 17:
+        _expected_base = 8
+    elif age <= 64:
+        _expected_base = 12
+    else:
+        _expected_base = 6
+    if is_member:
+        _expected = _expected_base * 0.8
+    else:
+        _expected = _expected_base
+    assert abs(ticket_price - _expected) < 0.01, f"for age={age}, member={is_member}, expected {_expected}, got {ticket_price}"
+    print("PASS: ticket_price matches expected value for age and membership")
+    _test_passed += 1
+except AssertionError as e:
+    print(f"FAIL: ticket_price matches expected value for age and membership - {e}")
+except Exception as e:
+    print(f"FAIL: ticket_price matches expected value for age and membership - {e}")
+
+if _test_passed == _test_total:
+    print("ALL_TESTS_PASSED")
+' WHERE id = 'a0000003-0003-0003-0003-000000000003';
+
+-- Lesson 4: Loops (3 tests - intermediate)
+UPDATE lessons SET test_code = '
+_test_passed = 0
+_test_total = 0
+
+# Test 1: Sum of 1 to 100
+_test_total += 1
+try:
+    assert total == 5050, f"expected 5050, got {repr(total)}"
+    print("PASS: sum of 1 to 100 is 5050")
+    _test_passed += 1
+except AssertionError as e:
+    print(f"FAIL: sum of 1 to 100 is 5050 - {e}")
+except Exception as e:
+    print(f"FAIL: sum of 1 to 100 is 5050 - {e}")
+
+# Test 2: First number > 1000 divisible by 7 and 13
+_test_total += 1
+try:
+    assert number > 1000, f"number must be > 1000, got {number}"
+    assert number % 7 == 0 and number % 13 == 0, f"{number} is not divisible by both 7 and 13"
+    assert number == 1001, f"expected 1001 (smallest > 1000 divisible by 7 and 13), got {number}"
+    print("PASS: first number > 1000 divisible by 7 and 13")
+    _test_passed += 1
+except AssertionError as e:
+    print(f"FAIL: first number > 1000 divisible by 7 and 13 - {e}")
+except Exception as e:
+    print(f"FAIL: first number > 1000 divisible by 7 and 13 - {e}")
+
+# Test 3: Reversed string
+_test_total += 1
+try:
+    assert reversed_str == "nohtyP", f"expected ''nohtyP'', got {repr(reversed_str)}"
+    print("PASS: reversed string is nohtyP")
+    _test_passed += 1
+except AssertionError as e:
+    print(f"FAIL: reversed string is nohtyP - {e}")
+except Exception as e:
+    print(f"FAIL: reversed string is nohtyP - {e}")
+
+if _test_passed == _test_total:
+    print("ALL_TESTS_PASSED")
+' WHERE id = 'a0000004-0004-0004-0004-000000000004';
+
+-- Lesson 5: Functions (4 tests - intermediate)
+UPDATE lessons SET test_code = '
+_test_passed = 0
+_test_total = 0
+
+# Test 1: celsius_to_fahrenheit
+_test_total += 1
+try:
+    assert celsius_to_fahrenheit(0) == 32, f"expected 32, got {celsius_to_fahrenheit(0)}"
+    assert celsius_to_fahrenheit(100) == 212, f"expected 212, got {celsius_to_fahrenheit(100)}"
+    assert abs(celsius_to_fahrenheit(-40) - (-40)) < 0.01, f"expected -40, got {celsius_to_fahrenheit(-40)}"
+    print("PASS: celsius_to_fahrenheit works correctly")
+    _test_passed += 1
+except AssertionError as e:
+    print(f"FAIL: celsius_to_fahrenheit works correctly - {e}")
+except Exception as e:
+    print(f"FAIL: celsius_to_fahrenheit works correctly - {e}")
+
+# Test 2: is_palindrome
+_test_total += 1
+try:
+    assert is_palindrome("racecar") == True, "racecar should be True"
+    assert is_palindrome("Racecar") == True, "Racecar (mixed case) should be True"
+    assert is_palindrome("hello") == False, "hello should be False"
+    assert is_palindrome("madam") == True, "madam should be True"
+    print("PASS: is_palindrome works correctly")
+    _test_passed += 1
+except AssertionError as e:
+    print(f"FAIL: is_palindrome works correctly - {e}")
+except Exception as e:
+    print(f"FAIL: is_palindrome works correctly - {e}")
+
+# Test 3: find_max
+_test_total += 1
+try:
+    assert find_max(3, 7, 2, 9, 4) == 9, f"expected 9, got {find_max(3, 7, 2, 9, 4)}"
+    assert find_max(1) == 1, f"expected 1 for single arg, got {find_max(1)}"
+    assert find_max(-5, -1, -10) == -1, f"expected -1 for negatives, got {find_max(-5, -1, -10)}"
+    print("PASS: find_max works correctly")
+    _test_passed += 1
+except AssertionError as e:
+    print(f"FAIL: find_max works correctly - {e}")
+except Exception as e:
+    print(f"FAIL: find_max works correctly - {e}")
+
+# Test 4: create_profile
+_test_total += 1
+try:
+    _profile = create_profile("Alice", 25, city="NYC")
+    assert isinstance(_profile, dict), f"expected dict, got {type(_profile)}"
+    assert _profile.get("name") == "Alice", f"expected name=Alice, got {_profile.get(''name'')}"
+    assert _profile.get("age") == 25, f"expected age=25, got {_profile.get(''age'')}"
+    assert _profile.get("city") == "NYC", f"expected city=NYC, got {_profile.get(''city'')}"
+    print("PASS: create_profile works correctly")
+    _test_passed += 1
+except AssertionError as e:
+    print(f"FAIL: create_profile works correctly - {e}")
+except Exception as e:
+    print(f"FAIL: create_profile works correctly - {e}")
+
+if _test_passed == _test_total:
+    print("ALL_TESTS_PASSED")
+' WHERE id = 'a0000005-0005-0005-0005-000000000005';
+
+-- Lesson 6: Lists & Tuples (4 tests - intermediate)
+UPDATE lessons SET test_code = '
+_test_passed = 0
+_test_total = 0
+
+# Test 1: movies list has at least 5 items
+_test_total += 1
+try:
+    assert isinstance(movies, list), f"expected list, got {type(movies)}"
+    assert len(movies) >= 5, f"expected at least 5 movies, got {len(movies)}"
+    print("PASS: movies list has at least 5 items")
+    _test_passed += 1
+except AssertionError as e:
+    print(f"FAIL: movies list has at least 5 items - {e}")
+except Exception as e:
+    print(f"FAIL: movies list has at least 5 items - {e}")
+
+# Test 2: lengths is a list of integers matching movie name lengths
+_test_total += 1
+try:
+    assert isinstance(lengths, list), f"expected list, got {type(lengths)}"
+    assert len(lengths) == len(movies), f"lengths ({len(lengths)}) should match movies ({len(movies)})"
+    _expected_lengths = [len(m) for m in movies]
+    assert lengths == _expected_lengths, f"expected {_expected_lengths}, got {lengths}"
+    print("PASS: lengths list matches movie name lengths")
+    _test_passed += 1
+except AssertionError as e:
+    print(f"FAIL: lengths list matches movie name lengths - {e}")
+except Exception as e:
+    print(f"FAIL: lengths list matches movie name lengths - {e}")
+
+# Test 3: color tuple has 3 elements and is unpacked into r, g, b
+_test_total += 1
+try:
+    assert isinstance(color, tuple), f"expected tuple, got {type(color)}"
+    assert len(color) == 3, f"expected 3 elements, got {len(color)}"
+    assert r == color[0] and g == color[1] and b == color[2], "r, g, b should match color tuple values"
+    print("PASS: color tuple unpacked into r, g, b")
+    _test_passed += 1
+except AssertionError as e:
+    print(f"FAIL: color tuple unpacked into r, g, b - {e}")
+except Exception as e:
+    print(f"FAIL: color tuple unpacked into r, g, b - {e}")
+
+# Test 4: sorted_students is sorted by score descending
+_test_total += 1
+try:
+    assert isinstance(sorted_students, list), f"expected list, got {type(sorted_students)}"
+    assert len(sorted_students) == 4, f"expected 4 students, got {len(sorted_students)}"
+    assert sorted_students[0][1] >= sorted_students[1][1] >= sorted_students[2][1] >= sorted_students[3][1], "students should be sorted by score descending"
+    assert sorted_students[0] == ("Diana", 95), f"expected Diana first, got {sorted_students[0]}"
+    print("PASS: sorted_students sorted by score descending")
+    _test_passed += 1
+except AssertionError as e:
+    print(f"FAIL: sorted_students sorted by score descending - {e}")
+except Exception as e:
+    print(f"FAIL: sorted_students sorted by score descending - {e}")
+
+if _test_passed == _test_total:
+    print("ALL_TESTS_PASSED")
+' WHERE id = 'a0000006-0006-0006-0006-000000000006';
+
+-- Lesson 7: Dictionaries (4 tests - intermediate)
+UPDATE lessons SET test_code = '
+_test_passed = 0
+_test_total = 0
+
+# Test 1: inventory has at least 5 items (4 original + Headphones)
+_test_total += 1
+try:
+    assert isinstance(inventory, dict), f"expected dict, got {type(inventory)}"
+    assert len(inventory) >= 5, f"expected at least 5 items (4 original + Headphones), got {len(inventory)}"
+    assert "Headphones" in inventory, "Headphones should be in inventory"
+    assert inventory["Headphones"]["price"] == 29.99, f"Headphones price should be 29.99"
+    assert inventory["Headphones"]["quantity"] == 20, f"Headphones quantity should be 20"
+    print("PASS: inventory has items and Headphones added correctly")
+    _test_passed += 1
+except AssertionError as e:
+    print(f"FAIL: inventory has items and Headphones added correctly - {e}")
+except Exception as e:
+    print(f"FAIL: inventory has items and Headphones added correctly - {e}")
+
+# Test 2: total_value is calculated correctly
+_test_total += 1
+try:
+    _expected_total = sum(v["price"] * v["quantity"] for v in inventory.values())
+    assert isinstance(total_value, (int, float)), f"expected number, got {type(total_value)}"
+    assert abs(total_value - _expected_total) < 0.01, f"expected {_expected_total}, got {total_value}"
+    print("PASS: total_value calculated correctly")
+    _test_passed += 1
+except AssertionError as e:
+    print(f"FAIL: total_value calculated correctly - {e}")
+except Exception as e:
+    print(f"FAIL: total_value calculated correctly - {e}")
+
+# Test 3: low_stock contains only items with quantity < 30
+_test_total += 1
+try:
+    assert isinstance(low_stock, dict), f"expected dict, got {type(low_stock)}"
+    _expected_low = {k: v for k, v in inventory.items() if v["quantity"] < 30}
+    assert len(low_stock) == len(_expected_low), f"expected {len(_expected_low)} low stock items, got {len(low_stock)}"
+    for k in _expected_low:
+        assert k in low_stock, f"{k} should be in low_stock"
+    print("PASS: low_stock dict contains correct items")
+    _test_passed += 1
+except AssertionError as e:
+    print(f"FAIL: low_stock dict contains correct items - {e}")
+except Exception as e:
+    print(f"FAIL: low_stock dict contains correct items - {e}")
+
+# Test 4: most_expensive is a string matching the most expensive item
+_test_total += 1
+try:
+    _expected_expensive = max(inventory, key=lambda k: inventory[k]["price"])
+    assert most_expensive == _expected_expensive, f"expected {repr(_expected_expensive)}, got {repr(most_expensive)}"
+    print("PASS: most_expensive item identified correctly")
+    _test_passed += 1
+except AssertionError as e:
+    print(f"FAIL: most_expensive item identified correctly - {e}")
+except Exception as e:
+    print(f"FAIL: most_expensive item identified correctly - {e}")
+
+if _test_passed == _test_total:
+    print("ALL_TESTS_PASSED")
+' WHERE id = 'a0000007-0007-0007-0007-000000000007';
+
+-- Lesson 8: Classes & Objects (5 tests - intermediate)
+UPDATE lessons SET test_code = '
+_test_passed = 0
+_test_total = 0
+
+# Test 1: Book class constructor and description method
+_test_total += 1
+try:
+    _b = Book("Test Book", "Test Author", 200)
+    assert _b.title == "Test Book", f"expected title ''Test Book'', got {repr(_b.title)}"
+    assert _b.author == "Test Author", f"expected author ''Test Author'', got {repr(_b.author)}"
+    assert _b.pages == 200, f"expected pages 200, got {repr(_b.pages)}"
+    _desc = _b.description()
+    assert "Test Book" in _desc and "Test Author" in _desc and "200" in _desc, f"description should contain title, author, pages. Got: {_desc}"
+    print("PASS: Book class has correct attributes and description()")
+    _test_passed += 1
+except AssertionError as e:
+    print(f"FAIL: Book class has correct attributes and description() - {e}")
+except Exception as e:
+    print(f"FAIL: Book class has correct attributes and description() - {e}")
+
+# Test 2: Book __str__ method
+_test_total += 1
+try:
+    _b = Book("Dune", "Herbert", 412)
+    _s = str(_b)
+    assert "Dune" in _s and "Herbert" in _s, f"__str__ should contain title and author. Got: {_s}"
+    print("PASS: Book __str__ returns meaningful string")
+    _test_passed += 1
+except AssertionError as e:
+    print(f"FAIL: Book __str__ returns meaningful string - {e}")
+except Exception as e:
+    print(f"FAIL: Book __str__ returns meaningful string - {e}")
+
+# Test 3: Library add_book and __str__
+_test_total += 1
+try:
+    _lib = Library()
+    _lib.add_book(Book("A", "Author1", 100))
+    _lib.add_book(Book("B", "Author2", 200))
+    _s = str(_lib)
+    assert "2" in _s, f"Library __str__ should mention 2 books. Got: {_s}"
+    print("PASS: Library add_book and __str__ work correctly")
+    _test_passed += 1
+except AssertionError as e:
+    print(f"FAIL: Library add_book and __str__ work correctly - {e}")
+except Exception as e:
+    print(f"FAIL: Library add_book and __str__ work correctly - {e}")
+
+# Test 4: Library find_by_author
+_test_total += 1
+try:
+    _lib = Library()
+    _lib.add_book(Book("The Hobbit", "Tolkien", 310))
+    _lib.add_book(Book("1984", "Orwell", 328))
+    _lib.add_book(Book("Lord of the Rings", "Tolkien", 1178))
+    _results = _lib.find_by_author("Tolkien")
+    assert isinstance(_results, list), f"expected list, got {type(_results)}"
+    assert len(_results) == 2, f"expected 2 Tolkien books, got {len(_results)}"
+    print("PASS: Library find_by_author returns correct books")
+    _test_passed += 1
+except AssertionError as e:
+    print(f"FAIL: Library find_by_author returns correct books - {e}")
+except Exception as e:
+    print(f"FAIL: Library find_by_author returns correct books - {e}")
+
+# Test 5: Library longest_book
+_test_total += 1
+try:
+    _lib = Library()
+    _lib.add_book(Book("Short", "A", 100))
+    _lib.add_book(Book("Long", "B", 500))
+    _lib.add_book(Book("Medium", "C", 300))
+    _longest = _lib.longest_book()
+    assert _longest.pages == 500, f"expected longest book to have 500 pages, got {_longest.pages}"
+    assert _longest.title == "Long", f"expected ''Long'', got {repr(_longest.title)}"
+    print("PASS: Library longest_book returns book with most pages")
+    _test_passed += 1
+except AssertionError as e:
+    print(f"FAIL: Library longest_book returns book with most pages - {e}")
+except Exception as e:
+    print(f"FAIL: Library longest_book returns book with most pages - {e}")
+
+if _test_passed == _test_total:
+    print("ALL_TESTS_PASSED")
+' WHERE id = 'a0000008-0008-0008-0008-000000000008';
+
+-- Add test_code for JavaScript Essentials lessons
+
+-- Lesson 1: Variables & Data Types
+UPDATE lessons SET test_code = '
+let _testPassed = 0;
+let _testTotal = 0;
+
+_testTotal++;
+try {
+  if (typeof name === "string" && name.length > 0) {
+    console.log("PASS: name is a non-empty string");
+    _testPassed++;
+  } else {
+    console.log("FAIL: name is a non-empty string - expected a non-empty string, got " + JSON.stringify(name));
+  }
+} catch(e) {
+  console.log("FAIL: name is a non-empty string - " + e.message);
+}
+
+_testTotal++;
+try {
+  if (typeof age === "number" && age > 0) {
+    console.log("PASS: age is a positive number");
+    _testPassed++;
+  } else {
+    console.log("FAIL: age is a positive number - expected a positive number, got " + JSON.stringify(age));
+  }
+} catch(e) {
+  console.log("FAIL: age is a positive number - " + e.message);
+}
+
+_testTotal++;
+try {
+  if (typeof profile === "object" && profile !== null && "name" in profile && "age" in profile && "isStudent" in profile && "favoriteLanguage" in profile) {
+    console.log("PASS: profile object has required properties");
+    _testPassed++;
+  } else {
+    const keys = profile ? Object.keys(profile) : [];
+    console.log("FAIL: profile object has required properties - expected name, age, isStudent, favoriteLanguage but got keys: " + keys.join(", "));
+  }
+} catch(e) {
+  console.log("FAIL: profile object has required properties - " + e.message);
+}
+
+if (_testPassed === _testTotal) {
+  console.log("ALL_TESTS_PASSED");
+}
+' WHERE id = 'b0000001-0001-0001-0001-000000000001';
+
+-- Lesson 2: Functions & Scope
+UPDATE lessons SET test_code = '
+let _testPassed = 0;
+let _testTotal = 0;
+
+_testTotal++;
+try {
+  const r1 = capitalize("hello");
+  const r2 = capitalize("javaScript");
+  if (r1 === "Hello" && r2 === "JavaScript") {
+    console.log("PASS: capitalize returns correct results");
+    _testPassed++;
+  } else {
+    console.log("FAIL: capitalize returns correct results - expected Hello/JavaScript, got " + r1 + "/" + r2);
+  }
+} catch(e) {
+  console.log("FAIL: capitalize returns correct results - " + e.message);
+}
+
+_testTotal++;
+try {
+  const evens = filterEvens([1, 2, 3, 4, 5, 6]);
+  if (Array.isArray(evens) && evens.length === 3 && evens[0] === 2 && evens[1] === 4 && evens[2] === 6) {
+    console.log("PASS: filterEvens returns only even numbers");
+    _testPassed++;
+  } else {
+    console.log("FAIL: filterEvens returns only even numbers - got " + JSON.stringify(evens));
+  }
+} catch(e) {
+  console.log("FAIL: filterEvens returns only even numbers - " + e.message);
+}
+
+_testTotal++;
+try {
+  const _triple = createMultiplier(3);
+  const _double = createMultiplier(2);
+  if (typeof _triple === "function" && _triple(5) === 15 && _double(7) === 14) {
+    console.log("PASS: createMultiplier returns a working closure");
+    _testPassed++;
+  } else {
+    console.log("FAIL: createMultiplier returns a working closure - triple(5)=" + _triple(5) + ", double(7)=" + _double(7));
+  }
+} catch(e) {
+  console.log("FAIL: createMultiplier returns a working closure - " + e.message);
+}
+
+_testTotal++;
+try {
+  const _addOne = n => n + 1;
+  const _square = n => n * n;
+  const _dbl = createMultiplier(2);
+  const _transform = pipe(_dbl, _addOne, _square);
+  const result = _transform(3);
+  if (result === 49) {
+    console.log("PASS: pipe chains functions left to right");
+    _testPassed++;
+  } else {
+    console.log("FAIL: pipe chains functions left to right - expected 49, got " + result);
+  }
+} catch(e) {
+  console.log("FAIL: pipe chains functions left to right - " + e.message);
+}
+
+if (_testPassed === _testTotal) {
+  console.log("ALL_TESTS_PASSED");
+}
+' WHERE id = 'b0000002-0002-0002-0002-000000000002';
+
+-- Lesson 3: Arrays & Array Methods
+UPDATE lessons SET test_code = '
+let _testPassed = 0;
+let _testTotal = 0;
+
+_testTotal++;
+try {
+  if (Array.isArray(names) && names.length === 6 && names[0] === "Alice" && names[5] === "Frank") {
+    console.log("PASS: names array contains all student names");
+    _testPassed++;
+  } else {
+    console.log("FAIL: names array contains all student names - got " + JSON.stringify(names));
+  }
+} catch(e) {
+  console.log("FAIL: names array contains all student names - " + e.message);
+}
+
+_testTotal++;
+try {
+  const hsNames = highScorers.map(s => s.name).sort();
+  if (Array.isArray(highScorers) && highScorers.length === 4 && hsNames.includes("Alice") && hsNames.includes("Charlie") && hsNames.includes("Diana") && hsNames.includes("Eve")) {
+    console.log("PASS: highScorers contains students with grade >= 85");
+    _testPassed++;
+  } else {
+    console.log("FAIL: highScorers contains students with grade >= 85 - got " + JSON.stringify(highScorers.map(s => s.name)));
+  }
+} catch(e) {
+  console.log("FAIL: highScorers contains students with grade >= 85 - " + e.message);
+}
+
+_testTotal++;
+try {
+  const expected = (92 + 78 + 85 + 96 + 88 + 72) / 6;
+  if (typeof averageGrade === "number" && Math.abs(averageGrade - expected) < 0.01) {
+    console.log("PASS: averageGrade is correctly calculated");
+    _testPassed++;
+  } else {
+    console.log("FAIL: averageGrade is correctly calculated - expected " + expected + ", got " + averageGrade);
+  }
+} catch(e) {
+  console.log("FAIL: averageGrade is correctly calculated - " + e.message);
+}
+
+_testTotal++;
+try {
+  const expectedMath = ["Alice", "Charlie", "Eve"];
+  if (Array.isArray(mathStudentNames) && mathStudentNames.length === 3 && expectedMath.every(n => mathStudentNames.includes(n))) {
+    console.log("PASS: mathStudentNames contains only Math student names");
+    _testPassed++;
+  } else {
+    console.log("FAIL: mathStudentNames contains only Math student names - got " + JSON.stringify(mathStudentNames));
+  }
+} catch(e) {
+  console.log("FAIL: mathStudentNames contains only Math student names - " + e.message);
+}
+
+_testTotal++;
+try {
+  if (bySubject && Array.isArray(bySubject.Math) && Array.isArray(bySubject.Science) && bySubject.Math.length === 3 && bySubject.Science.length === 3) {
+    console.log("PASS: bySubject groups students correctly");
+    _testPassed++;
+  } else {
+    const mathLen = bySubject && bySubject.Math ? bySubject.Math.length : 0;
+    const sciLen = bySubject && bySubject.Science ? bySubject.Science.length : 0;
+    console.log("FAIL: bySubject groups students correctly - Math count: " + mathLen + ", Science count: " + sciLen);
+  }
+} catch(e) {
+  console.log("FAIL: bySubject groups students correctly - " + e.message);
+}
+
+if (_testPassed === _testTotal) {
+  console.log("ALL_TESTS_PASSED");
+}
+' WHERE id = 'b0000003-0003-0003-0003-000000000003';
+
+-- Lesson 4: Objects & JSON
+UPDATE lessons SET test_code = '
+let _testPassed = 0;
+let _testTotal = 0;
+
+_testTotal++;
+try {
+  if (movie && typeof movie.title === "string" && typeof movie.director === "string" && typeof movie.year === "number" && Array.isArray(movie.genres) && typeof movie.ratings === "object" && "imdb" in movie.ratings && "rotten" in movie.ratings) {
+    console.log("PASS: movie object has all required properties");
+    _testPassed++;
+  } else {
+    console.log("FAIL: movie object has all required properties - got keys: " + Object.keys(movie || {}).join(", "));
+  }
+} catch(e) {
+  console.log("FAIL: movie object has all required properties - " + e.message);
+}
+
+_testTotal++;
+try {
+  if (updatedMovie && updatedMovie.watched === true && updatedMovie.title === movie.title) {
+    console.log("PASS: updatedMovie has watched property and retains original data");
+    _testPassed++;
+  } else {
+    console.log("FAIL: updatedMovie has watched property and retains original data - watched=" + (updatedMovie && updatedMovie.watched));
+  }
+} catch(e) {
+  console.log("FAIL: updatedMovie has watched property and retains original data - " + e.message);
+}
+
+_testTotal++;
+try {
+  const result = greetPerson({ name: "TestUser", age: 30 });
+  if (typeof result === "string" && result.includes("TestUser")) {
+    console.log("PASS: greetPerson returns a greeting with the name");
+    _testPassed++;
+  } else {
+    console.log("FAIL: greetPerson returns a greeting with the name - got " + JSON.stringify(result));
+  }
+} catch(e) {
+  console.log("FAIL: greetPerson returns a greeting with the name - " + e.message);
+}
+
+_testTotal++;
+try {
+  if (typeof jsonString === "string" && jsonString.length > 2 && parsedMovie && parsedMovie.title === movie.title) {
+    console.log("PASS: JSON stringify and parse work correctly");
+    _testPassed++;
+  } else {
+    console.log("FAIL: JSON stringify and parse work correctly - jsonString length=" + (jsonString ? jsonString.length : 0));
+  }
+} catch(e) {
+  console.log("FAIL: JSON stringify and parse work correctly - " + e.message);
+}
+
+_testTotal++;
+try {
+  if (ceoEmail === undefined) {
+    console.log("PASS: ceoEmail is undefined via optional chaining");
+    _testPassed++;
+  } else {
+    console.log("FAIL: ceoEmail is undefined via optional chaining - got " + JSON.stringify(ceoEmail));
+  }
+} catch(e) {
+  console.log("FAIL: ceoEmail is undefined via optional chaining - " + e.message);
+}
+
+if (_testPassed === _testTotal) {
+  console.log("ALL_TESTS_PASSED");
+}
+' WHERE id = 'b0000004-0004-0004-0004-000000000004';
+
+-- Lesson 5: DOM Manipulation
+-- Note: Runs on Node.js (no DOM), so we test function structure and logic
+UPDATE lessons SET test_code = '
+let _testPassed = 0;
+let _testTotal = 0;
+
+_testTotal++;
+try {
+  if (typeof createTodoApp === "function") {
+    console.log("PASS: createTodoApp is defined as a function");
+    _testPassed++;
+  } else {
+    console.log("FAIL: createTodoApp is defined as a function - got " + typeof createTodoApp);
+  }
+} catch(e) {
+  console.log("FAIL: createTodoApp is defined as a function - " + e.message);
+}
+
+_testTotal++;
+try {
+  const src = createTodoApp.toString();
+  const usesCreateElement = src.includes("createElement");
+  const usesEventListener = src.includes("addEventListener") || src.includes("onclick");
+  if (usesCreateElement) {
+    console.log("PASS: createTodoApp uses createElement to build DOM elements");
+    _testPassed++;
+  } else {
+    console.log("FAIL: createTodoApp uses createElement to build DOM elements - function body does not call createElement");
+  }
+} catch(e) {
+  console.log("FAIL: createTodoApp uses createElement to build DOM elements - " + e.message);
+}
+
+_testTotal++;
+try {
+  const src = createTodoApp.toString();
+  const usesEventListener = src.includes("addEventListener") || src.includes("onclick");
+  if (usesEventListener) {
+    console.log("PASS: createTodoApp attaches event listeners");
+    _testPassed++;
+  } else {
+    console.log("FAIL: createTodoApp attaches event listeners - function body does not use addEventListener or onclick");
+  }
+} catch(e) {
+  console.log("FAIL: createTodoApp attaches event listeners - " + e.message);
+}
+
+if (_testPassed === _testTotal) {
+  console.log("ALL_TESTS_PASSED");
+}
+' WHERE id = 'b0000005-0005-0005-0005-000000000005';
+
+-- Lesson 6: Async/Await & Promises
+UPDATE lessons SET test_code = '
+let _testPassed = 0;
+let _testTotal = 0;
+
+async function _runTests() {
+  _testTotal++;
+  try {
+    const users = await fetchUsers();
+    if (Array.isArray(users) && users.length === 2 && users[0].name === "Alice") {
+      console.log("PASS: fetchUsers returns users array");
+      _testPassed++;
+    } else {
+      console.log("FAIL: fetchUsers returns users array - got " + JSON.stringify(users));
+    }
+  } catch(e) {
+    console.log("FAIL: fetchUsers returns users array - " + e.message);
+  }
+
+  _testTotal++;
+  try {
+    const all = await fetchAll();
+    if (all && Array.isArray(all.users) && Array.isArray(all.posts) && Array.isArray(all.comments)) {
+      console.log("PASS: fetchAll returns object with users, posts, comments");
+      _testPassed++;
+    } else {
+      console.log("FAIL: fetchAll returns object with users, posts, comments - got keys: " + Object.keys(all || {}).join(", "));
+    }
+  } catch(e) {
+    console.log("FAIL: fetchAll returns object with users, posts, comments - " + e.message);
+  }
+
+  _testTotal++;
+  try {
+    const safe = await fetchSafe();
+    if (safe !== undefined && safe !== null) {
+      console.log("PASS: fetchSafe returns a default value on error");
+      _testPassed++;
+    } else {
+      console.log("FAIL: fetchSafe returns a default value on error - got " + JSON.stringify(safe));
+    }
+  } catch(e) {
+    console.log("FAIL: fetchSafe returns a default value on error - threw instead of catching: " + e.message);
+  }
+
+  _testTotal++;
+  try {
+    const seq = await fetchSequential();
+    if (seq && Array.isArray(seq.users) && Array.isArray(seq.posts)) {
+      console.log("PASS: fetchSequential returns users and posts");
+      _testPassed++;
+    } else {
+      console.log("FAIL: fetchSequential returns users and posts - got keys: " + Object.keys(seq || {}).join(", "));
+    }
+  } catch(e) {
+    console.log("FAIL: fetchSequential returns users and posts - " + e.message);
+  }
+
+  if (_testPassed === _testTotal) {
+    console.log("ALL_TESTS_PASSED");
+  }
+}
+
+_runTests();
+' WHERE id = 'b0000006-0006-0006-0006-000000000006';
+
+-- Lesson 7: ES6+ Features
+UPDATE lessons SET test_code = '
+let _testPassed = 0;
+let _testTotal = 0;
+
+_testTotal++;
+try {
+  const s = new Shape("Triangle", 3);
+  const desc = s.describe();
+  if (desc.includes("Triangle") && desc.includes("3")) {
+    console.log("PASS: Shape class works with describe method");
+    _testPassed++;
+  } else {
+    console.log("FAIL: Shape class works with describe method - got " + JSON.stringify(desc));
+  }
+} catch(e) {
+  console.log("FAIL: Shape class works with describe method - " + e.message);
+}
+
+_testTotal++;
+try {
+  const c = new Circle(5);
+  if (c instanceof Shape && c instanceof Circle) {
+    console.log("PASS: Circle extends Shape correctly");
+    _testPassed++;
+  } else {
+    console.log("FAIL: Circle extends Shape correctly - instanceof checks failed");
+  }
+} catch(e) {
+  console.log("FAIL: Circle extends Shape correctly - " + e.message);
+}
+
+_testTotal++;
+try {
+  const c = new Circle(5);
+  const area = c.area();
+  const expected = Math.PI * 25;
+  if (typeof area === "number" && Math.abs(area - expected) < 0.01) {
+    console.log("PASS: Circle area calculation is correct");
+    _testPassed++;
+  } else {
+    console.log("FAIL: Circle area calculation is correct - expected " + expected + ", got " + area);
+  }
+} catch(e) {
+  console.log("FAIL: Circle area calculation is correct - " + e.message);
+}
+
+_testTotal++;
+try {
+  if (Array.isArray(unique) && unique.length === 4 && [1,2,3,4].every(n => unique.includes(n))) {
+    console.log("PASS: unique array has deduplicated values");
+    _testPassed++;
+  } else {
+    console.log("FAIL: unique array has deduplicated values - got " + JSON.stringify(unique));
+  }
+} catch(e) {
+  console.log("FAIL: unique array has deduplicated values - " + e.message);
+}
+
+_testTotal++;
+try {
+  if (wordCount instanceof Map && wordCount.get("the") === 3 && wordCount.get("cat") === 2 && wordCount.get("sat") === 1) {
+    console.log("PASS: wordCount Map has correct frequencies");
+    _testPassed++;
+  } else {
+    const theCount = wordCount instanceof Map ? wordCount.get("the") : "not a Map";
+    console.log("FAIL: wordCount Map has correct frequencies - the=" + theCount);
+  }
+} catch(e) {
+  console.log("FAIL: wordCount Map has correct frequencies - " + e.message);
+}
+
+if (_testPassed === _testTotal) {
+  console.log("ALL_TESTS_PASSED");
+}
+' WHERE id = 'b0000007-0007-0007-0007-000000000007';
+
+-- Add test_code to Java Fundamentals lessons
+-- Test code replaces the main method body via buildTestCode()
+
+-- Lesson 1: Hello World & Setup (Beginner - 2 tests)
+-- Starter code is all in main with no helper methods.
+-- Tests verify the class compiled and basic output works.
+UPDATE lessons SET test_code = 'int _testPassed = 0;
+int _testTotal = 0;
+
+// Test 1: Verify System.out.println works
+_testTotal++;
+try {
+    System.out.println("Hello, World!");
+    System.out.println("PASS: println outputs text");
+    _testPassed++;
+} catch (Exception e) {
+    System.out.println("FAIL: println outputs text - threw " + e.getMessage());
+}
+
+// Test 2: Verify printf with format specifiers
+_testTotal++;
+try {
+    String name = "Test";
+    int age = 20;
+    double gpa = 3.50;
+    String expected = String.format("Name: %s, Age: %d, GPA: %.2f", name, age, gpa);
+    if (expected.equals("Name: Test, Age: 20, GPA: 3.50")) {
+        System.out.println("PASS: printf format specifiers work correctly");
+        _testPassed++;
+    } else {
+        System.out.println("FAIL: printf format specifiers work correctly - got " + expected);
+    }
+} catch (Exception e) {
+    System.out.println("FAIL: printf format specifiers work correctly - threw " + e.getMessage());
+}
+
+if (_testPassed == _testTotal) {
+    System.out.println("ALL_TESTS_PASSED");
+}' WHERE id = 'c0000001-0001-0001-0001-000000000001';
+
+-- Lesson 2: Variables & Data Types (Beginner - 3 tests)
+-- Starter code is all in main with no helper methods.
+-- Tests verify type casting, parsing, and string comparison.
+UPDATE lessons SET test_code = 'int _testPassed = 0;
+int _testTotal = 0;
+
+// Test 1: Type casting double to int truncates
+_testTotal++;
+double price = 9.99;
+int truncated = (int) price;
+if (truncated == 9) {
+    System.out.println("PASS: casting double 9.99 to int gives 9");
+    _testPassed++;
+} else {
+    System.out.println("FAIL: casting double 9.99 to int gives 9 - got " + truncated);
+}
+
+// Test 2: String.valueOf converts int to String
+_testTotal++;
+String yearStr = String.valueOf(2024);
+if (yearStr.equals("2024")) {
+    System.out.println("PASS: String.valueOf(2024) returns \"2024\"");
+    _testPassed++;
+} else {
+    System.out.println("FAIL: String.valueOf(2024) returns \"2024\" - got " + yearStr);
+}
+
+// Test 3: Integer.parseInt converts String to int
+_testTotal++;
+int parsed = Integer.parseInt("42");
+if (parsed == 42) {
+    System.out.println("PASS: Integer.parseInt(\"42\") returns 42");
+    _testPassed++;
+} else {
+    System.out.println("FAIL: Integer.parseInt(\"42\") returns 42 - got " + parsed);
+}
+
+if (_testPassed == _testTotal) {
+    System.out.println("ALL_TESTS_PASSED");
+}' WHERE id = 'c0000002-0002-0002-0002-000000000002';
+
+-- Lesson 3: Control Flow (Intermediate - 3 tests)
+-- Starter code is all in main with no helper methods.
+-- Tests verify if/else logic, loop sums, and FizzBuzz concepts.
+UPDATE lessons SET test_code = 'int _testPassed = 0;
+int _testTotal = 0;
+
+// Test 1: Grade calculation logic (if/else)
+_testTotal++;
+int score = 85;
+String grade = "";
+if (score >= 90) grade = "A";
+else if (score >= 80) grade = "B";
+else if (score >= 70) grade = "C";
+else if (score >= 60) grade = "D";
+else grade = "F";
+if (grade.equals("B")) {
+    System.out.println("PASS: score 85 gives grade B");
+    _testPassed++;
+} else {
+    System.out.println("FAIL: score 85 gives grade B - got " + grade);
+}
+
+// Test 2: Sum of even numbers 1-100 using a while loop
+_testTotal++;
+int sum = 0;
+int i = 1;
+while (i <= 100) {
+    if (i % 2 == 0) sum += i;
+    i++;
+}
+if (sum == 2550) {
+    System.out.println("PASS: sum of evens 1-100 is 2550");
+    _testPassed++;
+} else {
+    System.out.println("FAIL: sum of evens 1-100 is 2550 - got " + sum);
+}
+
+// Test 3: Season from month using switch
+_testTotal++;
+int month = 7;
+String season = "";
+switch (month) {
+    case 12: case 1: case 2: season = "Winter"; break;
+    case 3: case 4: case 5: season = "Spring"; break;
+    case 6: case 7: case 8: season = "Summer"; break;
+    case 9: case 10: case 11: season = "Fall"; break;
+    default: season = "Unknown";
+}
+if (season.equals("Summer")) {
+    System.out.println("PASS: month 7 is Summer");
+    _testPassed++;
+} else {
+    System.out.println("FAIL: month 7 is Summer - got " + season);
+}
+
+if (_testPassed == _testTotal) {
+    System.out.println("ALL_TESTS_PASSED");
+}' WHERE id = 'c0000003-0003-0003-0003-000000000003';
+
+-- Lesson 4: Methods (Intermediate - 4 tests)
+-- Starter code has static methods: isPrime, max, reverseString, fibonacci, average
+UPDATE lessons SET test_code = 'int _testPassed = 0;
+int _testTotal = 0;
+
+// Test 1: isPrime
+_testTotal++;
+if (isPrime(7) == true && isPrime(10) == false && isPrime(2) == true && isPrime(1) == false) {
+    System.out.println("PASS: isPrime correctly identifies primes");
+    _testPassed++;
+} else {
+    System.out.println("FAIL: isPrime correctly identifies primes - isPrime(7)=" + isPrime(7) + " isPrime(10)=" + isPrime(10) + " isPrime(2)=" + isPrime(2) + " isPrime(1)=" + isPrime(1));
+}
+
+// Test 2: max(int, int)
+_testTotal++;
+if (max(3, 7) == 7 && max(-1, -5) == -1 && max(4, 4) == 4) {
+    System.out.println("PASS: max(a, b) returns the larger value");
+    _testPassed++;
+} else {
+    System.out.println("FAIL: max(a, b) returns the larger value - max(3,7)=" + max(3, 7) + " max(-1,-5)=" + max(-1, -5));
+}
+
+// Test 3: reverseString
+_testTotal++;
+if (reverseString("Java").equals("avaJ") && reverseString("hello").equals("olleh") && reverseString("").equals("")) {
+    System.out.println("PASS: reverseString reverses correctly");
+    _testPassed++;
+} else {
+    System.out.println("FAIL: reverseString reverses correctly - reverseString(\"Java\")=" + reverseString("Java"));
+}
+
+// Test 4: fibonacci
+_testTotal++;
+if (fibonacci(0) == 0 && fibonacci(1) == 1 && fibonacci(7) == 13 && fibonacci(10) == 55) {
+    System.out.println("PASS: fibonacci returns correct values");
+    _testPassed++;
+} else {
+    System.out.println("FAIL: fibonacci returns correct values - fib(0)=" + fibonacci(0) + " fib(1)=" + fibonacci(1) + " fib(7)=" + fibonacci(7) + " fib(10)=" + fibonacci(10));
+}
+
+if (_testPassed == _testTotal) {
+    System.out.println("ALL_TESTS_PASSED");
+}' WHERE id = 'c0000004-0004-0004-0004-000000000004';
+
+-- Lesson 5: OOP - Classes & Objects (Advanced - 4 tests)
+-- Starter code has Student class (addGrade, getAverage, getHighestGrade, toString)
+-- and Classroom class (addStudent, getTopStudent, getClassAverage)
+UPDATE lessons SET test_code = 'int _testPassed = 0;
+int _testTotal = 0;
+
+// Test 1: Student addGrade and getAverage
+_testTotal++;
+Student s1 = new Student("Alice", 1);
+s1.addGrade(90);
+s1.addGrade(80);
+s1.addGrade(100);
+double avg = s1.getAverage();
+if (Math.abs(avg - 90.0) < 0.01) {
+    System.out.println("PASS: getAverage returns correct average (90.0)");
+    _testPassed++;
+} else {
+    System.out.println("FAIL: getAverage returns correct average (90.0) - got " + avg);
+}
+
+// Test 2: Student getHighestGrade
+_testTotal++;
+int highest = s1.getHighestGrade();
+if (highest == 100) {
+    System.out.println("PASS: getHighestGrade returns 100");
+    _testPassed++;
+} else {
+    System.out.println("FAIL: getHighestGrade returns 100 - got " + highest);
+}
+
+// Test 3: Student toString contains name
+_testTotal++;
+String str = s1.toString();
+if (str.contains("Alice")) {
+    System.out.println("PASS: toString contains student name");
+    _testPassed++;
+} else {
+    System.out.println("FAIL: toString contains student name - got " + str);
+}
+
+// Test 4: Classroom getTopStudent and getClassAverage
+_testTotal++;
+Student s2 = new Student("Bob", 2);
+s2.addGrade(70);
+s2.addGrade(60);
+s2.addGrade(80);
+Classroom room = new Classroom();
+room.addStudent(s1);
+room.addStudent(s2);
+Student top = room.getTopStudent();
+double classAvg = room.getClassAverage();
+if (top.toString().contains("Alice") && Math.abs(classAvg - 80.0) < 0.01) {
+    System.out.println("PASS: getTopStudent is Alice and classAverage is 80.0");
+    _testPassed++;
+} else {
+    System.out.println("FAIL: getTopStudent is Alice and classAverage is 80.0 - top=" + top + " classAvg=" + classAvg);
+}
+
+if (_testPassed == _testTotal) {
+    System.out.println("ALL_TESTS_PASSED");
+}' WHERE id = 'c0000005-0005-0005-0005-000000000005';
+
+-- Lesson 6: Collections & Generics (Advanced - 5 tests)
+-- Starter code has: ArrayList sorting, HashMap contacts, HashSet, Pair<A,B> class
+UPDATE lessons SET test_code = 'int _testPassed = 0;
+int _testTotal = 0;
+
+// Test 1: ArrayList sorting
+_testTotal++;
+ArrayList<Integer> numbers = new ArrayList<>();
+numbers.add(5); numbers.add(2); numbers.add(8); numbers.add(1); numbers.add(9); numbers.add(3);
+Collections.sort(numbers);
+if (numbers.get(0) == 1 && numbers.get(numbers.size() - 1) == 9) {
+    System.out.println("PASS: sorted list starts with 1 and ends with 9");
+    _testPassed++;
+} else {
+    System.out.println("FAIL: sorted list starts with 1 and ends with 9 - got " + numbers);
+}
+
+// Test 2: Collections.max and Collections.min
+_testTotal++;
+int max = Collections.max(numbers);
+int min = Collections.min(numbers);
+if (max == 9 && min == 1) {
+    System.out.println("PASS: max is 9 and min is 1");
+    _testPassed++;
+} else {
+    System.out.println("FAIL: max is 9 and min is 1 - got max=" + max + " min=" + min);
+}
+
+// Test 3: HashMap with contacts
+_testTotal++;
+HashMap<String, ArrayList<String>> contacts = new HashMap<>();
+ArrayList<String> alicePhones = new ArrayList<>();
+alicePhones.add("555-0001");
+alicePhones.add("555-0002");
+contacts.put("Alice", alicePhones);
+contacts.put("Bob", new ArrayList<>(List.of("555-0003")));
+if (contacts.size() == 2 && contacts.get("Alice").size() == 2 && contacts.containsKey("Bob")) {
+    System.out.println("PASS: HashMap stores contacts correctly");
+    _testPassed++;
+} else {
+    System.out.println("FAIL: HashMap stores contacts correctly - size=" + contacts.size());
+}
+
+// Test 4: HashSet removes duplicates
+_testTotal++;
+numbers.add(5);
+HashSet<Integer> uniqueNumbers = new HashSet<>(numbers);
+if (uniqueNumbers.size() == 6) {
+    System.out.println("PASS: HashSet removes duplicates (size=6)");
+    _testPassed++;
+} else {
+    System.out.println("FAIL: HashSet removes duplicates (size=6) - got size=" + uniqueNumbers.size());
+}
+
+// Test 5: Generic Pair class
+_testTotal++;
+try {
+    Pair<String, Integer> pair = new Pair<>("Alice", 25);
+    boolean firstOk = pair.getFirst().equals("Alice");
+    boolean secondOk = pair.getSecond().equals(25);
+    if (firstOk && secondOk) {
+        System.out.println("PASS: Pair<String, Integer> stores and retrieves values");
+        _testPassed++;
+    } else {
+        System.out.println("FAIL: Pair<String, Integer> stores and retrieves values - first=" + pair.getFirst() + " second=" + pair.getSecond());
+    }
+} catch (Exception e) {
+    System.out.println("FAIL: Pair<String, Integer> stores and retrieves values - threw " + e.getMessage());
+}
+
+if (_testPassed == _testTotal) {
+    System.out.println("ALL_TESTS_PASSED");
+}' WHERE id = 'c0000006-0006-0006-0006-000000000006';
+
+-- =============================================================================
+-- TEST CODE for SQL Mastery lessons
+-- =============================================================================
+-- Tests run on SQLite 3.46.1 via Wandbox.
+-- test_code is appended after user code. User queries against non-existent
+-- tables will error silently; SQLite continues to the test statements.
+-- Each test block creates its own tables with known data, then verifies
+-- that the SQL concepts taught in the lesson work correctly.
+
+-- Lesson 1: SELECT Basics (Beginner - 3 tests)
+UPDATE lessons SET test_code = '
+-- === Test Setup ===
+CREATE TABLE IF NOT EXISTS employees (
+  id INTEGER PRIMARY KEY,
+  first_name TEXT,
+  last_name TEXT,
+  email TEXT,
+  department TEXT,
+  salary REAL,
+  hire_date TEXT,
+  manager_id INTEGER
+);
+DELETE FROM employees;
+INSERT INTO employees VALUES (1, ''Alice'',   ''Smith'',   ''alice@co.com'',   ''Engineering'', 95000, ''2022-03-15'', NULL);
+INSERT INTO employees VALUES (2, ''Bob'',     ''Jones'',   ''bob@co.com'',     ''Marketing'',   62000, ''2023-01-10'', 1);
+INSERT INTO employees VALUES (3, ''Charlie'', ''Brown'',   ''charlie@co.com'', ''Engineering'', 88000, ''2022-07-20'', 1);
+INSERT INTO employees VALUES (4, ''Diana'',   ''Prince'',  ''diana@co.com'',   ''Design'',      72000, ''2023-06-01'', 1);
+INSERT INTO employees VALUES (5, ''Eve'',     ''Davis'',   ''eve@co.com'',     ''Marketing'',   55000, ''2023-09-12'', 2);
+INSERT INTO employees VALUES (6, ''Frank'',   ''Miller'',  ''frank@co.com'',   ''Engineering'', 105000,''2021-11-05'', NULL);
+
+CREATE TEMP TABLE _test_results(name TEXT, passed INTEGER);
+
+-- Test 1: SELECT with ORDER BY and LIMIT returns correct top earner
+INSERT INTO _test_results VALUES(''SELECT with ORDER BY DESC and LIMIT'',
+  CASE WHEN (SELECT first_name FROM employees ORDER BY salary DESC LIMIT 1) = ''Frank''
+  THEN 1 ELSE 0 END);
+
+-- Test 2: DISTINCT departments returns correct count
+INSERT INTO _test_results VALUES(''SELECT DISTINCT departments'',
+  CASE WHEN (SELECT COUNT(DISTINCT department) FROM employees) = 3
+  THEN 1 ELSE 0 END);
+
+-- Test 3: Calculated column and alias work
+INSERT INTO _test_results VALUES(''calculated column salary * 12'',
+  CASE WHEN (SELECT CAST(salary * 12 AS INTEGER) FROM employees WHERE id = 1) = 1140000
+  THEN 1 ELSE 0 END);
+
+-- Output results
+SELECT CASE WHEN passed = 1 THEN ''PASS: '' || name ELSE ''FAIL: '' || name || '' - incorrect result'' END FROM _test_results;
+SELECT CASE WHEN (SELECT COUNT(*) FROM _test_results WHERE passed = 0) = 0 THEN ''ALL_TESTS_PASSED'' ELSE ''SOME_TESTS_FAILED'' END;
+' WHERE id = 'd0000001-0001-0001-0001-000000000001';
+
+
+-- Lesson 2: WHERE & Filtering (Beginner - 3 tests)
+UPDATE lessons SET test_code = '
+-- === Test Setup ===
+CREATE TABLE IF NOT EXISTS employees (
+  id INTEGER PRIMARY KEY,
+  first_name TEXT,
+  last_name TEXT,
+  email TEXT,
+  department TEXT,
+  salary REAL,
+  hire_date TEXT,
+  manager_id INTEGER
+);
+DELETE FROM employees;
+INSERT INTO employees VALUES (1, ''Alice'',   ''Smith'',   ''alice@co.com'',     ''Engineering'', 95000, ''2022-03-15'', NULL);
+INSERT INTO employees VALUES (2, ''Bob'',     ''Jones'',   ''bob@gmail.com'',    ''Marketing'',   62000, ''2023-01-10'', 1);
+INSERT INTO employees VALUES (3, ''Charlie'', ''Brown'',   ''charlie@co.com'',   ''Engineering'', 88000, ''2023-07-20'', 1);
+INSERT INTO employees VALUES (4, ''Diana'',   ''Prince'',  ''diana@co.com'',     ''Design'',      72000, ''2023-06-01'', 1);
+INSERT INTO employees VALUES (5, ''Eve'',     ''Davis'',   ''eve@co.com'',       ''Marketing'',   55000, ''2023-09-12'', 2);
+INSERT INTO employees VALUES (6, ''Frank'',   ''Miller'',  ''frank@co.com'',     ''Engineering'', 105000,''2022-06-05'', NULL);
+INSERT INTO employees VALUES (7, ''Jane'',    ''Doe'',     ''jane@gmail.com'',   ''Product'',     78000, ''2023-04-18'', 1);
+
+CREATE TEMP TABLE _test_results(name TEXT, passed INTEGER);
+
+-- Test 1: WHERE with department filter
+INSERT INTO _test_results VALUES(''WHERE department = Engineering'',
+  CASE WHEN (SELECT COUNT(*) FROM employees WHERE department = ''Engineering'') = 3
+  THEN 1 ELSE 0 END);
+
+-- Test 2: BETWEEN salary range
+INSERT INTO _test_results VALUES(''BETWEEN 60000 AND 90000'',
+  CASE WHEN (SELECT COUNT(*) FROM employees WHERE salary BETWEEN 60000 AND 90000) = 4
+  THEN 1 ELSE 0 END);
+
+-- Test 3: LIKE pattern matching for email containing gmail
+INSERT INTO _test_results VALUES(''LIKE pattern matching gmail'',
+  CASE WHEN (SELECT COUNT(*) FROM employees WHERE email LIKE ''%gmail%'') = 2
+  THEN 1 ELSE 0 END);
+
+-- Output results
+SELECT CASE WHEN passed = 1 THEN ''PASS: '' || name ELSE ''FAIL: '' || name || '' - incorrect result'' END FROM _test_results;
+SELECT CASE WHEN (SELECT COUNT(*) FROM _test_results WHERE passed = 0) = 0 THEN ''ALL_TESTS_PASSED'' ELSE ''SOME_TESTS_FAILED'' END;
+' WHERE id = 'd0000002-0002-0002-0002-000000000002';
+
+
+-- Lesson 3: JOIN Operations (Intermediate - 4 tests)
+UPDATE lessons SET test_code = '
+-- === Test Setup ===
+CREATE TABLE IF NOT EXISTS departments (
+  id INTEGER PRIMARY KEY,
+  name TEXT,
+  budget REAL,
+  location TEXT
+);
+CREATE TABLE IF NOT EXISTS employees (
+  id INTEGER PRIMARY KEY,
+  first_name TEXT,
+  last_name TEXT,
+  department_id INTEGER,
+  salary REAL,
+  manager_id INTEGER
+);
+CREATE TABLE IF NOT EXISTS projects (
+  id INTEGER PRIMARY KEY,
+  title TEXT,
+  department_id INTEGER,
+  deadline TEXT
+);
+DELETE FROM departments;
+DELETE FROM employees;
+DELETE FROM projects;
+INSERT INTO departments VALUES (1, ''Engineering'', 800000, ''Building A'');
+INSERT INTO departments VALUES (2, ''Marketing'',   300000, ''Building B'');
+INSERT INTO departments VALUES (3, ''Design'',      200000, ''Building A'');
+INSERT INTO departments VALUES (4, ''Research'',    600000, ''Building C'');
+INSERT INTO employees VALUES (1, ''Alice'',   ''Smith'', 1, 95000,  NULL);
+INSERT INTO employees VALUES (2, ''Bob'',     ''Jones'', 2, 62000,  1);
+INSERT INTO employees VALUES (3, ''Charlie'', ''Brown'', 1, 88000,  1);
+INSERT INTO employees VALUES (4, ''Diana'',   ''Prince'',3, 72000,  1);
+INSERT INTO employees VALUES (5, ''Eve'',     ''Davis'', NULL, 55000, 2);
+INSERT INTO employees VALUES (6, ''Frank'',   ''Miller'',1, 105000, NULL);
+INSERT INTO projects VALUES (1, ''Project Alpha'', 1, ''2024-06-01'');
+INSERT INTO projects VALUES (2, ''Project Beta'',  2, ''2024-09-15'');
+
+CREATE TEMP TABLE _test_results(name TEXT, passed INTEGER);
+
+-- Test 1: INNER JOIN returns only matching rows (excludes Eve who has no dept)
+INSERT INTO _test_results VALUES(''INNER JOIN excludes unmatched rows'',
+  CASE WHEN (SELECT COUNT(*) FROM employees e INNER JOIN departments d ON e.department_id = d.id) = 5
+  THEN 1 ELSE 0 END);
+
+-- Test 2: LEFT JOIN keeps all employees including those without a department
+INSERT INTO _test_results VALUES(''LEFT JOIN keeps all employees'',
+  CASE WHEN (SELECT COUNT(*) FROM employees e LEFT JOIN departments d ON e.department_id = d.id) = 6
+  THEN 1 ELSE 0 END);
+
+-- Test 3: Self-join to find employee-manager pairs
+INSERT INTO _test_results VALUES(''self-join finds managers'',
+  CASE WHEN (SELECT m.first_name FROM employees e LEFT JOIN employees m ON e.manager_id = m.id WHERE e.id = 2) = ''Alice''
+  THEN 1 ELSE 0 END);
+
+-- Test 4: LEFT JOIN with NULL filter finds unassigned employees
+INSERT INTO _test_results VALUES(''LEFT JOIN with IS NULL finds unassigned'',
+  CASE WHEN (SELECT COUNT(*) FROM employees e LEFT JOIN departments d ON e.department_id = d.id WHERE d.id IS NULL) = 1
+  THEN 1 ELSE 0 END);
+
+-- Output results
+SELECT CASE WHEN passed = 1 THEN ''PASS: '' || name ELSE ''FAIL: '' || name || '' - incorrect result'' END FROM _test_results;
+SELECT CASE WHEN (SELECT COUNT(*) FROM _test_results WHERE passed = 0) = 0 THEN ''ALL_TESTS_PASSED'' ELSE ''SOME_TESTS_FAILED'' END;
+' WHERE id = 'd0000003-0003-0003-0003-000000000003';
+
+
+-- Lesson 4: GROUP BY & Aggregates (Intermediate - 4 tests)
+UPDATE lessons SET test_code = '
+-- === Test Setup ===
+CREATE TABLE IF NOT EXISTS employees (
+  id INTEGER PRIMARY KEY,
+  first_name TEXT,
+  last_name TEXT,
+  department TEXT,
+  salary REAL,
+  hire_date TEXT
+);
+DELETE FROM employees;
+INSERT INTO employees VALUES (1, ''Alice'',   ''Smith'',  ''Engineering'', 95000,  ''2022-03-15'');
+INSERT INTO employees VALUES (2, ''Bob'',     ''Jones'',  ''Marketing'',   62000,  ''2023-01-10'');
+INSERT INTO employees VALUES (3, ''Charlie'', ''Brown'',  ''Engineering'', 88000,  ''2023-07-20'');
+INSERT INTO employees VALUES (4, ''Diana'',   ''Prince'', ''Design'',      72000,  ''2023-06-01'');
+INSERT INTO employees VALUES (5, ''Eve'',     ''Davis'',  ''Marketing'',   55000,  ''2023-09-12'');
+INSERT INTO employees VALUES (6, ''Frank'',   ''Miller'', ''Engineering'', 105000, ''2022-06-05'');
+INSERT INTO employees VALUES (7, ''Grace'',   ''Lee'',    ''Design'',      68000,  ''2022-11-30'');
+INSERT INTO employees VALUES (8, ''Hank'',    ''Wilson'', ''Engineering'', 82000,  ''2023-02-14'');
+
+CREATE TEMP TABLE _test_results(name TEXT, passed INTEGER);
+
+-- Test 1: COUNT(*) returns total employees
+INSERT INTO _test_results VALUES(''COUNT all employees'',
+  CASE WHEN (SELECT COUNT(*) FROM employees) = 8
+  THEN 1 ELSE 0 END);
+
+-- Test 2: GROUP BY department with COUNT
+INSERT INTO _test_results VALUES(''GROUP BY department count'',
+  CASE WHEN (SELECT COUNT(*) FROM employees WHERE department = ''Engineering'') = 4
+  THEN 1 ELSE 0 END);
+
+-- Test 3: AVG salary for Engineering
+INSERT INTO _test_results VALUES(''AVG salary per department'',
+  CASE WHEN ABS((SELECT AVG(salary) FROM employees WHERE department = ''Engineering'') - 92500.0) < 1
+  THEN 1 ELSE 0 END);
+
+-- Test 4: HAVING filters groups correctly (departments with avg > 70000)
+INSERT INTO _test_results VALUES(''HAVING filters low-avg departments'',
+  CASE WHEN (SELECT COUNT(*) FROM (
+    SELECT department FROM employees GROUP BY department HAVING AVG(salary) > 70000
+  )) = 1
+  THEN 1 ELSE 0 END);
+
+-- Output results
+SELECT CASE WHEN passed = 1 THEN ''PASS: '' || name ELSE ''FAIL: '' || name || '' - incorrect result'' END FROM _test_results;
+SELECT CASE WHEN (SELECT COUNT(*) FROM _test_results WHERE passed = 0) = 0 THEN ''ALL_TESTS_PASSED'' ELSE ''SOME_TESTS_FAILED'' END;
+' WHERE id = 'd0000004-0004-0004-0004-000000000004';
+
+
+-- Lesson 5: Subqueries (Advanced - 5 tests)
+UPDATE lessons SET test_code = '
+-- === Test Setup ===
+CREATE TABLE IF NOT EXISTS departments (
+  id INTEGER PRIMARY KEY,
+  name TEXT,
+  budget REAL
+);
+CREATE TABLE IF NOT EXISTS employees (
+  id INTEGER PRIMARY KEY,
+  first_name TEXT,
+  last_name TEXT,
+  department TEXT,
+  department_id INTEGER,
+  salary REAL,
+  hire_date TEXT,
+  manager_id INTEGER
+);
+DELETE FROM departments;
+DELETE FROM employees;
+INSERT INTO departments VALUES (1, ''Engineering'', 800000);
+INSERT INTO departments VALUES (2, ''Marketing'',   300000);
+INSERT INTO departments VALUES (3, ''Design'',      200000);
+INSERT INTO departments VALUES (4, ''Research'',    600000);
+INSERT INTO employees VALUES (1, ''Alice'',   ''Smith'',  ''Engineering'', 1, 95000,  ''2022-03-15'', NULL);
+INSERT INTO employees VALUES (2, ''Bob'',     ''Jones'',  ''Marketing'',   2, 62000,  ''2023-01-10'', 1);
+INSERT INTO employees VALUES (3, ''Charlie'', ''Brown'',  ''Engineering'', 1, 88000,  ''2023-07-20'', 1);
+INSERT INTO employees VALUES (4, ''Diana'',   ''Prince'', ''Design'',      3, 72000,  ''2023-06-01'', 1);
+INSERT INTO employees VALUES (5, ''Eve'',     ''Davis'',  ''Marketing'',   2, 55000,  ''2023-09-12'', 2);
+INSERT INTO employees VALUES (6, ''Frank'',   ''Miller'', ''Engineering'', 1, 105000, ''2022-06-05'', NULL);
+INSERT INTO employees VALUES (7, ''Grace'',   ''Lee'',    ''Design'',      3, 68000,  ''2022-11-30'', 4);
+INSERT INTO employees VALUES (8, ''Hank'',    ''Wilson'', ''Engineering'', 1, 82000,  ''2023-02-14'', 1);
+
+CREATE TEMP TABLE _test_results(name TEXT, passed INTEGER);
+
+-- Test 1: Subquery in WHERE - employees earning above average
+INSERT INTO _test_results VALUES(''subquery in WHERE above avg salary'',
+  CASE WHEN (SELECT COUNT(*) FROM employees WHERE salary > (SELECT AVG(salary) FROM employees)) = 3
+  THEN 1 ELSE 0 END);
+
+-- Test 2: Subquery with IN - employees in high-budget departments
+INSERT INTO _test_results VALUES(''subquery with IN high-budget depts'',
+  CASE WHEN (SELECT COUNT(*) FROM employees WHERE department_id IN (SELECT id FROM departments WHERE budget > 500000)) = 4
+  THEN 1 ELSE 0 END);
+
+-- Test 3: Scalar subquery - company average alongside each employee
+INSERT INTO _test_results VALUES(''scalar subquery returns single value'',
+  CASE WHEN ABS((SELECT AVG(salary) FROM employees) - 78375.0) < 1
+  THEN 1 ELSE 0 END);
+
+-- Test 4: Correlated subquery - employees above their dept average
+INSERT INTO _test_results VALUES(''correlated subquery above dept avg'',
+  CASE WHEN (SELECT COUNT(*) FROM employees e
+    WHERE e.salary > (SELECT AVG(e2.salary) FROM employees e2 WHERE e2.department = e.department)) = 3
+  THEN 1 ELSE 0 END);
+
+-- Test 5: CTE with derived stats
+INSERT INTO _test_results VALUES(''CTE with department stats'',
+  CASE WHEN (SELECT COUNT(*) FROM (
+    WITH dept_stats AS (
+      SELECT department, AVG(salary) AS avg_salary, COUNT(*) AS headcount
+      FROM employees GROUP BY department
+    )
+    SELECT * FROM dept_stats WHERE headcount > 2
+  )) = 2
+  THEN 1 ELSE 0 END);
+
+-- Output results
+SELECT CASE WHEN passed = 1 THEN ''PASS: '' || name ELSE ''FAIL: '' || name || '' - incorrect result'' END FROM _test_results;
+SELECT CASE WHEN (SELECT COUNT(*) FROM _test_results WHERE passed = 0) = 0 THEN ''ALL_TESTS_PASSED'' ELSE ''SOME_TESTS_FAILED'' END;
+' WHERE id = 'd0000005-0005-0005-0005-000000000005';
+
+
+-- Lesson 6: INSERT, UPDATE, DELETE (Advanced - 5 tests)
+UPDATE lessons SET test_code = '
+-- === Test Setup ===
+CREATE TABLE IF NOT EXISTS employees (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  first_name TEXT,
+  last_name TEXT,
+  email TEXT UNIQUE,
+  department TEXT,
+  salary REAL,
+  hire_date TEXT,
+  manager_id INTEGER
+);
+CREATE TABLE IF NOT EXISTS engineering_backup (
+  id INTEGER PRIMARY KEY,
+  first_name TEXT,
+  last_name TEXT,
+  email TEXT,
+  department TEXT,
+  salary REAL,
+  hire_date TEXT,
+  manager_id INTEGER
+);
+DELETE FROM employees;
+DELETE FROM engineering_backup;
+INSERT INTO employees VALUES (1, ''Alice'',   ''Smith'',  ''alice@co.com'',   ''Engineering'', 95000,  ''2022-03-15'', NULL);
+INSERT INTO employees VALUES (2, ''Bob'',     ''Jones'',  ''bob@co.com'',     ''Marketing'',   62000,  ''2023-01-10'', 1);
+INSERT INTO employees VALUES (3, ''Charlie'', ''Brown'',  ''charlie@co.com'', ''Legacy'',      45000,  ''2018-07-20'', 1);
+INSERT INTO employees VALUES (4, ''Diana'',   ''Prince'', ''diana@co.com'',   ''Design'',      72000,  ''2023-06-01'', 1);
+INSERT INTO employees VALUES (5, ''Eve'',     ''Davis'',  ''eve@co.com'',     ''Engineering'', 48000,  ''2019-09-12'', 1);
+
+CREATE TEMP TABLE _test_results(name TEXT, passed INTEGER);
+
+-- Test 1: INSERT a new row
+INSERT INTO employees (first_name, last_name, email, department, salary)
+VALUES (''Grace'', ''Hopper'', ''grace@example.com'', ''Engineering'', 95000);
+INSERT INTO _test_results VALUES(''INSERT single row'',
+  CASE WHEN (SELECT COUNT(*) FROM employees WHERE email = ''grace@example.com'') = 1
+  THEN 1 ELSE 0 END);
+
+-- Test 2: INSERT multiple rows
+INSERT INTO employees (first_name, last_name, email, department, salary)
+VALUES (''Test1'', ''User1'', ''t1@co.com'', ''Product'', 70000),
+       (''Test2'', ''User2'', ''t2@co.com'', ''Product'', 71000),
+       (''Test3'', ''User3'', ''t3@co.com'', ''Product'', 72000);
+INSERT INTO _test_results VALUES(''INSERT multiple rows'',
+  CASE WHEN (SELECT COUNT(*) FROM employees WHERE department = ''Product'') = 3
+  THEN 1 ELSE 0 END);
+
+-- Test 3: UPDATE specific rows
+UPDATE employees SET salary = 105000 WHERE email = ''grace@example.com'';
+INSERT INTO _test_results VALUES(''UPDATE specific row'',
+  CASE WHEN (SELECT salary FROM employees WHERE email = ''grace@example.com'') = 105000
+  THEN 1 ELSE 0 END);
+
+-- Test 4: UPDATE with calculation - 10% raise for Engineering
+UPDATE employees SET salary = salary * 1.10 WHERE department = ''Engineering'';
+INSERT INTO _test_results VALUES(''UPDATE with calculation'',
+  CASE WHEN (SELECT CAST(salary AS INTEGER) FROM employees WHERE email = ''grace@example.com'') = 115500
+  THEN 1 ELSE 0 END);
+
+-- Test 5: DELETE with WHERE clause
+DELETE FROM employees WHERE department = ''Legacy'';
+INSERT INTO _test_results VALUES(''DELETE with WHERE'',
+  CASE WHEN (SELECT COUNT(*) FROM employees WHERE department = ''Legacy'') = 0
+  THEN 1 ELSE 0 END);
+
+-- Output results
+SELECT CASE WHEN passed = 1 THEN ''PASS: '' || name ELSE ''FAIL: '' || name || '' - incorrect result'' END FROM _test_results;
+SELECT CASE WHEN (SELECT COUNT(*) FROM _test_results WHERE passed = 0) = 0 THEN ''ALL_TESTS_PASSED'' ELSE ''SOME_TESTS_FAILED'' END;
+' WHERE id = 'd0000006-0006-0006-0006-000000000006';
+

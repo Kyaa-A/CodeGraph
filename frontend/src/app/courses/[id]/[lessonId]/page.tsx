@@ -66,6 +66,7 @@ export default async function LessonPage({
       lessonContent={typedLesson.content}
       starterCode={typedLesson.starter_code || ""}
       language={typedLesson.language || "python"}
+      hasTests={!!typedLesson.test_code && typedLesson.test_code.trim().length > 0}
       lessons={lessons}
       currentIndex={currentIndex}
       prevLesson={prevLesson}

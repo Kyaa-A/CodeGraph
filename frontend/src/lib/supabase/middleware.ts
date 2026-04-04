@@ -41,7 +41,9 @@ export async function updateSession(request: NextRequest) {
       request.nextUrl.pathname.startsWith(path)
     ) ||
     // Protect individual lesson pages but keep course listing/detail public
-    /^\/courses\/[^/]+\/[^/]+/.test(request.nextUrl.pathname);
+    /^\/courses\/[^/]+\/[^/]+/.test(request.nextUrl.pathname) ||
+    // Protect individual problem solve pages but keep listing public
+    /^\/problems\/[^/]+/.test(request.nextUrl.pathname);
 
   if (isProtectedRoute && !user) {
     const url = request.nextUrl.clone();

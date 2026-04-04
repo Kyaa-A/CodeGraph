@@ -22,6 +22,7 @@ const Icons = {
 };
 
 export default function SignupPage() {
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -48,7 +49,11 @@ export default function SignupPage() {
     }
 
     setLoading(true);
-    const { error } = await supabase.auth.signUp({ email, password });
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: { data: { name: name.trim() || email.split("@")[0] } },
+    });
 
     if (error) {
       setError(error.message);
@@ -89,6 +94,24 @@ export default function SignupPage() {
                 )}
 
                 <form onSubmit={handleSignup} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="name" className="text-slate-700 font-medium">Full name</Label>
+                    <div className="relative">
+                      <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
+                        <Icons.user />
+                      </div>
+                      <Input
+                        id="name"
+                        type="text"
+                        placeholder="Your full name"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        required
+                        className="pl-10 h-12 rounded-lg border-slate-200 focus:border-amber-500 focus:ring-amber-500/20"
+                      />
+                    </div>
+                  </div>
+
                   <div className="space-y-2">
                     <Label htmlFor="email" className="text-slate-700 font-medium">Email address</Label>
                     <div className="relative">
