@@ -1,17 +1,32 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useCallback } from "react";
 import Link from "next/link";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import dynamic from "next/dynamic";
 import { Button } from "@/components/ui/button";
 import { AuthModal } from "@/components/auth-modal";
-import { Code2, BookOpen, Terminal, Play, ChevronRight, Sparkles, Zap, Shield, Globe, Rocket, Star, ArrowRight, Cpu, Layers, CheckCircle2, TerminalIcon, MonitorPlay } from "lucide-react";
+import { 
+  Code2, 
+  BookOpen, 
+  Terminal, 
+  Play, 
+  ChevronRight, 
+  Zap, 
+  Shield, 
+  Globe, 
+  Rocket, 
+  ArrowRight,
+  Users,
+  Award,
+  Laptop,
+  CheckCircle2
+} from "lucide-react";
 
 const MonacoEditor = dynamic(() => import("@monaco-editor/react").then(m => m.default), {
   ssr: false,
   loading: () => (
-    <div className="h-full bg-[#0d1117] flex items-center justify-center text-slate-500 text-sm">
+    <div className="h-full bg-[#fafafa] flex items-center justify-center text-slate-400 text-sm">
       Loading editor...
     </div>
   ),
@@ -23,212 +38,154 @@ const LANGUAGES = [
   { id: "javascript", name: "JavaScript" },
   { id: "typescript", name: "TypeScript" },
   { id: "java", name: "Java" },
-  { id: "c", name: "C" },
+  { id: "c", name: "C", disabled: true },
   { id: "cpp", name: "C++" },
-  { id: "csharp", name: "C#" },
-  { id: "go", name: "Go" },
-  { id: "rust", name: "Rust" },
-  { id: "ruby", name: "Ruby" },
+  { id: "csharp", name: "C#", disabled: true },
+  { id: "go", name: "Go", disabled: true },
+  { id: "rust", name: "Rust", disabled: true },
+  { id: "ruby", name: "Ruby", disabled: true },
   { id: "php", name: "PHP" },
-  { id: "kotlin", name: "Kotlin" },
-  { id: "sql", name: "SQL" },
+  { id: "kotlin", name: "Kotlin", disabled: true },
+  { id: "sql", name: "SQL", disabled: true },
 ];
 
 const DEFAULT_CODE: Record<string, string> = {
-  python: `def main():
-    # Welcome to CodeGraph
-    print("Hello from CodeGraph! 🚀")
+  python: `class Solution:
+    def twoSum(self, nums: List[int], target: int) -> List[int]:
+        seen = {}
+        for i, num in enumerate(nums):
+            complement = target - num
+            if complement in seen:
+                return [seen[complement], i]
+            seen[num] = i
+        return []`,
+  javascript: `function twoSum(nums, target) {
+    const map = new Map();
     
-    # Solve coding challenges
-    for i in range(5):
-        print(f"  Step {i + 1}: Master Python")
-
-if __name__ == "__main__":
-    main()`,
-  javascript: `// Welcome to CodeGraph
-function main() {
-    console.log("Hello from CodeGraph! 🚀");
-    
-    // Solve coding challenges
-    for (let i = 1; i <= 5; i++) {
-        console.log(\`  Step \${i}: Master JavaScript\`);
-    }
-}
-
-main();`,
-  typescript: `// Welcome to CodeGraph
-const main = (): void => {
-    console.log("Hello from CodeGraph! 🚀");
-    
-    // Solve coding challenges
-    const steps: number[] = [1, 2, 3, 4, 5];
-    steps.forEach(s => console.log(\`  Step \${s}: Master TypeScript\`));
-};
-
-main();`,
-  java: `public class Main {
-    public static void main(String[] args) {
-        System.out.println("Hello from CodeGraph! 🚀");
-        
-        // Solve coding challenges
-        for (int i = 1; i <= 5; i++) {
-            System.out.println("  Step " + i + ": Master Java");
+    for (let i = 0; i < nums.length; i++) {
+        const complement = target - nums[i];
+        if (map.has(complement)) {
+            return [map.get(complement), i];
         }
+        map.set(nums[i], i);
     }
-}`,
-  c: `#include <stdio.h>
-
-int main() {
-    printf("Hello from CodeGraph! 🚀\\n");
     
-    // Solve coding challenges
-    for (int i = 1; i <= 5; i++) {
-        printf("  Step %d: Master C\\n", i);
-    }
-    return 0;
+    return [];
 }`,
-  cpp: `#include <iostream>
-using namespace std;
-
-int main() {
-    cout << "Hello from CodeGraph! 🚀" << endl;
+  typescript: `function twoSum(nums: number[], target: number): number[] {
+    const map = new Map<number, number>();
     
-    // Solve coding challenges
-    for (int i = 1; i <= 5; i++) {
-        cout << "  Step " << i << ": Master C++" << endl;
-    }
-    return 0;
-}`,
-  csharp: `using System;
-
-class Program {
-    static void Main() {
-        Console.WriteLine("Hello from CodeGraph! 🚀");
-        
-        // Solve coding challenges
-        for (int i = 1; i <= 5; i++) {
-            Console.WriteLine($"  Step {i}: Master C#");
+    for (let i = 0; i < nums.length; i++) {
+        const complement = target - nums[i];
+        if (map.has(complement)) {
+            return [map.get(complement)!, i];
         }
+        map.set(nums[i], i);
     }
-}`,
-  go: `package main
-
-import "fmt"
-
-func main() {
-    fmt.Println("Hello from CodeGraph! 🚀")
     
-    // Solve coding challenges
-    for i := 1; i <= 5; i++ {
-        fmt.Printf("  Step %d: Master Go\\n", i)
+    return [];
+}`,
+  java: `class Solution {
+    public int[] twoSum(int[] nums, int target) {
+        Map<Integer, Integer> map = new HashMap<>();
+        
+        for (int i = 0; i < nums.length; i++) {
+            int complement = target - nums[i];
+            if (map.containsKey(complement)) {
+                return new int[] { map.get(complement), i };
+            }
+            map.put(nums[i], i);
+        }
+        
+        return new int[0];
     }
 }`,
-  rust: `fn main() {
-    println!("Hello from CodeGraph! 🚀");
-    
-    // Solve coding challenges
-    for i in 1..=5 {
-        println!("  Step {}: Master Rust", i);
+  cpp: `class Solution {
+public:
+    vector<int> twoSum(vector<int>& nums, int target) {
+        unordered_map<int, int> map;
+        
+        for (int i = 0; i < nums.size(); i++) {
+            int complement = target - nums[i];
+            if (map.find(complement) != map.end()) {
+                return {map[complement], i};
+            }
+            map[nums[i]] = i;
+        }
+        
+        return {};
+    }
+};`,
+  php: `class Solution {
+    function twoSum($nums, $target) {
+        $map = [];
+        
+        foreach ($nums as $i => $num) {
+            $complement = $target - $num;
+            if (isset($map[$complement])) {
+                return [$map[$complement], $i];
+            }
+            $map[$num] = $i;
+        }
+        
+        return [];
     }
 }`,
-  ruby: `puts "Hello from CodeGraph! 🚀"
-
-# Solve coding challenges
-5.times do |i|
-  puts "  Step #{i + 1}: Master Ruby"
-end`,
-  php: `<?php
-echo "Hello from CodeGraph! 🚀\\n";
-
-// Solve coding challenges
-for ($i = 1; $i <= 5; $i++) {
-    echo "  Step $i: Master PHP\\n";
-}`,
-  kotlin: `fun main() {
-    println("Hello from CodeGraph! 🚀")
-    
-    // Solve coding challenges
-    for (i in 1..5) {
-        println("  Step $i: Master Kotlin")
-    }
-}`,
-  sql: "\n-- Query your data\nSELECT 'Hello from CodeGraph! 🚀' AS greeting;\n\n-- Solve coding challenges\nSELECT 'Step ' || value || ': Master SQL' AS step\nFROM generate_series(1, 5) AS value;",
 };
 
 // --- Features data ---
 const FEATURES = [
   {
-    icon: <BookOpen className="h-5 w-5" />,
-    title: "Interactive Courses",
-    description: "Master concepts with hands-on projects and guided tutorials",
-    color: "from-emerald-500/20 to-emerald-500/5",
-    borderColor: "border-emerald-500/20",
-    iconBg: "bg-emerald-500/20",
-    iconColor: "text-emerald-400",
+    icon: <BookOpen className="h-6 w-6" />,
+    title: "Structured Courses",
+    description: "Learn with step-by-step tutorials designed by industry experts",
+    href: "/courses",
+    color: "bg-emerald-100 text-emerald-600",
   },
   {
-    icon: <Cpu className="h-5 w-5" />,
+    icon: <Code2 className="h-6 w-6" />,
     title: "Coding Problems",
     description: "Practice with LeetCode-style challenges across all difficulty levels",
-    color: "from-amber-500/20 to-amber-500/5",
-    borderColor: "border-amber-500/20",
-    iconBg: "bg-amber-500/20",
-    iconColor: "text-amber-400",
+    href: "/problems",
+    color: "bg-amber-100 text-amber-600",
   },
   {
-    icon: <Terminal className="h-5 w-5" />,
-    title: "Live Playground",
-    description: "Write and execute code instantly in 13 languages from your browser",
-    color: "from-violet-500/20 to-violet-500/5",
-    borderColor: "border-violet-500/20",
-    iconBg: "bg-violet-500/20",
-    iconColor: "text-violet-400",
+    icon: <Users className="h-6 w-6" />,
+    title: "Active Community",
+    description: "Join thousands of developers and grow together",
+    href: "/",
+    color: "bg-blue-100 text-blue-600",
   },
 ];
 
-// --- Bento grid items ---
-const BENTO_ITEMS = [
-  {
-    title: "13 Languages",
-    value: "13+",
-    label: "Popular programming languages supported",
-    icon: <Globe className="h-4 w-4" />,
-    color: "from-blue-500/10 to-blue-500/5",
-    border: "border-blue-500/20",
-    iconBg: "bg-blue-500/20",
-  },
-  {
-    title: "Coding Problems",
-    value: "20+",
-    label: "LeetCode-style challenges",
-    icon: <Zap className="h-4 w-4" />,
-    color: "from-amber-500/10 to-amber-500/5",
-    border: "border-amber-500/20",
-    iconBg: "bg-amber-500/20",
-  },
-  {
-    title: "Interactive Courses",
-    value: "5+",
-    label: "Step-by-step learning paths",
-    icon: <Layers className="h-4 w-4" />,
-    color: "from-emerald-500/10 to-emerald-500/5",
-    border: "border-emerald-500/20",
-    iconBg: "bg-emerald-500/20",
-  },
-  {
-    title: "Free to Use",
-    value: "100%",
-    label: "No credit card required",
-    icon: <Shield className="h-4 w-4" />,
-    color: "from-violet-500/10 to-violet-500/5",
-    border: "border-violet-500/20",
-    iconBg: "bg-violet-500/20",
-  },
+// --- Stats data ---
+const STATS = [
+  { value: "5+", label: "Interactive Courses", icon: <BookOpen className="h-5 w-5" /> },
+  { value: "20+", label: "Coding Problems", icon: <Code2 className="h-5 w-5" /> },
+  { value: "13", label: "Languages", icon: <Globe className="h-5 w-5" /> },
+  { value: "100%", label: "Free", icon: <CheckCircle2 className="h-5 w-5" /> },
 ];
+
+// --- Hexagonal icon component ---
+function HexIcon({ icon, color, className = "" }: { icon: React.ReactNode; color: string; className?: string }) {
+  return (
+    <div className={`relative ${className}`}>
+      <svg viewBox="0 0 60 60" className="h-16 w-16">
+        <path
+          d="M30 5 L55 20 V42 L30 56 L5 42 V20 Z"
+          fill="currentColor"
+          className={color}
+        />
+      </svg>
+      <div className="absolute inset-0 flex items-center justify-center text-white">
+        {icon}
+      </div>
+    </div>
+  );
+}
 
 // --- Main Component ---
 export default function HomePage() {
-  const [activeFeature, setActiveFeature] = useState(0);
   const [editorLang, setEditorLang] = useState("python");
   const [editorCode, setEditorCode] = useState(DEFAULT_CODE.python);
   const [output, setOutput] = useState("");
@@ -237,7 +194,7 @@ export default function HomePage() {
 
   const handleLangChange = (langId: string) => {
     setEditorLang(langId);
-    setEditorCode(DEFAULT_CODE[langId] || "");
+    setEditorCode(DEFAULT_CODE[langId] || DEFAULT_CODE.python);
     setOutput("");
   };
 
@@ -264,267 +221,222 @@ export default function HomePage() {
   }, [editorCode, editorLang]);
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#020617]">
+    <div className="flex flex-col min-h-screen bg-white">
       <div className="h-20" />
 
       {/* ===== HERO SECTION ===== */}
-      <section className="relative overflow-hidden">
-        {/* Animated gradient background */}
-        <div className="absolute inset-0 bg-[#020617]">
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.25),transparent)]" />
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_60%_at_80%_50%,rgba(99,102,241,0.12),transparent)]" />
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_40%_40%_at_20%_80%,rgba(16,185,129,0.1),transparent)]" />
-        </div>
-        
-        {/* Grid pattern overlay */}
-        <div 
-          className="absolute inset-0 opacity-[0.02]"
-          style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='72' height='72' viewBox='0 0 72 72' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 0h2v72h-2zM0 36h72v2H0z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-          }}
-        />
-
-        <div className="relative z-10 max-w-6xl mx-auto px-4 py-20 sm:py-32">
-          <div className="text-center max-w-3xl mx-auto">
-            {/* Badge */}
+      <section className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+        <div className="max-w-6xl mx-auto px-4 py-20 sm:py-28">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            {/* Left - Content */}
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5 }}
-              className="inline-flex"
             >
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-800/50 border border-slate-700/50 backdrop-blur-sm text-slate-300 text-sm font-medium mb-8">
-                <Sparkles className="h-3.5 w-3.5 text-amber-400" />
-                <span>Now with AI-powered assistance</span>
+              <h1 className="text-4xl sm:text-5xl font-bold text-white tracking-tight leading-tight">
+                A New Way to
+                <span className="block text-emerald-400">Learn Coding</span>
+              </h1>
+              <p className="mt-6 text-lg text-slate-300 leading-relaxed">
+                CodeGraph is the best platform to help you enhance your skills, expand 
+                your knowledge and prepare for technical interviews. Interactive courses, 
+                coding problems, and a powerful playground — all in your browser.
+              </p>
+              <div className="mt-8 flex flex-col sm:flex-row gap-3">
+                <Link href="/auth/signup">
+                  <Button size="lg" className="bg-emerald-500 hover:bg-emerald-600 text-white font-semibold text-base px-6 h-12 rounded-full">
+                    Create Account
+                    <ChevronRight className="ml-1 h-4 w-4" />
+                  </Button>
+                </Link>
+                <Link href="#playground">
+                  <Button size="lg" variant="outline" className="border-slate-600 text-slate-300 hover:bg-slate-800 hover:text-white text-base px-6 h-12 rounded-full">
+                    Start Exploring
+                  </Button>
+                </Link>
               </div>
             </motion.div>
 
-            {/* Headline */}
-            <motion.h1
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-              className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight"
-            >
-              <span className="text-white">Code.</span>{" "}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-400">Learn.</span>{" "}
-              <span className="text-white">Solve.</span>
-            </motion.h1>
-
-            {/* Subheadline */}
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
+            {/* Right - Mockup */}
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
-              className="mt-6 text-lg sm:text-xl text-slate-400 max-w-xl mx-auto leading-relaxed"
+              className="relative"
             >
-              The all-in-one platform for developers. Interactive courses, LeetCode-style
-              problems, and a multi-language playground — all in your browser.
-            </motion.p>
-
-            {/* CTAs */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.3 }}
-              className="mt-10 flex flex-col sm:flex-row gap-3 justify-center"
-            >
-              <Link href="/auth/signup">
-                <Button size="lg" className="bg-emerald-500 hover:bg-emerald-600 text-white font-semibold text-base px-8 h-12 rounded-xl shadow-lg shadow-emerald-500/20">
-                  Get Started Free
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-              </Link>
-              <Link href="#playground">
-                <Button size="lg" variant="outline" className="border-slate-700 bg-slate-800/50 text-white hover:bg-slate-700/50 text-base px-8 h-12 rounded-xl backdrop-blur-sm">
-                  <Play className="mr-2 h-4 w-4 text-emerald-400" />
-                  Try Playground
-                </Button>
-              </Link>
-            </motion.div>
-
-            {/* Trust indicators */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.4 }}
-              className="mt-8 flex flex-wrap items-center justify-center gap-6 text-sm text-slate-500"
-            >
-              <div className="flex items-center gap-2">
-                <CheckCircle2 className="h-4 w-4 text-emerald-500" />
-                <span>Free forever</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <CheckCircle2 className="h-4 w-4 text-emerald-500" />
-                <span>No signup required</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <CheckCircle2 className="h-4 w-4 text-emerald-500" />
-                <span>13 languages</span>
-              </div>
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
-      {/* ===== BENTO STATS GRID ===== */}
-      <section className="relative py-16">
-        <div className="max-w-5xl mx-auto px-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {BENTO_ITEMS.map((item, i) => (
-              <motion.div
-                key={item.title}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.4, delay: i * 0.1 }}
-                className={`relative p-5 rounded-2xl bg-gradient-to-br ${item.color} ${item.border} border backdrop-blur-sm`}
-              >
-                <div className="flex items-center gap-2 text-slate-400 mb-2">
-                  <div className={`p-1.5 rounded-lg ${item.iconBg || 'bg-slate-800/50'}`}>
-                    {item.icon}
+              <div className="relative rounded-2xl bg-white shadow-2xl overflow-hidden transform rotate-[-2deg] hover:rotate-0 transition-transform duration-500">
+                <div className="bg-slate-100 px-4 py-3 border-b border-slate-200 flex items-center gap-2">
+                  <div className="flex gap-1.5">
+                    <div className="w-3 h-3 rounded-full bg-red-400" />
+                    <div className="w-3 h-3 rounded-full bg-amber-400" />
+                    <div className="w-3 h-3 rounded-full bg-emerald-400" />
                   </div>
-                  <span className="text-xs font-medium uppercase tracking-wider">{item.title}</span>
+                  <div className="ml-4 text-sm text-slate-500">solution.py</div>
                 </div>
-                <div className="text-3xl font-bold text-white">{item.value}</div>
-                <div className="text-xs text-slate-500 mt-1">{item.label}</div>
-              </motion.div>
-            ))}
+                <div className="p-6 bg-white">
+                  <div className="space-y-2">
+                    <div className="h-2 w-3/4 bg-slate-100 rounded" />
+                    <div className="h-2 w-1/2 bg-slate-100 rounded" />
+                    <div className="h-2 w-5/6 bg-slate-100 rounded" />
+                    <div className="h-2 w-2/3 bg-slate-100 rounded" />
+                    <div className="h-2 w-4/5 bg-slate-100 rounded" />
+                  </div>
+                  <div className="mt-6 flex items-center gap-3">
+                    <div className="h-8 w-20 bg-emerald-100 rounded flex items-center justify-center">
+                      <span className="text-xs text-emerald-600 font-medium">Easy</span>
+                    </div>
+                    <div className="h-8 w-20 bg-amber-100 rounded flex items-center justify-center">
+                      <span className="text-xs text-amber-600 font-medium">Medium</span>
+                    </div>
+                    <div className="h-8 w-20 bg-red-100 rounded flex items-center justify-center">
+                      <span className="text-xs text-red-600 font-medium">Hard</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Floating elements */}
+              <div className="absolute -bottom-4 -right-4 w-24 h-24 bg-emerald-500 rounded-2xl flex items-center justify-center shadow-lg transform rotate-12">
+                <CheckCircle2 className="h-10 w-10 text-white" />
+              </div>
+            </motion.div>
           </div>
+        </div>
+
+        {/* Wave divider */}
+        <div className="absolute bottom-0 left-0 right-0">
+          <svg viewBox="0 0 1440 100" fill="none" className="w-full">
+            <path
+              d="M0 50L60 45.7C120 41 240 33 360 35.3C480 37 600 50 720 52.3C840 55 960 46 1080 41.7C1200 37 1320 37 1380 37L1440 37V100H1380C1320 100 1200 100 1080 100C960 100 840 100 720 100C600 100 480 100 360 100C240 100 120 100 60 100H0V50Z"
+              fill="white"
+            />
+          </svg>
         </div>
       </section>
 
-      {/* ===== FEATURES ===== */}
-      <section className="relative py-20 sm:py-28">
+      {/* ===== FEATURES SECTION ===== */}
+      <section id="explore" className="py-16 bg-white">
         <div className="max-w-6xl mx-auto px-4">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-3xl sm:text-4xl font-bold text-white tracking-tight">
-              Everything you need to learn coding
-            </h2>
-            <p className="mt-4 text-lg text-slate-400 max-w-2xl mx-auto">
-              From structured courses to coding challenges to a powerful playground — 
-              all designed to accelerate your development journey.
-            </p>
-          </motion.div>
-
-          {/* Feature cards */}
-          <div className="grid md:grid-cols-3 gap-6">
-            {FEATURES.map((feature, i) => (
-              <motion.div
-                key={feature.title}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.4, delay: i * 0.1 }}
-                onMouseEnter={() => setActiveFeature(i)}
-                className={`group relative p-6 rounded-2xl bg-gradient-to-br ${feature.color} ${feature.borderColor} border backdrop-blur-sm transition-all duration-300 hover:scale-[1.02]`}
-              >
-                <div className={`inline-flex items-center justify-center h-12 w-12 rounded-xl ${feature.iconBg} ${feature.iconColor} mb-5`}>
-                  {feature.icon}
-                </div>
-                <h3 className="text-xl font-semibold text-white mb-2">{feature.title}</h3>
-                <p className="text-slate-400 text-sm leading-relaxed">{feature.description}</p>
-                
-                <div className="mt-6 flex items-center text-emerald-400 text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity">
-                  <span>Learn more</span>
-                  <ChevronRight className="ml-1 h-4 w-4" />
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ===== INTERACTIVE PLAYGROUND ===== */}
-      <section id="playground" className="relative py-20 sm:py-28">
-        {/* Background gradient */}
-        <div className="absolute inset-0 bg-gradient-to-b from-slate-950 via-slate-900/50 to-slate-950" />
-        
-        <div className="relative z-10 max-w-6xl mx-auto px-4">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             className="text-center mb-12"
           >
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-violet-500/10 border border-violet-500/20 text-violet-400 text-xs font-medium mb-4">
-              <MonitorPlay className="h-3.5 w-3.5" />
-              Interactive Demo
-            </div>
-            <h2 className="text-3xl sm:text-4xl font-bold text-white tracking-tight">
-              Built for Developers
-            </h2>
-            <p className="mt-4 text-lg text-slate-400 max-w-xl mx-auto">
-              Write, run, and debug code instantly. No setup, no installation — 
-              just open your browser and start coding.
+            <h2 className="text-emerald-600 font-semibold text-sm uppercase tracking-wider mb-2">Start Exploring</h2>
+            <p className="text-slate-600 max-w-2xl mx-auto">
+              Explore is a well-organized tool that helps you get the most out of CodeGraph by providing structure to guide your progress.
             </p>
           </motion.div>
 
-          {/* Language selector */}
+          <div className="grid md:grid-cols-2 gap-8">
+            {/* Feature Card 1 */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.1 }}
+              className="flex gap-6"
+            >
+              <HexIcon icon={<BookOpen className="h-6 w-6" />} color="text-blue-500" />
+              <div className="flex-1">
+                <h3 className="text-xl font-semibold text-slate-900 mb-2">Questions, Community & Contests</h3>
+                <p className="text-slate-500 leading-relaxed">
+                  Over 20 coding problems for you to practice. Come and join our growing community of developers and participate in contests to challenge yourself and earn rewards.
+                </p>
+                <Link href="/problems" className="inline-flex items-center mt-4 text-emerald-600 hover:text-emerald-700 font-medium text-sm">
+                  View Questions
+                  <ChevronRight className="ml-1 h-4 w-4" />
+                </Link>
+              </div>
+            </motion.div>
+
+            {/* Feature Card 2 */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2 }}
+              className="flex gap-6"
+            >
+              <HexIcon icon={<Laptop className="h-6 w-6" />} color="text-amber-500" />
+              <div className="flex-1">
+                <h3 className="text-xl font-semibold text-slate-900 mb-2">Companies & Candidates</h3>
+                <p className="text-slate-500 leading-relaxed">
+                  Not only does CodeGraph prepare candidates for technical interviews, we also help identify top technical talent. From coding challenges to assessments and training.
+                </p>
+                <Link href="/courses" className="inline-flex items-center mt-4 text-emerald-600 hover:text-emerald-700 font-medium text-sm">
+                  Browse Opportunities
+                  <ChevronRight className="ml-1 h-4 w-4" />
+                </Link>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* ===== DEVELOPER SECTION ===== */}
+      <section className="py-16 bg-slate-50">
+        <div className="max-w-6xl mx-auto px-4">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="flex flex-wrap justify-center gap-2 mb-8"
+            className="text-center mb-12"
           >
-            {LANGUAGES.map((lang) => (
-              <button
-                key={lang.id}
-                onClick={() => handleLangChange(lang.id)}
-                className={`px-3.5 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 ${
-                  editorLang === lang.id
-                    ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 shadow-sm shadow-emerald-500/10"
-                    : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border border-slate-800 hover:border-slate-700"
-                }`}
-              >
-                {lang.name}
-              </button>
-            ))}
+            <HexIcon icon={<Code2 className="h-6 w-6" />} color="text-emerald-500" className="mx-auto mb-4" />
+            <h2 className="text-emerald-600 font-semibold text-lg mb-2">Developer</h2>
+            <p className="text-slate-500 max-w-2xl mx-auto">
+              We now support 13 popular coding languages. At our core, CodeGraph is about developers. Our powerful development tools such as Playground help you test, debug and even write your own projects online.
+            </p>
           </motion.div>
 
-          {/* Editor card */}
+          {/* Interactive Playground */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="rounded-2xl overflow-hidden border border-slate-800 bg-slate-900/50 backdrop-blur-sm shadow-2xl shadow-black/20"
+            id="playground"
+            className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden"
           >
-            {/* Editor toolbar */}
-            <div className="flex items-center justify-between px-4 py-3 bg-slate-950/80 border-b border-slate-800">
-              <div className="flex items-center gap-3">
-                <div className="flex items-center gap-1.5">
-                  <div className="h-3 w-3 rounded-full bg-red-500/90" />
-                  <div className="h-3 w-3 rounded-full bg-amber-500/90" />
-                  <div className="h-3 w-3 rounded-full bg-emerald-500/90" />
-                </div>
-                <div className="h-4 w-px bg-slate-700 mx-2" />
-                <div className="flex items-center gap-2 text-slate-400">
-                  <TerminalIcon className="h-4 w-4" />
-                  <span className="text-sm">playground.{editorLang === "cpp" ? "cpp" : editorLang === "csharp" ? "cs" : editorLang}</span>
-                </div>
+            {/* Tabs */}
+            <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200 bg-slate-50">
+              <div className="flex items-center gap-1">
+                {LANGUAGES.slice(0, 5).map((lang) => (
+                  <button
+                    key={lang.id}
+                    onClick={() => handleLangChange(lang.id)}
+                    disabled={lang.disabled}
+                    className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+                      lang.disabled 
+                        ? "text-slate-400 cursor-not-allowed" 
+                        : editorLang === lang.id
+                          ? "bg-white text-slate-900 shadow-sm border border-slate-200"
+                          : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+                    }`}
+                  >
+                    {lang.name}
+                  </button>
+                ))}
               </div>
               <button
                 onClick={handleRun}
                 disabled={running}
-                className={`flex items-center gap-2 px-4 py-1.5 rounded-lg text-sm font-medium transition-all ${
+                className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
                   running
-                    ? "bg-slate-800 text-slate-500 cursor-not-allowed"
-                    : "bg-emerald-500 hover:bg-emerald-600 text-white shadow-lg shadow-emerald-500/20"
+                    ? "bg-slate-200 text-slate-500 cursor-not-allowed"
+                    : "bg-emerald-500 hover:bg-emerald-600 text-white"
                 }`}
               >
                 {running ? (
                   <>
-                    <div className="h-3.5 w-3.5 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                    <div className="h-4 w-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
                     Running...
                   </>
                 ) : (
                   <>
-                    <Play className="h-3.5 w-3.5 fill-current" />
+                    <Play className="h-4 w-4 fill-current" />
                     Run
                   </>
                 )}
@@ -532,14 +444,14 @@ export default function HomePage() {
             </div>
 
             {/* Editor */}
-            <div className="grid lg:grid-cols-[1fr,320px]">
-              <div className="h-[380px]">
+            <div className="grid lg:grid-cols-[1fr,280px]">
+              <div className="h-[360px]">
                 <MonacoEditor
                   height="100%"
-                  language={editorLang === "cpp" ? "cpp" : editorLang === "csharp" ? "csharp" : editorLang}
+                  language={editorLang === "cpp" ? "cpp" : editorLang}
                   value={editorCode}
                   onChange={(value) => setEditorCode(value || "")}
-                  theme="vs-dark"
+                  theme="light"
                   options={{
                     minimap: { enabled: false },
                     fontSize: 14,
@@ -550,153 +462,129 @@ export default function HomePage() {
                     automaticLayout: true,
                     tabSize: 4,
                     renderLineHighlight: "line",
-                    cursorBlinking: "smooth",
-                    smoothScrolling: true,
                     contextmenu: false,
-                    fontFamily: "JetBrains Mono, monospace",
                   }}
                 />
               </div>
 
-              {/* Output panel */}
-              <div className="border-t lg:border-t-0 lg:border-l border-slate-800 bg-slate-950/50">
-                <div className="px-4 py-2 border-b border-slate-800 flex items-center justify-between">
-                  <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Output</span>
-                  {output && !running && (
-                    <button 
-                      onClick={() => setOutput("")}
-                      className="text-xs text-slate-600 hover:text-slate-400 transition-colors"
-                    >
-                      Clear
+              {/* Sidebar */}
+              <div className="border-t lg:border-t-0 lg:border-l border-slate-200 bg-slate-50">
+                <div className="p-4">
+                  <h4 className="text-sm font-semibold text-slate-900 mb-3">Popular Topics</h4>
+                  <div className="space-y-2">
+                    <button className="w-full flex items-center gap-3 px-3 py-2 rounded-lg bg-white border border-slate-200 text-sm text-slate-700 hover:border-emerald-300 hover:bg-emerald-50 transition-colors">
+                      <Code2 className="h-4 w-4 text-emerald-500" />
+                      Linked List
                     </button>
-                  )}
+                    <button className="w-full flex items-center gap-3 px-3 py-2 rounded-lg bg-white border border-slate-200 text-sm text-slate-700 hover:border-emerald-300 hover:bg-emerald-50 transition-colors">
+                      <Code2 className="h-4 w-4 text-emerald-500" />
+                      Binary Tree
+                    </button>
+                    <button className="w-full flex items-center gap-3 px-3 py-2 rounded-lg bg-white border border-slate-200 text-sm text-slate-700 hover:border-emerald-300 hover:bg-emerald-50 transition-colors">
+                      <Code2 className="h-4 w-4 text-emerald-500" />
+                      Fibonacci
+                    </button>
+                  </div>
+                  <Link href="/playground" className="flex items-center mt-4 text-emerald-600 hover:text-emerald-700 font-medium text-sm">
+                    Create Playground
+                    <ChevronRight className="ml-1 h-4 w-4" />
+                  </Link>
                 </div>
-                <div className="p-4 h-full lg:h-[332px] overflow-y-auto">
-                  {running ? (
-                    <div className="flex items-center gap-2 text-sm text-slate-500">
-                      <div className="h-4 w-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                      Executing code...
-                    </div>
-                  ) : output ? (
-                    <pre className="text-sm font-mono text-slate-300 whitespace-pre-wrap">{output}</pre>
-                  ) : (
-                    <div className="text-sm text-slate-600 italic">
-                      Click \"Run\" to execute your code
-                    </div>
-                  )}
+
+                {/* Output */}
+                <div className="border-t border-slate-200 p-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs font-semibold text-slate-500 uppercase">Output</span>
+                    {output && (
+                      <button 
+                        onClick={() => setOutput("")}
+                        className="text-xs text-slate-400 hover:text-slate-600"
+                      >
+                        Clear
+                      </button>
+                    )}
+                  </div>
+                  <div className="bg-white border border-slate-200 rounded-lg p-3 min-h-[100px]">
+                    {running ? (
+                      <div className="flex items-center gap-2 text-sm text-slate-500">
+                        <div className="h-4 w-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                        Executing...
+                      </div>
+                    ) : output ? (
+                      <pre className="text-sm font-mono text-slate-700 whitespace-pre-wrap">{output}</pre>
+                    ) : (
+                      <span className="text-sm text-slate-400 italic">Click Run to execute your code</span>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
-          </motion.div>
-
-          {/* Quick start links */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="mt-8 grid sm:grid-cols-2 gap-4"
-          >
-            <Link 
-              href="/problems"
-              className="group flex items-center justify-between p-4 rounded-xl bg-slate-900/50 border border-slate-800 hover:border-slate-700 transition-colors"
-            >
-              <div className="flex items-center gap-3">
-                <div className="flex items-center justify-center h-10 w-10 rounded-lg bg-amber-500/10">
-                  <Zap className="h-5 w-5 text-amber-400" />
-                </div>
-                <div>
-                  <h4 className="text-sm font-semibold text-white">Start Coding</h4>
-                  <p className="text-xs text-slate-500">Browse 20+ coding problems</p>
-                </div>
-              </div>
-              <ArrowRight className="h-5 w-5 text-slate-600 group-hover:text-slate-400 group-hover:translate-x-0.5 transition-all" />
-            </Link>
-
-            <Link 
-              href="/courses"
-              className="group flex items-center justify-between p-4 rounded-xl bg-slate-900/50 border border-slate-800 hover:border-slate-700 transition-colors"
-            >
-              <div className="flex items-center gap-3">
-                <div className="flex items-center justify-center h-10 w-10 rounded-lg bg-emerald-500/10">
-                  <Rocket className="h-5 w-5 text-emerald-400" />
-                </div>
-                <div>
-                  <h4 className="text-sm font-semibold text-white">Start Learning</h4>
-                  <p className="text-xs text-slate-500">Explore structured courses</p>
-                </div>
-              </div>
-              <ArrowRight className="h-5 w-5 text-slate-600 group-hover:text-slate-400 group-hover:translate-x-0.5 transition-all" />
-            </Link>
           </motion.div>
         </div>
       </section>
 
-      {/* ===== CTA SECTION ===== */}
-      <section className="relative py-20 sm:py-28 overflow-hidden">
-        {/* Gradient background */}
-        <div className="absolute inset-0">
-          <div className="absolute inset-0 bg-gradient-to-b from-slate-950 to-[#020617]" />
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_100%,rgba(16,185,129,0.15),transparent)]" />
+      {/* ===== STATS SECTION ===== */}
+      <section className="py-16 bg-white">
+        <div className="max-w-4xl mx-auto px-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+            {STATS.map((stat, i) => (
+              <motion.div
+                key={stat.label}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4, delay: i * 0.1 }}
+                className="text-center"
+              >
+                <div className="inline-flex items-center justify-center h-12 w-12 rounded-2xl bg-emerald-100 text-emerald-600 mb-3">
+                  {stat.icon}
+                </div>
+                <div className="text-3xl font-bold text-slate-900">{stat.value}</div>
+                <div className="text-sm text-slate-500 mt-1">{stat.label}</div>
+              </motion.div>
+            ))}
+          </div>
         </div>
+      </section>
 
-        <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
+      {/* ===== CTA SECTION ===== */}
+      <section className="py-20 bg-slate-50">
+        <div className="max-w-3xl mx-auto px-4 text-center">
           <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-            className="p-8 sm:p-12 rounded-3xl bg-gradient-to-br from-slate-900/80 to-slate-900/40 border border-slate-800 backdrop-blur-sm"
           >
-            <div className="inline-flex items-center justify-center h-12 w-12 rounded-2xl bg-emerald-500/10 text-emerald-400 mb-6">
-              <Code2 className="h-6 w-6" />
-            </div>
-            <h2 className="text-3xl sm:text-4xl font-bold text-white tracking-tight">
-              Ready to start coding?
-            </h2>
-            <p className="mt-4 text-lg text-slate-400 max-w-lg mx-auto">
-              Join thousands of developers learning and building on CodeGraph. 
-              It's free forever.
+            <h2 className="text-emerald-600 font-semibold text-lg mb-2">Ready to start coding?</h2>
+            <p className="text-slate-600 mb-8">
+              Join thousands of developers learning and building on CodeGraph. Free forever.
             </p>
-            <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
-              <Link href="/auth/signup">
-                <Button size="lg" className="bg-emerald-500 hover:bg-emerald-600 text-white font-semibold text-base px-10 h-12 rounded-xl shadow-lg shadow-emerald-500/20">
-                  Get Started Free
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-              </Link>
-              <Link href="/problems">
-                <Button size="lg" variant="outline" className="border-slate-700 bg-slate-800/50 text-white hover:bg-slate-700/50 text-base px-10 h-12 rounded-xl">
-                  Explore Problems
-                </Button>
-              </Link>
-            </div>
-            <p className="mt-4 text-xs text-slate-500">No credit card required</p>
+            <Link href="/auth/signup">
+              <Button size="lg" className="bg-emerald-500 hover:bg-emerald-600 text-white font-semibold text-base px-10 h-12 rounded-full">
+                Get Started Free
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </Link>
+            <p className="mt-4 text-xs text-slate-400">No credit card required</p>
           </motion.div>
         </div>
       </section>
 
       {/* ===== FOOTER ===== */}
-      <footer className="relative border-t border-slate-800/50 bg-[#020617]">
-        <div className="max-w-6xl mx-auto px-4 py-12">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            {/* Logo */}
+      <footer className="bg-white border-t border-slate-200">
+        <div className="max-w-6xl mx-auto px-4 py-8">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-2">
-              <div className="flex items-center justify-center h-8 w-8 rounded-lg bg-emerald-500/10">
-                <Code2 className="h-5 w-5 text-emerald-400" />
-              </div>
-              <span className="font-bold text-white text-lg tracking-tight">CodeGraph</span>
+              <Code2 className="h-6 w-6 text-emerald-500" />
+              <span className="font-bold text-slate-900">CodeGraph</span>
             </div>
-
-            {/* Links */}
-            <div className="flex items-center gap-8 text-sm">
-              <Link href="/courses" className="text-slate-500 hover:text-slate-300 transition-colors">Courses</Link>
-              <Link href="/problems" className="text-slate-500 hover:text-slate-300 transition-colors">Problems</Link>
-              <Link href="/playground" className="text-slate-500 hover:text-slate-300 transition-colors">Playground</Link>
+            <div className="flex items-center gap-6 text-sm text-slate-500">
+              <Link href="/courses" className="hover:text-slate-700 transition-colors">Courses</Link>
+              <Link href="/problems" className="hover:text-slate-700 transition-colors">Problems</Link>
+              <Link href="/playground" className="hover:text-slate-700 transition-colors">Playground</Link>
             </div>
-
-            {/* Copyright */}
-            <p className="text-xs text-slate-600">
-              &copy; {new Date().getFullYear()} CodeGraph. All rights reserved.
+            <p className="text-xs text-slate-400">
+              &copy; {new Date().getFullYear()} CodeGraph
             </p>
           </div>
         </div>
