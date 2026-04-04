@@ -1,11 +1,12 @@
 import { notFound } from "next/navigation";
-import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { LessonViewer } from "@/components/lesson-viewer";
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 import { LessonClientShell } from "./lesson-client-shell";
 import type { Lesson } from "@/lib/supabase/types";
+
+export const metadata = {
+  title: "Lesson | CodeGraph",
+  description: "Course lesson content",
+};
 
 export default async function LessonPage({
   params,
@@ -34,64 +35,44 @@ export default async function LessonPage({
     .eq("course_id", id)
     .order("order_index", { ascending: true });
 
-  const lessons = (allLessons ?? []) as Pick<
-    Lesson,
-    "id" | "title" | "order_index"
-  >[];
+  const lessons = (allLessons ?? []) as Pick<Lesson, "id" | "title" | "order_index">[];
   const currentIndex = lessons.findIndex((l) => l.id === lessonId);
   const prevLesson = currentIndex > 0 ? lessons[currentIndex - 1] : null;
-  const nextLesson =
-    currentIndex < lessons.length - 1 ? lessons[currentIndex + 1] : null;
+  const nextLesson = currentIndex < lessons.length - 1 ? lessons[currentIndex + 1] : null;
+
+  // Fetch real completion data
+  const { data: { user } } = await supabase.auth.getUser();
+  let completedLessonIds = new Set<string>();
+  if (user) {
+    const { data: progress } = await supabase
+      .from("user_progress")
+      .select("lesson_id")
+      .eq("user_id", user.id)
+      .eq("completed", true)
+      .in("lesson_id", lessons.map((l) => l.id));
+    if (progress) {
+      completedLessonIds = new Set(progress.map((p: { lesson_id: string }) => p.lesson_id));
+    }
+  }
+  const completedCount = completedLessonIds.size;
+  const progressPercent = lessons.length > 0 ? Math.round((completedCount / lessons.length) * 100) : 0;
+
+  const completedIds = Array.from(completedLessonIds);
 
   return (
-    <LessonClientShell lessonId={lessonId} courseId={id}>
-      <div className="container mx-auto px-4 py-8">
-        {/* Breadcrumb */}
-        <nav className="mb-6 flex items-center gap-2 text-sm text-muted-foreground">
-          <Link href="/courses" className="hover:text-foreground">
-            Courses
-          </Link>
-          <span>/</span>
-          <Link href={`/courses/${id}`} className="hover:text-foreground">
-            Course
-          </Link>
-          <span>/</span>
-          <span className="text-foreground">{typedLesson.title}</span>
-        </nav>
-
-        <h1 className="mb-6 text-3xl font-bold tracking-tight">
-          {typedLesson.title}
-        </h1>
-
-        <Separator className="my-6" />
-
-        {/* Lesson content */}
-        <div className="mx-auto max-w-3xl">
-          <LessonViewer content={typedLesson.content} />
-        </div>
-
-        <Separator className="my-8" />
-
-        {/* Navigation */}
-        <div className="flex items-center justify-between">
-          {prevLesson ? (
-            <Link href={`/courses/${id}/${prevLesson.id}`}>
-              <Button variant="outline">Previous: {prevLesson.title}</Button>
-            </Link>
-          ) : (
-            <div />
-          )}
-          {nextLesson ? (
-            <Link href={`/courses/${id}/${nextLesson.id}`}>
-              <Button>Next: {nextLesson.title}</Button>
-            </Link>
-          ) : (
-            <Link href={`/courses/${id}`}>
-              <Button variant="outline">Back to course</Button>
-            </Link>
-          )}
-        </div>
-      </div>
-    </LessonClientShell>
+    <LessonClientShell
+      lessonId={lessonId}
+      courseId={id}
+      lessonContent={typedLesson.content}
+      starterCode={typedLesson.starter_code || ""}
+      language={typedLesson.language || "python"}
+      lessons={lessons}
+      currentIndex={currentIndex}
+      prevLesson={prevLesson}
+      nextLesson={nextLesson}
+      completedIds={completedIds}
+      completedCount={completedCount}
+      progressPercent={progressPercent}
+    />
   );
 }

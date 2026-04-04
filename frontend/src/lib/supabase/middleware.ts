@@ -35,19 +35,39 @@ export async function updateSession(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   // Define protected routes
-  const protectedPaths = ["/dashboard", "/admin"];
-  const isProtectedRoute = protectedPaths.some((path) =>
-    request.nextUrl.pathname.startsWith(path)
-  );
+  const protectedPaths = ["/dashboard"];
+  const isProtectedRoute =
+    protectedPaths.some((path) =>
+      request.nextUrl.pathname.startsWith(path)
+    ) ||
+    // Protect individual lesson pages but keep course listing/detail public
+    /^\/courses\/[^/]+\/[^/]+/.test(request.nextUrl.pathname);
 
-  // In development, allow bypassing auth with a query param
-  const bypassAuth = request.nextUrl.searchParams.get("bypass") === "true";
-
-  if (isProtectedRoute && !user && !bypassAuth) {
+  if (isProtectedRoute && !user) {
     const url = request.nextUrl.clone();
     url.pathname = "/auth/login";
     url.searchParams.set("next", request.nextUrl.pathname);
     return NextResponse.redirect(url);
+  }
+
+  // Admin routes require admin role
+  if (request.nextUrl.pathname.startsWith("/admin")) {
+    if (!user) {
+      const url = request.nextUrl.clone();
+      url.pathname = "/auth/login";
+      url.searchParams.set("next", request.nextUrl.pathname);
+      return NextResponse.redirect(url);
+    }
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .single();
+    if (!profile || profile.role !== "admin") {
+      const url = request.nextUrl.clone();
+      url.pathname = "/dashboard";
+      return NextResponse.redirect(url);
+    }
   }
 
   return supabaseResponse;

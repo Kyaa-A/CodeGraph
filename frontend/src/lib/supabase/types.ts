@@ -6,6 +6,7 @@ export interface Course {
   price: number;
   is_free: boolean;
   created_at: string;
+  updated_at?: string;
 }
 
 export interface Lesson {
@@ -14,6 +15,8 @@ export interface Lesson {
   title: string;
   content: string;
   order_index: number;
+  starter_code: string;
+  language: string;
   created_at: string;
 }
 
