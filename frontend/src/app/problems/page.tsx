@@ -64,11 +64,8 @@ export default async function ProblemsPage({
       solvedMap.set(s.problem_id, existing);
     }
 
-    // Collect submission dates for calendar
-    // Use the raw ISO date from postgres (YYYY-MM-DD prefix) to avoid timezone issues
-    submissionDates = (submissions ?? []).map((s: { created_at: string }) =>
-      s.created_at.substring(0, 10)
-    );
+    // Pass raw ISO timestamps — client will convert to local dates
+    submissionDates = (submissions ?? []).map((s: { created_at: string }) => s.created_at);
   }
 
   const totalCount = allTyped.length;
@@ -76,22 +73,6 @@ export default async function ProblemsPage({
   const mediumCount = allTyped.filter((p) => p.difficulty === "medium").length;
   const hardCount = allTyped.filter((p) => p.difficulty === "hard").length;
   const solvedCount = [...solvedMap.values()].filter((v) => v.solved).length;
-
-  // Calculate streak
-  const uniqueDateSet = new Set(submissionDates);
-  let streak = 0;
-  const now = new Date();
-  for (let i = 0; i < 365; i++) {
-    const d = new Date(now);
-    d.setDate(d.getDate() - i);
-    const dateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-    if (uniqueDateSet.has(dateStr)) {
-      streak++;
-    } else if (i > 0) {
-      // Allow today to have no submission (streak from yesterday still counts)
-      break;
-    }
-  }
 
   const difficultyColor: Record<string, string> = {
     easy: "text-emerald-600",
@@ -318,13 +299,7 @@ export default async function ProblemsPage({
 
             {/* Calendar Streak */}
             <div className="bg-white rounded-xl border border-slate-200 p-5">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-sm font-semibold text-slate-800">
-                  <span className="text-amber-500 mr-1.5">&#128293;</span>
-                  {streak} day streak
-                </h3>
-              </div>
-              <StreakCalendar activeDates={[...new Set(submissionDates)]} />
+              <StreakCalendar rawTimestamps={submissionDates} />
               {!user && (
                 <p className="text-[11px] text-slate-400 text-center mt-3">Sign in to track your streak</p>
               )}

@@ -1,17 +1,43 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 
 interface StreakCalendarProps {
-  activeDates: string[]; // ISO date strings like "2026-04-01"
+  /** Raw ISO timestamps from the server (e.g. "2026-04-04T10:30:00Z") */
+  rawTimestamps: string[];
 }
 
 const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
-export function StreakCalendar({ activeDates }: StreakCalendarProps) {
+function toLocalDateStr(date: Date): string {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+}
+
+export function StreakCalendar({ rawTimestamps }: StreakCalendarProps) {
   const [viewDate, setViewDate] = useState(new Date());
-  const activeSet = new Set(activeDates);
+
+  // Convert all timestamps to local date strings
+  const { activeSet, streak } = useMemo(() => {
+    const localDates = rawTimestamps.map((ts) => toLocalDateStr(new Date(ts)));
+    const set = new Set(localDates);
+
+    // Calculate streak
+    let s = 0;
+    const today = new Date();
+    for (let i = 0; i < 365; i++) {
+      const d = new Date(today);
+      d.setDate(d.getDate() - i);
+      const dateStr = toLocalDateStr(d);
+      if (set.has(dateStr)) {
+        s++;
+      } else if (i > 0) {
+        break;
+      }
+    }
+
+    return { activeSet: set, streak: s };
+  }, [rawTimestamps]);
 
   const year = viewDate.getFullYear();
   const month = viewDate.getMonth();
@@ -19,8 +45,7 @@ export function StreakCalendar({ activeDates }: StreakCalendarProps) {
   const firstDay = new Date(year, month, 1).getDay();
   const daysInMonth = new Date(year, month + 1, 0).getDate();
 
-  const today = new Date();
-  const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
+  const todayStr = toLocalDateStr(new Date());
 
   const prevMonth = () => setViewDate(new Date(year, month - 1, 1));
   const nextMonth = () => setViewDate(new Date(year, month + 1, 1));
@@ -31,6 +56,14 @@ export function StreakCalendar({ activeDates }: StreakCalendarProps) {
 
   return (
     <div>
+      {/* Streak header */}
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-sm font-semibold text-slate-800">
+          <span className="mr-1.5">{streak > 0 ? "\uD83D\uDD25" : "\u2744\uFE0F"}</span>
+          {streak} day streak
+        </h3>
+      </div>
+
       {/* Month Navigation */}
       <div className="flex items-center justify-between mb-3">
         <button onClick={prevMonth} className="p-1 rounded hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors">

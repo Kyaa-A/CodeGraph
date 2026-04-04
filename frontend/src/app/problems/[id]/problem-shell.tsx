@@ -47,7 +47,7 @@ export function ProblemShell({ problem, submissions: initialSubmissions, isAuthe
   const [running, setRunning] = useState(false);
   const [output, setOutput] = useState("");
   const [testResults, setTestResults] = useState<{ name: string; passed: boolean; message: string }[]>([]);
-  const [submitResult, setSubmitResult] = useState<{ passed: boolean; total: number; passedCount: number } | null>(null);
+  const [submitResult, setSubmitResult] = useState<{ passed: boolean; total: number; passedCount: number; solveTime?: number } | null>(null);
   const [submissions, setSubmissions] = useState(initialSubmissions);
   const [activePanel, setActivePanel] = useState<"output" | "tests">("tests");
   const [showAuthModal, setShowAuthModal] = useState(false);
@@ -134,10 +134,12 @@ export function ProblemShell({ problem, submissions: initialSubmissions, isAuthe
       });
       const data = await res.json();
       if (data.testResults) setTestResults(data.testResults);
+      const solveTime = data.passed && timerSeconds > 0 ? timerSeconds : undefined;
       setSubmitResult({
         passed: data.passed,
         total: data.totalTests,
         passedCount: data.passedTests,
+        solveTime,
       });
       setOutput(data.output || "");
       // Stop timer on successful submission
@@ -346,14 +348,21 @@ export function ProblemShell({ problem, submissions: initialSubmissions, isAuthe
               {activePanel === "tests" ? (
                 <div className="space-y-1.5">
                   {submitResult && (
-                    <div className={`rounded-lg px-3 py-2 text-sm font-semibold mb-2 ${
+                    <div className={`rounded-lg px-3 py-2 mb-2 ${
                       submitResult.passed
                         ? "bg-emerald-500/20 text-emerald-400"
                         : "bg-red-500/20 text-red-400"
                     }`}>
-                      {submitResult.passed
-                        ? `All Tests Passed! (${formatTime(timerSeconds)})`
-                        : `${submitResult.passedCount}/${submitResult.total} Tests Passed`}
+                      <div className="text-sm font-semibold">
+                        {submitResult.passed
+                          ? "All Tests Passed!"
+                          : `${submitResult.passedCount}/${submitResult.total} Tests Passed`}
+                      </div>
+                      {submitResult.passed && submitResult.solveTime && (
+                        <div className="text-xs mt-1 text-emerald-400/70">
+                          Solved in {formatTime(submitResult.solveTime)}
+                        </div>
+                      )}
                     </div>
                   )}
                   {testResults.map((t, i) => (
