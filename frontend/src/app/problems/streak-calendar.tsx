@@ -18,12 +18,13 @@ export function StreakCalendar({ rawTimestamps }: StreakCalendarProps) {
   const [viewDate, setViewDate] = useState(new Date());
 
   // Convert all timestamps to local date strings
-  const { activeSet, streak } = useMemo(() => {
+  const { activeSet, streak, streakDates } = useMemo(() => {
     const localDates = rawTimestamps.map((ts) => toLocalDateStr(new Date(ts)));
     const set = new Set(localDates);
 
-    // Calculate streak
+    // Calculate streak and collect streak dates
     let s = 0;
+    const sDates = new Set<string>();
     const today = new Date();
     for (let i = 0; i < 365; i++) {
       const d = new Date(today);
@@ -31,12 +32,13 @@ export function StreakCalendar({ rawTimestamps }: StreakCalendarProps) {
       const dateStr = toLocalDateStr(d);
       if (set.has(dateStr)) {
         s++;
+        sDates.add(dateStr);
       } else if (i > 0) {
         break;
       }
     }
 
-    return { activeSet: set, streak: s };
+    return { activeSet: set, streak: s, streakDates: sDates };
   }, [rawTimestamps]);
 
   const year = viewDate.getFullYear();
@@ -99,21 +101,26 @@ export function StreakCalendar({ rawTimestamps }: StreakCalendarProps) {
 
           const dateStr = `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
           const isActive = activeSet.has(dateStr);
+          const isStreak = streakDates.has(dateStr);
           const isToday = dateStr === todayStr;
 
           return (
             <div
               key={dateStr}
-              className={`aspect-square rounded-md flex items-center justify-center text-[11px] font-medium transition-colors ${
+              className={`aspect-square rounded-md flex items-center justify-center text-[11px] font-medium transition-colors relative ${
                 isActive
                   ? "bg-emerald-500 text-white"
                   : isToday
                     ? "bg-slate-100 text-slate-900 ring-1 ring-slate-300"
                     : "text-slate-500 hover:bg-slate-50"
               }`}
-              title={isActive ? `Active on ${dateStr}` : dateStr}
+              title={isStreak ? `Streak day!` : isActive ? `Active on ${dateStr}` : dateStr}
             >
-              {day}
+              {isStreak ? (
+                <span className="animate-pulse text-sm leading-none">🔥</span>
+              ) : (
+                day
+              )}
             </div>
           );
         })}
