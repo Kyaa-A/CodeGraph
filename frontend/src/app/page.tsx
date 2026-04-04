@@ -285,19 +285,59 @@ export default function HomePage() {
               </div>
             </motion.div>
 
-            {/* Right - Developer Animation */}
+            {/* Right - Mockup + Developer Animation */}
             <motion.div
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
-              className="relative flex items-center justify-center"
+              className="relative"
             >
-              <DotLottieReact
-                src="https://lottie.host/a28e7daa-5ade-4ac1-9c91-7353c3cd8f19/brFveAcB21.lottie"
-                loop
-                autoplay
-                className="w-full max-w-md"
-              />
+              {/* Code mockup card */}
+              <div className="relative rounded-2xl bg-white shadow-2xl overflow-hidden transform rotate-[-2deg] hover:rotate-0 transition-transform duration-500">
+                <div className="bg-slate-100 px-4 py-3 border-b border-slate-200 flex items-center gap-2">
+                  <div className="flex gap-1.5">
+                    <div className="w-3 h-3 rounded-full bg-red-400" />
+                    <div className="w-3 h-3 rounded-full bg-amber-400" />
+                    <div className="w-3 h-3 rounded-full bg-emerald-400" />
+                  </div>
+                  <div className="ml-4 text-sm text-slate-500">solution.py</div>
+                </div>
+                <div className="p-6 bg-white">
+                  <div className="space-y-2">
+                    <div className="h-2 w-3/4 bg-slate-100 rounded" />
+                    <div className="h-2 w-1/2 bg-slate-100 rounded" />
+                    <div className="h-2 w-5/6 bg-slate-100 rounded" />
+                    <div className="h-2 w-2/3 bg-slate-100 rounded" />
+                    <div className="h-2 w-4/5 bg-slate-100 rounded" />
+                  </div>
+                  <div className="mt-6 flex items-center gap-3">
+                    <div className="h-8 w-20 bg-emerald-100 rounded flex items-center justify-center">
+                      <span className="text-xs text-emerald-600 font-medium">Easy</span>
+                    </div>
+                    <div className="h-8 w-20 bg-amber-100 rounded flex items-center justify-center">
+                      <span className="text-xs text-amber-600 font-medium">Medium</span>
+                    </div>
+                    <div className="h-8 w-20 bg-red-100 rounded flex items-center justify-center">
+                      <span className="text-xs text-red-600 font-medium">Hard</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Developer animation overlaid */}
+              <div className="absolute -top-8 -right-8 w-48 h-48 pointer-events-none">
+                <DotLottieReact
+                  src="https://lottie.host/a28e7daa-5ade-4ac1-9c91-7353c3cd8f19/brFveAcB21.lottie"
+                  loop
+                  autoplay
+                  className="w-full h-full drop-shadow-lg"
+                />
+              </div>
+
+              {/* Floating checkmark */}
+              <div className="absolute -bottom-4 -left-4 w-20 h-20 bg-emerald-500 rounded-2xl flex items-center justify-center shadow-lg transform -rotate-12">
+                <CheckCircle2 className="h-8 w-8 text-white" />
+              </div>
             </motion.div>
           </div>
         </div>
