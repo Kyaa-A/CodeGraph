@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 
 interface StreakCalendarProps {
   /** Raw ISO timestamps from the server (e.g. "2026-04-04T10:30:00Z") */
@@ -117,7 +118,14 @@ export function StreakCalendar({ rawTimestamps }: StreakCalendarProps) {
               title={isStreak ? `Streak day!` : isActive ? `Active on ${dateStr}` : dateStr}
             >
               {isStreak ? (
-                <span className="animate-pulse text-sm leading-none">🔥</span>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <DotLottieReact
+                    src="https://lottie.host/c93e7d82-d61b-4625-bbf3-e05795cb4da2/EDXKgG995W.lottie"
+                    loop
+                    autoplay
+                    className="w-8 h-8"
+                  />
+                </div>
               ) : (
                 day
               )}
