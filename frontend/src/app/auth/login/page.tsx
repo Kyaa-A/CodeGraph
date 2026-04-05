@@ -31,6 +31,7 @@ function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
   const supabase = createClient();
@@ -51,9 +52,34 @@ function LoginForm() {
       return;
     }
 
+    setSuccess(true);
     const next = searchParams.get("next") || "/dashboard";
-    router.push(next);
-    router.refresh();
+    setTimeout(() => {
+      router.push(next);
+      router.refresh();
+    }, 1500);
+  }
+
+  if (success) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <motion.div
+          initial={{ scale: 0.8, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ type: "spring", damping: 15 }}
+          className="text-center"
+        >
+          <div className="w-32 h-32 mx-auto mb-4">
+            <LottieAnimation
+              src="https://lottie.host/cc5eb273-523d-40fe-a1ed-ace562c57eaa/Vz6dU46MWi.lottie"
+              className="w-full h-full"
+            />
+          </div>
+          <h2 className="text-xl font-bold text-slate-900 mb-1">Welcome back!</h2>
+          <p className="text-sm text-slate-500">Redirecting you now...</p>
+        </motion.div>
+      </div>
+    );
   }
 
   return (
@@ -187,17 +213,17 @@ function LoginForm() {
 
           <div className="mt-10 flex items-center justify-center gap-6 text-sm">
             <div className="text-center">
-              <p className="text-2xl font-bold text-emerald-400">5+</p>
-              <p className="text-slate-500">Courses</p>
-            </div>
-            <div className="w-px h-10 bg-slate-700" />
-            <div className="text-center">
-              <p className="text-2xl font-bold text-emerald-400">20+</p>
+              <p className="text-2xl font-bold text-emerald-400">1000+</p>
               <p className="text-slate-500">Problems</p>
             </div>
             <div className="w-px h-10 bg-slate-700" />
             <div className="text-center">
-              <p className="text-2xl font-bold text-emerald-400">13</p>
+              <p className="text-2xl font-bold text-emerald-400">600+</p>
+              <p className="text-slate-500">Doc Pages</p>
+            </div>
+            <div className="w-px h-10 bg-slate-700" />
+            <div className="text-center">
+              <p className="text-2xl font-bold text-emerald-400">15</p>
               <p className="text-slate-500">Languages</p>
             </div>
           </div>
