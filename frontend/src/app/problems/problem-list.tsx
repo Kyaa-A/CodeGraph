@@ -12,6 +12,8 @@ const difficultyColor: Record<string, string> = {
   hard: "text-red-600",
 };
 
+type StatusFilter = "all" | "solved" | "attempted" | "unsolved";
+
 export function ProblemList({
   problems,
   solvedMap,
@@ -24,15 +26,33 @@ export function ProblemList({
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const [showBackToTop, setShowBackToTop] = useState(false);
   const [searchQuery, setSearchQuery] = useState(initialSearch || "");
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
   const loaderRef = useRef<HTMLDivElement>(null);
 
   const filtered = useMemo(() => {
-    if (!searchQuery.trim()) return problems;
-    const lower = searchQuery.toLowerCase();
-    return problems.filter(
-      (p) => p.title.toLowerCase().includes(lower) || p.tags.some((t) => t.toLowerCase().includes(lower))
-    );
-  }, [problems, searchQuery]);
+    let result = problems;
+
+    // Status filter
+    if (statusFilter !== "all") {
+      result = result.filter((p) => {
+        const status = solvedMap[p.id];
+        if (statusFilter === "solved") return status?.solved;
+        if (statusFilter === "attempted") return status && !status.solved && status.attempts > 0;
+        if (statusFilter === "unsolved") return !status || (!status.solved && status.attempts === 0);
+        return true;
+      });
+    }
+
+    // Search filter
+    if (searchQuery.trim()) {
+      const lower = searchQuery.toLowerCase();
+      result = result.filter(
+        (p) => p.title.toLowerCase().includes(lower) || p.tags.some((t) => t.toLowerCase().includes(lower))
+      );
+    }
+
+    return result;
+  }, [problems, searchQuery, statusFilter, solvedMap]);
 
   const visible = filtered.slice(0, visibleCount);
   const hasMore = visibleCount < filtered.length;
@@ -66,11 +86,34 @@ export function ProblemList({
   // Reset visible count when filters or search change
   useEffect(() => {
     setVisibleCount(PAGE_SIZE);
-  }, [problems.length, searchQuery]);
+  }, [problems.length, searchQuery, statusFilter]);
 
   return (
     <>
-      {/* Instant search */}
+      {/* Status filter + search */}
+      <div className="flex flex-col sm:flex-row gap-2 mb-3">
+        <div className="flex items-center gap-1 bg-slate-100 rounded-lg p-1">
+          {([
+            { value: "all", label: "All" },
+            { value: "solved", label: "Solved" },
+            { value: "attempted", label: "Trying" },
+            { value: "unsolved", label: "Todo" },
+          ] as { value: StatusFilter; label: string }[]).map((s) => (
+            <button
+              key={s.value}
+              onClick={() => setStatusFilter(s.value)}
+              className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all whitespace-nowrap ${
+                statusFilter === s.value
+                  ? "bg-white text-slate-900 shadow-sm"
+                  : "text-slate-500 hover:text-slate-700"
+              }`}
+            >
+              {s.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
       <div className="relative mb-3">
         <svg className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />

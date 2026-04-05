@@ -102,6 +102,10 @@ export default async function ProfilePage() {
                 {profile?.name || user.email?.split("@")[0]}
               </h1>
               <p className="text-slate-400 text-sm">Member since {memberSince}</p>
+              <div className="flex items-center gap-2 mt-1 sm:hidden">
+                <span className="text-sm font-semibold text-emerald-400">Level {level}</span>
+                <span className="text-xs text-slate-400">{totalXp.toLocaleString()} XP</span>
+              </div>
             </div>
             <div className="ml-auto hidden sm:block">
               <div className="flex items-center gap-3">

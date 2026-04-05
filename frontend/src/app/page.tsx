@@ -262,7 +262,7 @@ export default function HomePage() {
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5 }}
             >
-              <h1 className="text-5xl sm:text-6xl font-bold text-white tracking-tight leading-tight">
+              <h1 className="text-3xl sm:text-5xl md:text-6xl font-bold text-white tracking-tight leading-tight">
                 A New Way to
                 <span className="block text-emerald-400">Learn Coding</span>
               </h1>
@@ -272,14 +272,14 @@ export default function HomePage() {
                 coding problems, and a powerful playground — all in your browser.
               </p>
               <div className="mt-10 flex flex-col sm:flex-row gap-3">
-                <Link href="/auth/signup">
-                  <Button size="lg" className="bg-emerald-500 hover:bg-emerald-600 text-white font-semibold text-base px-8 h-13 rounded-full">
+                <Link href="/auth/signup" className="w-full sm:w-auto">
+                  <Button size="lg" className="w-full sm:w-auto bg-emerald-500 hover:bg-emerald-600 text-white font-semibold text-base px-8 h-13 rounded-full">
                     Create Account
                     <ChevronRight className="ml-1 h-4 w-4" />
                   </Button>
                 </Link>
-                <Link href="#playground">
-                  <Button size="lg" variant="outline" className="border-slate-600 text-slate-300 hover:bg-slate-800 hover:text-white text-base px-8 h-13 rounded-full">
+                <Link href="#playground" className="w-full sm:w-auto">
+                  <Button size="lg" variant="outline" className="w-full sm:w-auto border-slate-600 text-slate-300 hover:bg-slate-800 hover:text-white text-base px-8 h-13 rounded-full">
                     Start Exploring
                   </Button>
                 </Link>
@@ -291,7 +291,7 @@ export default function HomePage() {
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
-              className="relative"
+              className="relative overflow-hidden sm:overflow-visible"
             >
               {/* Code mockup card */}
               <div className="relative rounded-2xl bg-white shadow-2xl overflow-hidden transform rotate-[-2deg] hover:rotate-0 transition-transform duration-500">
