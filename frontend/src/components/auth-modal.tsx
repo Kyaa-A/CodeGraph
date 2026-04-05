@@ -49,7 +49,7 @@ export function AuthModal({ open, onClose, message }: AuthModalProps) {
           >
             <div className="bg-white rounded-3xl shadow-2xl shadow-black/20 overflow-hidden">
               {/* Header with gradient */}
-              <div className="relative bg-gradient-to-br from-neutral-900 to-neutral-800 px-8 pt-10 pb-8 text-center">
+              <div className="relative bg-gradient-to-br from-neutral-900 to-neutral-800 px-8 pt-10 pb-8 text-center rounded-t-3xl">
                 {/* Close button */}
                 <button
                   onClick={onClose}
