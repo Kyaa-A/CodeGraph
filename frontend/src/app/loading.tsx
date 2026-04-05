@@ -6,7 +6,7 @@ export default function Loading() {
       <div className="text-center">
         <div className="w-24 h-24 mx-auto mb-4">
           <LottieAnimation
-            src="https://lottie.host/ec0730f3-b1c7-4de3-a5da-08b97c6fad99/ow1yY4NNxk.lottie"
+            src="https://lottie.host/embed/7d8efe42-f289-412f-9144-96c5c9ed9aaa/0KtgBuo0EM.lottie"
             loop
             className="w-full h-full"
           />

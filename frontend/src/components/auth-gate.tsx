@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
+import { LottieAnimation } from "@/components/lottie-animation";
 
 export function AuthGate({ children }: { children: React.ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
@@ -23,7 +24,13 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
   if (isAuthenticated === null) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="h-8 w-8 border-2 border-emerald-200 border-t-emerald-600 rounded-full animate-spin" />
+        <div className="w-20 h-20">
+          <LottieAnimation
+            src="https://lottie.host/embed/7d8efe42-f289-412f-9144-96c5c9ed9aaa/0KtgBuo0EM.lottie"
+            loop
+            className="w-full h-full"
+          />
+        </div>
       </div>
     );
   }
