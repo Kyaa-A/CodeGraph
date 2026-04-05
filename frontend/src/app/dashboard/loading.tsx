@@ -1,17 +1,18 @@
+import { LottieAnimation } from "@/components/lottie-animation";
+import { LOTTIE } from "@/lib/lottie-assets";
+
 export default function DashboardLoading() {
   return (
-    <div className="min-h-screen bg-white pt-24 pb-16">
-      <div className="max-w-6xl mx-auto px-4">
-        <div className="h-8 w-48 bg-slate-100 rounded-lg animate-pulse mb-8" />
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="h-24 bg-slate-50 rounded-xl border border-slate-100 animate-pulse" />
-          ))}
+    <div className="min-h-screen bg-white flex items-center justify-center">
+      <div className="text-center">
+        <div className="w-24 h-24 mx-auto mb-4">
+          <LottieAnimation
+            src={LOTTIE.greenLoader}
+            loop
+            className="w-full h-full"
+          />
         </div>
-        <div className="grid md:grid-cols-2 gap-6">
-          <div className="h-64 bg-slate-50 rounded-xl border border-slate-100 animate-pulse" />
-          <div className="h-64 bg-slate-50 rounded-xl border border-slate-100 animate-pulse" />
-        </div>
+        <p className="text-sm text-slate-400">Loading...</p>
       </div>
     </div>
   );
