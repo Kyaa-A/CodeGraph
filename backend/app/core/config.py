@@ -11,7 +11,7 @@ class Settings(BaseSettings):
     LLM_API_KEY: str
     LLM_MODEL: str = "Kimi-K2.5"
 
-    model_config = {"env_file": ".env", "env_file_encoding": "utf-8"}
+    model_config = {"env_file": ".env", "env_file_encoding": "utf-8", "extra": "ignore"}
 
 
 settings = Settings()
