@@ -19,10 +19,18 @@ export function DocSidebar({
   sections: SidebarSection[];
   langName: string;
 }) {
-  const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
+  // Start with all sections collapsed except the one containing the current page
+  const [expanded, setExpanded] = useState<Record<string, boolean>>(() => {
+    const initial: Record<string, boolean> = {};
+    for (const s of sections) {
+      const containsCurrent = s.pages.some((p) => p.slug === currentSlug);
+      initial[s.section] = containsCurrent;
+    }
+    return initial;
+  });
 
   const toggle = (section: string) => {
-    setCollapsed((prev) => ({ ...prev, [section]: !prev[section] }));
+    setExpanded((prev) => ({ ...prev, [section]: !prev[section] }));
   };
 
   return (
@@ -42,7 +50,7 @@ export function DocSidebar({
 
       <nav className="flex-1 overflow-y-auto py-2 px-2">
         {sections.map((s) => {
-          const isCollapsed = collapsed[s.section] ?? false;
+          const isOpen = expanded[s.section] ?? false;
 
           return (
             <div key={s.section} className="mb-1">
@@ -52,14 +60,14 @@ export function DocSidebar({
               >
                 {s.section}
                 <svg
-                  className={`h-3.5 w-3.5 transition-transform ${isCollapsed ? "" : "rotate-90"}`}
+                  className={`h-3.5 w-3.5 transition-transform ${isOpen ? "rotate-90" : ""}`}
                   fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
                 >
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                 </svg>
               </button>
 
-              {!isCollapsed && (
+              {isOpen && (
                 <div className="space-y-0.5">
                   {s.pages.map((p) => {
                     const isActive = p.slug === currentSlug;
