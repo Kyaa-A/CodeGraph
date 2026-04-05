@@ -1,5 +1,6 @@
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { AuthGate } from "@/components/auth-gate";
 import type { Problem, ProblemSubmission } from "@/lib/supabase/types";
 import { ProblemShell } from "./problem-shell";
 
@@ -22,11 +23,7 @@ export default async function ProblemPage({ params }: { params: Promise<{ id: st
   const { id } = await params;
   const supabase = await createClient();
 
-  // Require authentication to access problems
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) {
-    redirect(`/auth/login?next=/problems/${id}`);
-  }
 
   const { data: problem, error } = await supabase
     .from("problems")
@@ -42,14 +39,16 @@ export default async function ProblemPage({ params }: { params: Promise<{ id: st
 
   // Fetch user's submissions for this problem
   let submissions: ProblemSubmission[] = [];
-  const { data: subs } = await supabase
-    .from("problem_submissions")
-    .select("*")
-    .eq("problem_id", id)
-    .eq("user_id", user.id)
-    .order("created_at", { ascending: false });
+  if (user) {
+    const { data: subs } = await supabase
+      .from("problem_submissions")
+      .select("*")
+      .eq("problem_id", id)
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false });
 
-  submissions = (subs ?? []) as ProblemSubmission[];
+    submissions = (subs ?? []) as ProblemSubmission[];
+  }
 
   // Strip test_code from client payload (hidden tests)
   const clientProblem: Problem = {
@@ -57,5 +56,9 @@ export default async function ProblemPage({ params }: { params: Promise<{ id: st
     test_code: {},
   };
 
-  return <ProblemShell problem={clientProblem} submissions={submissions} isAuthenticated={!!user} />;
+  return (
+    <AuthGate>
+      <ProblemShell problem={clientProblem} submissions={submissions} isAuthenticated={!!user} />
+    </AuthGate>
+  );
 }

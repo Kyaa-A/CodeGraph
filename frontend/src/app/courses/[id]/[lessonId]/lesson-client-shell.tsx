@@ -9,6 +9,7 @@ import { CodeEditor } from "@/components/code-editor";
 import { AIChatPanel } from "@/components/ai-chat-panel";
 import { QuizModal } from "@/components/quiz-modal";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
+import { AuthGate } from "@/components/auth-gate";
 import { createClient } from "@/lib/supabase/client";
 
 interface LessonClientShellProps {
@@ -93,7 +94,7 @@ export function LessonClientShell({
   const completedSet = new Set(completedIds);
 
   return (
-    <>
+    <AuthGate>
       <div className="min-h-screen bg-[#fafafa] pt-20">
         {/* Top bar */}
         <div className="fixed top-[72px] left-0 right-0 z-30 bg-white/80 backdrop-blur-xl border-b border-black/5">
@@ -417,6 +418,6 @@ export function LessonClientShell({
       </Sheet>
 
       <QuizModal open={quizOpen} onOpenChange={setQuizOpen} lessonId={lessonId} />
-    </>
+    </AuthGate>
   );
 }

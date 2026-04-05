@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
+import { AuthGate } from "@/components/auth-gate";
 import type { Problem, Difficulty } from "@/lib/supabase/types";
 import { StreakCalendar } from "./streak-calendar";
 import { ProblemList } from "./problem-list";
@@ -76,6 +77,7 @@ export default async function ProblemsPage({
   const solvedCount = [...solvedMap.values()].filter((v) => v.solved).length;
 
   return (
+    <AuthGate>
     <div className="min-h-screen bg-white pt-20 sm:pt-24 pb-12 sm:pb-16">
       <div className="max-w-7xl mx-auto px-3 sm:px-4">
         <div className="flex gap-6">
@@ -263,5 +265,6 @@ export default async function ProblemsPage({
         </div>
       </div>
     </div>
+    </AuthGate>
   );
 }

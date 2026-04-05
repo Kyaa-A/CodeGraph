@@ -79,3 +79,14 @@ export interface ProblemSubmission {
   runtime_ms: number | null;
   created_at: string;
 }
+
+export interface DocTopic {
+  id: string;
+  lang: string;
+  section: string;
+  title: string;
+  slug: string;
+  order_index: number;
+  content: string;
+  created_at: string;
+}

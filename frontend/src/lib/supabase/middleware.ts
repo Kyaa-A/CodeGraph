@@ -36,12 +36,9 @@ export async function updateSession(request: NextRequest) {
 
   // Define protected routes
   const protectedPaths = ["/dashboard"];
-  const isProtectedRoute =
-    protectedPaths.some((path) =>
-      request.nextUrl.pathname.startsWith(path)
-    ) ||
-    // Protect individual lesson pages but keep course listing/detail public
-    /^\/courses\/[^/]+\/[^/]+/.test(request.nextUrl.pathname);
+  const isProtectedRoute = protectedPaths.some((path) =>
+    request.nextUrl.pathname.startsWith(path)
+  );
 
   if (isProtectedRoute && !user) {
     const url = request.nextUrl.clone();

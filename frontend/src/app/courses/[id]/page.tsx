@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import type { Course } from "@/lib/supabase/types";
 import { LessonList } from "./lesson-list";
 import { AdminOnly } from "@/components/admin-only";
+import { AuthGate } from "@/components/auth-gate";
 import { LottieAnimation } from "@/components/lottie-animation";
 
 export const metadata = {
@@ -93,6 +94,7 @@ export default async function CourseDetailPage({
   const progressPercent = totalLessons > 0 ? Math.round((completedCount / totalLessons) * 100) : 0;
 
   return (
+    <AuthGate>
     <div className="min-h-screen bg-slate-50 pt-28 pb-16">
       <div className="container mx-auto px-4">
         {/* Breadcrumb */}
@@ -260,5 +262,6 @@ export default async function CourseDetailPage({
         </div>
       </div>
     </div>
+    </AuthGate>
   );
 }
