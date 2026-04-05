@@ -189,8 +189,8 @@ const FEATURES = [
 // --- Stats data ---
 const STATS = [
   { value: "5+", label: "Interactive Courses", icon: <BookOpen className="h-5 w-5" /> },
-  { value: "20+", label: "Coding Problems", icon: <Code2 className="h-5 w-5" /> },
-  { value: "13", label: "Languages", icon: <Globe className="h-5 w-5" /> },
+  { value: "1000+", label: "Coding Problems", icon: <Code2 className="h-5 w-5" /> },
+  { value: "15", label: "Languages", icon: <Globe className="h-5 w-5" /> },
   { value: "100%", label: "Free", icon: <CheckCircle2 className="h-5 w-5" /> },
 ];
 
@@ -382,7 +382,7 @@ export default function HomePage() {
               <div className="flex-1">
                 <h3 className="text-xl font-semibold text-slate-900 mb-2">Questions, Community & Contests</h3>
                 <p className="text-slate-500 leading-relaxed">
-                  Over 20 coding problems for you to practice. Come and join our growing community of developers and participate in contests to challenge yourself and earn rewards.
+                  Over 1,000 coding problems for you to practice. Come and join our growing community of developers and participate in contests to challenge yourself and earn rewards.
                 </p>
                 <Link href="/problems" className="inline-flex items-center mt-4 text-emerald-600 hover:text-emerald-700 font-medium text-sm">
                   View Questions

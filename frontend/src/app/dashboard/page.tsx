@@ -2,6 +2,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { Button } from "@/components/ui/button";
 import type { Course, Lesson, UserProgress } from "@/lib/supabase/types";
+import { DailyXpTrigger } from "./daily-xp-trigger";
 
 export const metadata = {
   title: "Dashboard | CodeGraph",
@@ -174,6 +175,7 @@ export default async function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white pt-20">
+      {user && <DailyXpTrigger />}
       <div className="container mx-auto px-4 py-6 sm:py-10 max-w-6xl">
         {/* Welcome Header */}
         <div className="mb-8 sm:mb-10">
@@ -429,7 +431,7 @@ export default async function DashboardPage() {
                   { label: "Medium problem", xp: 25, color: "bg-amber-100 text-amber-700" },
                   { label: "Hard problem", xp: 50, color: "bg-red-100 text-red-700" },
                   { label: "Complete lesson", xp: 15, color: "bg-blue-100 text-blue-700" },
-                  { label: "Daily streak", xp: 5, color: "bg-orange-100 text-orange-700" },
+                  { label: "Daily login", xp: 5, color: "bg-orange-100 text-orange-700" },
                 ].map((item) => (
                   <div key={item.label} className="flex items-center justify-between">
                     <span className="text-sm text-slate-600">{item.label}</span>
