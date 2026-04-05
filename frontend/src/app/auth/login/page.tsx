@@ -71,7 +71,7 @@ function LoginForm() {
         >
           <div className="w-32 h-32 mx-auto mb-4">
             <LottieAnimation
-              src="https://lottie.host/cc5eb273-523d-40fe-a1ed-ace562c57eaa/Vz6dU46MWi.lottie"
+              src="https://lottie.host/embed/857ce841-21aa-42e9-8d41-8f721c0a7f29/BfjTYlOrhM.lottie"
               className="w-full h-full"
             />
           </div>
