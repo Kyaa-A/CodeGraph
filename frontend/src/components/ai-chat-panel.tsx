@@ -4,6 +4,9 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { ChatMessage } from "@/lib/api";
 import { createChatSession, sendChatMessage } from "@/lib/api";
+import ReactMarkdown from "react-markdown";
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import { oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 
@@ -128,7 +131,41 @@ export function AIChatPanel({ lessonId }: AIChatPanelProps) {
                       : "bg-slate-50 text-foreground rounded-bl-md border border-slate-200"
                   }`}
                 >
-                  {message.content}
+                  {message.role === "user" ? (
+                    message.content
+                  ) : (
+                    <div className="prose prose-sm prose-slate max-w-none [&>p]:mb-2 [&>p:last-child]:mb-0 [&>ul]:mb-2 [&>ol]:mb-2 [&>pre]:mb-2">
+                      <ReactMarkdown
+                        components={{
+                          code({ className, children, ...props }: any) {
+                            const match = /language-(\w+)/.exec(className || "");
+                            const codeStr = String(children).replace(/\n$/, "");
+                            const isBlock = match || (typeof children === "string" && children.includes("\n"));
+                            return isBlock ? (
+                              <SyntaxHighlighter
+                                style={oneDark}
+                                language={match?.[1] || "text"}
+                                PreTag="div"
+                                customStyle={{ margin: "0.5rem 0", padding: "0.75rem", borderRadius: "0.5rem", fontSize: "0.8rem" }}
+                              >
+                                {codeStr}
+                              </SyntaxHighlighter>
+                            ) : (
+                              <code className="bg-slate-200 text-slate-800 px-1 py-0.5 rounded text-[0.8em]" {...props}>
+                                {children}
+                              </code>
+                            );
+                          },
+                          p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
+                          ul: ({ children }) => <ul className="list-disc ml-4 mb-2">{children}</ul>,
+                          ol: ({ children }) => <ol className="list-decimal ml-4 mb-2">{children}</ol>,
+                          strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
+                        }}
+                      >
+                        {message.content}
+                      </ReactMarkdown>
+                    </div>
+                  )}
                 </div>
                 {message.role === "user" && (
                   <div className="h-8 w-8 rounded-xl bg-slate-100 text-slate-600 flex items-center justify-center shrink-0">
