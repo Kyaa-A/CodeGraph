@@ -7,7 +7,7 @@ export default function NotFound() {
       <div className="text-center max-w-md">
         <div className="w-64 h-64 mx-auto mb-6">
           <LottieAnimation
-            src="https://lottie.host/dc213716-1c4c-4024-a3d9-5dbb79747794/xy8nxrSLaB.lottie"
+            src="https://lottie.host/embed/132950ae-0f3b-4659-a58a-c2091477c5b9/jIsVSY4YGA.lottie"
             loop
             className="w-full h-full"
           />

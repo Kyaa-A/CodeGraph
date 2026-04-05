@@ -151,7 +151,8 @@ export function ProblemDescription({
                   <DotLottieReact
                     src="https://lottie.host/e7e37b80-60e9-457c-bba6-9316e75839e3/TgVAsNqb9S.lottie"
                     loop
-                    autoplay
+                    autoplay={false}
+                    playOnHover
                     className="w-8 h-8"
                   />
                   <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
