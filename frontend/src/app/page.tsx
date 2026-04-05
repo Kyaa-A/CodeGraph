@@ -325,16 +325,6 @@ export default function HomePage() {
                 </div>
               </div>
 
-              {/* Developer animation overlaid */}
-              <div className="absolute -top-6 -right-6 sm:-top-10 sm:-right-10 w-32 h-32 sm:w-52 sm:h-52 pointer-events-none">
-                <DotLottieReact
-                  src={LOTTIE.codingHero}
-                  loop
-                  autoplay
-                  className="w-full h-full drop-shadow-lg"
-                />
-              </div>
-
               {/* Floating checkmark */}
               <div className="absolute -bottom-3 -left-3 sm:-bottom-5 sm:-left-5 w-16 h-16 sm:w-22 sm:h-22 bg-emerald-500 rounded-2xl flex items-center justify-center shadow-lg transform -rotate-12">
                 <CheckCircle2 className="h-7 w-7 sm:h-9 sm:w-9 text-white" />

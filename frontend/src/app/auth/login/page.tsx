@@ -200,11 +200,11 @@ function LoginForm() {
         className="hidden lg:flex relative w-1/2 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 items-center justify-center"
       >
         <div className="max-w-md text-center px-12">
-          <div className="w-64 h-64 mx-auto mb-8">
+          <div className="w-48 h-48 mx-auto mb-4">
             <LottieAnimation
-              src={LOTTIE.authIllustration}
+              src={LOTTIE.codingHero}
               loop
-              className="w-full h-full"
+              className="w-full h-full drop-shadow-lg"
             />
           </div>
           <h2 className="text-2xl font-bold text-white mb-3">Continue your journey</h2>
