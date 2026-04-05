@@ -3,6 +3,8 @@ import { CourseCard } from "@/components/course-card";
 import { AuthGate } from "@/components/auth-gate";
 import type { Course } from "@/lib/supabase/types";
 
+export const revalidate = 300; // cache for 5 minutes
+
 export const metadata = {
   title: "Courses | CodeGraph",
   description: "Browse AI development courses",

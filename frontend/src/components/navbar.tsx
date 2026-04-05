@@ -164,7 +164,7 @@ export function Navbar() {
         }
         setStreak(count);
       });
-  }, [user, supabase, pathname]);
+  }, [user, supabase]);
 
   async function handleSignOut() {
     await supabase.auth.signOut();

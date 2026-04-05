@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { DocSidebar } from "./doc-sidebar";
 import { DocViewer } from "./doc-viewer";
@@ -94,9 +95,9 @@ export default async function DocPage({
 
         <div className="flex-1 flex flex-col min-w-0">
           <div className="flex items-center gap-2 px-4 py-2 border-b border-slate-100 bg-slate-50/50 text-sm lg:px-6">
-            <a href="/docs" className="text-slate-400 hover:text-slate-600 transition-colors">Docs</a>
+            <Link href="/docs" className="text-slate-400 hover:text-slate-600 transition-colors">Docs</Link>
             <span className="text-slate-300">/</span>
-            <a href={`/docs/${lang}`} className="text-slate-400 hover:text-slate-600 transition-colors">{LANG_NAMES[lang] || lang}</a>
+            <Link href={`/docs/${lang}`} className="text-slate-400 hover:text-slate-600 transition-colors">{LANG_NAMES[lang] || lang}</Link>
             <span className="text-slate-300">/</span>
             <span className="text-slate-700 font-medium truncate">{currentPage.title}</span>
           </div>

@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 
+export const revalidate = 600; // cache for 10 minutes
+
 export const metadata = {
   title: "Documentation | CodeGraph",
   description: "Free programming documentation and tutorials for 15+ languages",
