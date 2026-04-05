@@ -2,6 +2,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import type { Problem, Difficulty } from "@/lib/supabase/types";
 import { StreakCalendar } from "./streak-calendar";
+import { ProblemList } from "./problem-list";
 
 export const metadata = {
   title: "Problems | CodeGraph",
@@ -73,12 +74,6 @@ export default async function ProblemsPage({
   const mediumCount = allTyped.filter((p) => p.difficulty === "medium").length;
   const hardCount = allTyped.filter((p) => p.difficulty === "hard").length;
   const solvedCount = [...solvedMap.values()].filter((v) => v.solved).length;
-
-  const difficultyColor: Record<string, string> = {
-    easy: "text-emerald-600",
-    medium: "text-amber-600",
-    hard: "text-red-600",
-  };
 
   return (
     <div className="min-h-screen bg-white pt-20 sm:pt-24 pb-12 sm:pb-16">
@@ -153,90 +148,15 @@ export default async function ProblemsPage({
               </form>
             </div>
 
-            {/* Problem Table */}
-            <div className="bg-white rounded-xl border border-slate-200 overflow-hidden overflow-x-auto">
-              {/* Header */}
-              <div className="grid grid-cols-[36px_1fr_90px_80px] sm:grid-cols-[36px_1fr_140px_90px_80px] px-4 py-3 text-[11px] font-semibold text-slate-400 uppercase tracking-wider border-b border-slate-100 bg-slate-50/50">
-                <div></div>
-                <div>Title</div>
-                <div className="hidden sm:block">Tags</div>
-                <div className="text-center">Difficulty</div>
-                <div className="text-center">Status</div>
-              </div>
-
-              {/* Rows */}
-              {filtered.map((problem, index) => {
-                const status = solvedMap.get(problem.id);
-                const isSolved = status?.solved ?? false;
-                const hasAttempted = (status?.attempts ?? 0) > 0;
-
-                return (
-                  <Link
-                    key={problem.id}
-                    href={`/problems/${problem.id}`}
-                    className={`grid grid-cols-[36px_1fr_90px_80px] sm:grid-cols-[36px_1fr_140px_90px_80px] px-4 py-3 items-center transition-colors hover:bg-slate-50 border-b border-slate-50 last:border-0 group ${
-                      index % 2 === 1 ? "bg-slate-50/40" : ""
-                    }`}
-                  >
-                    {/* Number */}
-                    <span className="text-sm text-slate-400 font-mono">{index + 1}</span>
-
-                    {/* Title */}
-                    <span className="text-sm font-medium text-slate-800 group-hover:text-emerald-600 transition-colors truncate pr-3">
-                      {problem.title}
-                    </span>
-
-                    {/* Tags */}
-                    <div className="hidden sm:flex items-center gap-1 overflow-hidden">
-                      {problem.tags.slice(0, 2).map((t) => (
-                        <span key={t} className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-slate-100 text-slate-500 truncate">
-                          {t}
-                        </span>
-                      ))}
-                      {problem.tags.length > 2 && (
-                        <span className="text-[10px] text-slate-400">+{problem.tags.length - 2}</span>
-                      )}
-                    </div>
-
-                    {/* Difficulty */}
-                    <div className={`text-center text-sm font-medium ${difficultyColor[problem.difficulty]}`}>
-                      {problem.difficulty.charAt(0).toUpperCase() + problem.difficulty.slice(1)}
-                    </div>
-
-                    {/* Status */}
-                    <div className="flex justify-center">
-                      {isSolved ? (
-                        <svg className="h-5 w-5 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                        </svg>
-                      ) : hasAttempted ? (
-                        <svg className="h-5 w-5 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                      ) : (
-                        <span className="h-4 w-4 rounded-full border-2 border-slate-200" />
-                      )}
-                    </div>
-                  </Link>
-                );
-              })}
-
-              {filtered.length === 0 && (
-                <div className="px-4 py-16 text-center">
-                  <svg className="h-12 w-12 mx-auto mb-4 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
-                  </svg>
-                  <h3 className="text-lg font-semibold text-slate-700 mb-1">No problems found</h3>
-                  <p className="text-sm text-slate-500">
-                    {search ? `No results for "${search}".` : "Check back soon for coding challenges!"}
-                  </p>
-                </div>
-              )}
-            </div>
+            {/* Problem Table with infinite scroll */}
+            <ProblemList
+              problems={filtered}
+              solvedMap={Object.fromEntries(solvedMap)}
+            />
 
             {/* Footer */}
             <div className="mt-3 flex items-center justify-between text-xs text-slate-400">
-              <span>Showing {filtered.length} of {totalCount} problems</span>
+              <span>{filtered.length} of {totalCount} problems</span>
               {(difficulty || tag || search) && (
                 <Link href="/problems" className="text-emerald-600 hover:text-emerald-700 transition-colors">
                   Clear all filters

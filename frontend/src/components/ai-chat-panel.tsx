@@ -90,18 +90,15 @@ export function AIChatPanel({ lessonId }: AIChatPanelProps) {
   }, [input, loading, lessonId, sessionId]);
 
   return (
-    <div className="flex flex-col h-full glass-card rounded-2xl overflow-hidden border border-black/5 shadow-lg shadow-black/5">
+    <div className="flex flex-col h-full bg-white rounded-2xl overflow-hidden border border-slate-200 shadow-xl">
       {/* Header */}
-      <div className="flex items-center gap-3 p-4 border-b border-black/5 bg-gradient-to-r from-emerald-50/50 to-transparent">
+      <div className="flex items-center gap-3 p-4 border-b border-slate-100 bg-white">
         <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-500 flex items-center justify-center text-white shadow-lg shadow-emerald-500/20">
           <Icons.bot />
         </div>
         <div>
           <h3 className="font-heading font-semibold">AI Tutor</h3>
-          <p className="text-xs text-muted-foreground flex items-center gap-1">
-            <Icons.sparkle />
-            Powered by Gemini 2.0 Flash
-          </p>
+          <p className="text-xs text-muted-foreground">Ask anything about this lesson</p>
         </div>
       </div>
 
@@ -128,7 +125,7 @@ export function AIChatPanel({ lessonId }: AIChatPanelProps) {
                   className={`max-w-[80%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
                     message.role === "user"
                       ? "bg-black text-white rounded-br-md"
-                      : "bg-muted/50 text-foreground rounded-bl-md border border-black/5"
+                      : "bg-slate-50 text-foreground rounded-bl-md border border-slate-200"
                   }`}
                 >
                   {message.content}
@@ -149,7 +146,7 @@ export function AIChatPanel({ lessonId }: AIChatPanelProps) {
                 <div className="h-8 w-8 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0">
                   <Icons.bot />
                 </div>
-                <div className="bg-muted/50 rounded-2xl rounded-bl-md px-4 py-3 border border-black/5">
+                <div className="bg-slate-50 rounded-2xl rounded-bl-md px-4 py-3 border border-slate-200">
                   <div className="flex gap-1.5">
                     <span className="w-2 h-2 rounded-full bg-emerald-400 animate-bounce" style={{ animationDelay: '0ms' }} />
                     <span className="w-2 h-2 rounded-full bg-emerald-400 animate-bounce" style={{ animationDelay: '150ms' }} />
@@ -163,7 +160,7 @@ export function AIChatPanel({ lessonId }: AIChatPanelProps) {
       </div>
 
       {/* Input */}
-      <form onSubmit={handleSubmit} className="p-4 border-t border-black/5">
+      <form onSubmit={handleSubmit} className="p-4 border-t border-slate-100 bg-white">
         <div className="flex gap-2">
           <Textarea
             value={input}
@@ -175,7 +172,7 @@ export function AIChatPanel({ lessonId }: AIChatPanelProps) {
               }
             }}
             placeholder="Ask about the lesson..."
-            className="min-h-[60px] max-h-[120px] resize-none rounded-xl border-black/10 bg-white/50 focus:bg-white focus:border-emerald-500 focus:ring-emerald-500/20"
+            className="min-h-[60px] max-h-[120px] resize-none rounded-xl border-slate-200 bg-slate-50 focus:bg-white focus:border-emerald-500 focus:ring-emerald-500/20"
             disabled={loading || !sessionId}
           />
           <Button

@@ -149,10 +149,13 @@ function LoginForm() {
             </Button>
           </form>
 
-          <p className="text-center text-sm text-slate-500 mt-8">
-            Don&apos;t have an account?{" "}
-            <Link href="/auth/signup" className="text-emerald-600 hover:text-emerald-700 font-medium">Create one</Link>
-          </p>
+          <div className="flex items-center justify-between mt-8">
+            <Link href="/auth/forgot-password" className="text-sm text-slate-500 hover:text-slate-700">Forgot password?</Link>
+            <p className="text-sm text-slate-500">
+              No account?{" "}
+              <Link href="/auth/signup" className="text-emerald-600 hover:text-emerald-700 font-medium">Create one</Link>
+            </p>
+          </div>
 
           <p className="text-center text-xs text-slate-400 mt-4">
             By signing in, you agree to our{" "}
