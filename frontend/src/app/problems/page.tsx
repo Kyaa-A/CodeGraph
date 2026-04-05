@@ -42,10 +42,7 @@ export default async function ProblemsPage({
   if (tag) {
     filtered = filtered.filter((p) => p.tags.includes(tag));
   }
-  if (search) {
-    const lower = search.toLowerCase();
-    filtered = filtered.filter((p) => p.title.toLowerCase().includes(lower));
-  }
+  // Search is now handled client-side in ProblemList for instant results
 
   // User submissions
   const { data: { user } } = await supabase.auth.getUser();
@@ -134,26 +131,13 @@ export default async function ProblemsPage({
                 ))}
               </div>
 
-              <form action="/problems" method="GET" className="relative">
-                {difficulty && <input type="hidden" name="difficulty" value={difficulty} />}
-                {tag && <input type="hidden" name="tag" value={tag} />}
-                <svg className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-                <input
-                  type="text"
-                  name="search"
-                  defaultValue={search || ""}
-                  placeholder="Search questions..."
-                  className="w-full sm:w-56 pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-400"
-                />
-              </form>
             </div>
 
             {/* Problem Table with infinite scroll */}
             <ProblemList
               problems={filtered}
               solvedMap={Object.fromEntries(solvedMap)}
+              initialSearch={search}
             />
 
             {/* Footer */}

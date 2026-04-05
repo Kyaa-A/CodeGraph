@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import Link from "next/link";
 import type { Problem } from "@/lib/supabase/types";
 
@@ -15,16 +15,27 @@ const difficultyColor: Record<string, string> = {
 export function ProblemList({
   problems,
   solvedMap,
+  initialSearch,
 }: {
   problems: Problem[];
   solvedMap: Record<string, { solved: boolean; attempts: number }>;
+  initialSearch?: string;
 }) {
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const [showBackToTop, setShowBackToTop] = useState(false);
+  const [searchQuery, setSearchQuery] = useState(initialSearch || "");
   const loaderRef = useRef<HTMLDivElement>(null);
 
-  const visible = problems.slice(0, visibleCount);
-  const hasMore = visibleCount < problems.length;
+  const filtered = useMemo(() => {
+    if (!searchQuery.trim()) return problems;
+    const lower = searchQuery.toLowerCase();
+    return problems.filter(
+      (p) => p.title.toLowerCase().includes(lower) || p.tags.some((t) => t.toLowerCase().includes(lower))
+    );
+  }, [problems, searchQuery]);
+
+  const visible = filtered.slice(0, visibleCount);
+  const hasMore = visibleCount < filtered.length;
 
   // Infinite scroll with IntersectionObserver
   useEffect(() => {
@@ -32,14 +43,14 @@ export function ProblemList({
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting) {
-          setVisibleCount((prev) => Math.min(prev + PAGE_SIZE, problems.length));
+          setVisibleCount((prev) => Math.min(prev + PAGE_SIZE, filtered.length));
         }
       },
       { rootMargin: "200px" }
     );
     observer.observe(loaderRef.current);
     return () => observer.disconnect();
-  }, [hasMore, problems.length]);
+  }, [hasMore, filtered.length]);
 
   // Back to top visibility
   useEffect(() => {
@@ -52,13 +63,37 @@ export function ProblemList({
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
 
-  // Reset visible count when filters change
+  // Reset visible count when filters or search change
   useEffect(() => {
     setVisibleCount(PAGE_SIZE);
-  }, [problems.length]);
+  }, [problems.length, searchQuery]);
 
   return (
     <>
+      {/* Instant search */}
+      <div className="relative mb-3">
+        <svg className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+        <input
+          type="text"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          placeholder="Search problems by title or tag..."
+          className="w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-400 transition-all"
+        />
+        {searchQuery && (
+          <button
+            onClick={() => setSearchQuery("")}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+          >
+            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        )}
+      </div>
+
       <div className="bg-white rounded-xl border border-slate-200 overflow-hidden overflow-x-auto">
         {/* Header */}
         <div className="grid grid-cols-[36px_1fr_90px_80px] sm:grid-cols-[36px_1fr_140px_90px_80px] px-4 py-3 text-[11px] font-semibold text-slate-400 uppercase tracking-wider border-b border-slate-100 bg-slate-50/50">
@@ -134,15 +169,15 @@ export function ProblemList({
         <div ref={loaderRef} className="flex items-center justify-center py-6 gap-2">
           <div className="h-5 w-5 border-2 border-emerald-200 border-t-emerald-600 rounded-full animate-spin" />
           <span className="text-sm text-slate-400">
-            Loading more problems... ({visible.length} of {problems.length})
+            Loading more problems... ({visible.length} of {filtered.length})
           </span>
         </div>
       )}
 
       {/* Showing count */}
-      {!hasMore && problems.length > 0 && (
+      {!hasMore && filtered.length > 0 && (
         <div className="text-center py-4 text-xs text-slate-400">
-          Showing all {problems.length} problems
+          Showing all {filtered.length} {searchQuery ? `of ${problems.length} ` : ""}problems
         </div>
       )}
 
