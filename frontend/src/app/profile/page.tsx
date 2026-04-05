@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { StreakCalendar } from "../problems/streak-calendar";
+import { StreakCalendar } from "@/components/streak-calendar";
 
 export const metadata = {
   title: "Profile | CodeGraph",
@@ -18,13 +18,14 @@ export default async function ProfilePage() {
 
   if (!user) redirect("/auth/login?next=/profile");
 
-  const [profileRes, submissionsRes, progressRes, xpRes, coursesRes, lessonsRes] = await Promise.all([
-    supabase.from("profiles").select("name, avatar_url, total_xp, level, created_at").eq("id", user.id).single(),
+  const [profileRes, submissionsRes, progressRes, xpRes, coursesRes, lessonsRes, freezesRes] = await Promise.all([
+    supabase.from("profiles").select("name, avatar_url, total_xp, level, created_at, streak_freezes, streak_recovers").eq("id", user.id).single(),
     supabase.from("problem_submissions").select("problem_id, passed, language, created_at").eq("user_id", user.id),
     supabase.from("user_progress").select("lesson_id, completed, completed_at").eq("user_id", user.id).eq("completed", true),
     supabase.from("xp_events").select("event_type, xp_amount, created_at").eq("user_id", user.id).order("created_at", { ascending: false }).limit(20),
     supabase.from("courses").select("id, title"),
     supabase.from("lessons").select("id, course_id"),
+    supabase.from("streak_freezes").select("frozen_date").eq("user_id", user.id),
   ]);
 
   const profile = profileRes.data;
@@ -33,6 +34,9 @@ export default async function ProfilePage() {
   const xpEvents = xpRes.data ?? [];
   const courses = coursesRes.data ?? [];
   const lessons = lessonsRes.data ?? [];
+  const frozenDates = (freezesRes.data ?? []).map((f: { frozen_date: string }) => f.frozen_date);
+  const freezeCount = profile?.streak_freezes ?? 0;
+  const recoverCount = profile?.streak_recovers ?? 0;
 
   // Stats
   const solvedSet = new Set<string>();
@@ -154,7 +158,13 @@ export default async function ProfilePage() {
           {/* Activity Calendar */}
           <div className="bg-white rounded-xl border border-slate-200 p-5">
             <h2 className="text-sm font-semibold text-slate-800 mb-4">Activity Calendar</h2>
-            <StreakCalendar rawTimestamps={allTimestamps} />
+            <StreakCalendar
+              rawTimestamps={allTimestamps}
+              frozenDates={frozenDates}
+              freezeCount={freezeCount}
+              recoverCount={recoverCount}
+              interactive
+            />
           </div>
 
           {/* Recent XP */}

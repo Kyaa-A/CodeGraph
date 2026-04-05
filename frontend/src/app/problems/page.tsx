@@ -2,7 +2,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { AuthGate } from "@/components/auth-gate";
 import type { Problem, Difficulty } from "@/lib/supabase/types";
-import { StreakCalendar } from "./streak-calendar";
+import { StreakCalendar } from "@/components/streak-calendar";
 import { ProblemList } from "./problem-list";
 
 export const metadata = {
@@ -48,14 +48,33 @@ export default async function ProblemsPage({
   const { data: { user } } = await supabase.auth.getUser();
   const solvedMap = new Map<string, { solved: boolean; attempts: number }>();
   let submissionDates: string[] = [];
+  let frozenDates: string[] = [];
+  let freezeCount = 0;
+  let recoverCount = 0;
 
   if (user) {
-    const { data: submissions } = await supabase
-      .from("problem_submissions")
-      .select("problem_id, passed, created_at")
-      .eq("user_id", user.id);
+    const [submissionsRes, freezesRes, profileRes] = await Promise.all([
+      supabase
+        .from("problem_submissions")
+        .select("problem_id, passed, created_at")
+        .eq("user_id", user.id),
+      supabase
+        .from("streak_freezes")
+        .select("frozen_date")
+        .eq("user_id", user.id),
+      supabase
+        .from("profiles")
+        .select("streak_freezes, streak_recovers")
+        .eq("id", user.id)
+        .single(),
+    ]);
 
-    for (const sub of submissions ?? []) {
+    const submissions = submissionsRes.data ?? [];
+    frozenDates = (freezesRes.data ?? []).map((f: { frozen_date: string }) => f.frozen_date);
+    freezeCount = profileRes.data?.streak_freezes ?? 0;
+    recoverCount = profileRes.data?.streak_recovers ?? 0;
+
+    for (const sub of submissions) {
       const s = sub as { problem_id: string; passed: boolean; created_at: string };
       const existing = solvedMap.get(s.problem_id) ?? { solved: false, attempts: 0 };
       existing.attempts++;
@@ -63,8 +82,7 @@ export default async function ProblemsPage({
       solvedMap.set(s.problem_id, existing);
     }
 
-    // Pass raw ISO timestamps — client will convert to local dates
-    submissionDates = (submissions ?? []).map((s: { created_at: string }) => s.created_at);
+    submissionDates = submissions.map((s: { created_at: string }) => s.created_at);
   }
 
   const totalCount = allTyped.length;
@@ -205,7 +223,13 @@ export default async function ProblemsPage({
 
             {/* Calendar Streak */}
             <div className="bg-white rounded-xl border border-slate-200 p-5">
-              <StreakCalendar rawTimestamps={submissionDates} />
+              <StreakCalendar
+                rawTimestamps={submissionDates}
+                frozenDates={frozenDates}
+                freezeCount={freezeCount}
+                recoverCount={recoverCount}
+                interactive={!!user}
+              />
               {!user && (
                 <p className="text-[11px] text-slate-400 text-center mt-3">Sign in to track your streak</p>
               )}
