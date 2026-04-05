@@ -19,6 +19,8 @@ const LANGUAGE_OPTIONS = [
   { id: "typescript", name: "TypeScript", icon: "\u{1F537}" },
   { id: "java", name: "Java", icon: "\u2615" },
   { id: "cpp", name: "C++", icon: "\u26A1" },
+  { id: "c", name: "C", icon: "\u{1F1E8}" },
+  { id: "csharp", name: "C#", icon: "\u{1F7EA}" },
   { id: "go", name: "Go", icon: "\u{1F439}" },
   { id: "rust", name: "Rust", icon: "\u{1F980}" },
 ];
