@@ -42,7 +42,7 @@ export function LessonViewer({ content }: LessonViewerProps) {
               </div>
             ) : (
               <code
-                className="bg-emerald-100/50 text-emerald-800 px-1.5 py-0.5 rounded-md text-sm font-mono"
+                className="bg-slate-100 text-slate-800 px-1.5 py-0.5 rounded text-[0.875em] font-mono border border-slate-200"
                 {...props}
               >
                 {children}
@@ -84,7 +84,7 @@ export function LessonViewer({ content }: LessonViewerProps) {
           ),
           // Blockquotes
           blockquote: ({ children }) => (
-            <blockquote className="border-l-4 border-emerald-400 bg-emerald-50/50 pl-6 pr-4 py-3 my-6 rounded-r-lg italic text-muted-foreground">
+            <blockquote className="border-l-4 border-slate-300 bg-slate-50 pl-6 pr-4 py-3 my-6 rounded-r-lg text-muted-foreground">
               {children}
             </blockquote>
           ),
