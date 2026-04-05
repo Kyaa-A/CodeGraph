@@ -7,8 +7,18 @@ import type { DocTopic } from "@/lib/supabase/types";
 const LANG_NAMES: Record<string, string> = {
   python: "Python",
   javascript: "JavaScript",
+  typescript: "TypeScript",
+  react: "React",
+  "html-css": "HTML & CSS",
   java: "Java",
   sql: "SQL",
+  go: "Go",
+  rust: "Rust",
+  c: "C",
+  cpp: "C++",
+  csharp: "C#",
+  php: "PHP",
+  nodejs: "Node.js",
   langchain: "LangChain",
 };
 
