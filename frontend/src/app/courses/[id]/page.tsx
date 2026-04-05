@@ -8,6 +8,7 @@ import { LessonList } from "./lesson-list";
 import { AdminOnly } from "@/components/admin-only";
 import { AuthGate } from "@/components/auth-gate";
 import { LottieAnimation } from "@/components/lottie-animation";
+import { LOTTIE } from "@/lib/lottie-assets";
 
 export const metadata = {
   title: "Course | CodeGraph",
@@ -202,7 +203,7 @@ export default async function CourseDetailPage({
                 ) : totalLessons > 0 ? (
                   <div className="flex items-center gap-2">
                     <LottieAnimation
-                      src="https://lottie.host/cc5eb273-523d-40fe-a1ed-ace562c57eaa/Vz6dU46MWi.lottie"
+                      src={LOTTIE.trophy}
                       className="w-14 h-14"
                     />
                     <Button size="lg" disabled className="rounded-xl px-8 bg-emerald-100 text-emerald-700">

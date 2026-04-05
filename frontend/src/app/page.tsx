@@ -7,6 +7,7 @@ import dynamic from "next/dynamic";
 import { Button } from "@/components/ui/button";
 
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
+import { LOTTIE } from "@/lib/lottie-assets";
 import { ChatbotWidget } from "@/components/chatbot-widget";
 import {
   BookOpen,
@@ -327,7 +328,7 @@ export default function HomePage() {
               {/* Developer animation overlaid */}
               <div className="absolute -top-6 -right-6 sm:-top-10 sm:-right-10 w-32 h-32 sm:w-52 sm:h-52 pointer-events-none">
                 <DotLottieReact
-                  src="https://lottie.host/a28e7daa-5ade-4ac1-9c91-7353c3cd8f19/brFveAcB21.lottie"
+                  src={LOTTIE.codingHero}
                   loop
                   autoplay
                   className="w-full h-full drop-shadow-lg"

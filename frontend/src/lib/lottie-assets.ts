@@ -4,19 +4,19 @@
  */
 export const LOTTIE = {
   /** Login success — confetti burst */
-  confetti: "https://lottie.host/embed/857ce841-21aa-42e9-8d41-8f721c0a7f29/BfjTYlOrhM.lottie",
+  confetti: "https://lottie.host/857ce841-21aa-42e9-8d41-8f721c0a7f29/BfjTYlOrhM.lottie",
 
   /** Course/problem completion — trophy */
   trophy: "https://lottie.host/cc5eb273-523d-40fe-a1ed-ace562c57eaa/Vz6dU46MWi.lottie",
 
   /** Level up overlay animation */
-  levelUp: "https://lottie.host/embed/884d0167-164e-4830-ba3e-cd4ea2ae4a57/JovhHlzhef.lottie",
+  levelUp: "https://lottie.host/884d0167-164e-4830-ba3e-cd4ea2ae4a57/JovhHlzhef.lottie",
 
   /** Global loading / auth gate spinner */
-  greenLoader: "https://lottie.host/embed/7d8efe42-f289-412f-9144-96c5c9ed9aaa/0KtgBuo0EM.lottie",
+  greenLoader: "https://lottie.host/7d8efe42-f289-412f-9144-96c5c9ed9aaa/0KtgBuo0EM.lottie",
 
   /** 404 not found page */
-  notFoundRobot: "https://lottie.host/embed/132950ae-0f3b-4659-a58a-c2091477c5b9/jIsVSY4YGA.lottie",
+  notFoundRobot: "https://lottie.host/132950ae-0f3b-4659-a58a-c2091477c5b9/jIsVSY4YGA.lottie",
 
   /** Hint button — plays on hover */
   lightbulb: "https://lottie.host/e7e37b80-60e9-457c-bba6-9316e75839e3/TgVAsNqb9S.lottie",

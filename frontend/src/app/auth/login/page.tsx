@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { LottieAnimation } from "@/components/lottie-animation";
+import { LOTTIE } from "@/lib/lottie-assets";
 
 export default function LoginPage() {
   return (
@@ -71,7 +72,7 @@ function LoginForm() {
         >
           <div className="w-32 h-32 mx-auto mb-4">
             <LottieAnimation
-              src="https://lottie.host/embed/857ce841-21aa-42e9-8d41-8f721c0a7f29/BfjTYlOrhM.lottie"
+              src={LOTTIE.confetti}
               className="w-full h-full"
             />
           </div>
@@ -201,7 +202,7 @@ function LoginForm() {
         <div className="max-w-md text-center px-12">
           <div className="w-64 h-64 mx-auto mb-8">
             <LottieAnimation
-              src="https://lottie.host/2cc81489-2645-4f2f-b980-89f103a9b498/ZzFHFOMOdG.lottie"
+              src={LOTTIE.authIllustration}
               loop
               className="w-full h-full"
             />

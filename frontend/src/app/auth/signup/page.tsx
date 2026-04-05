@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
+import { LOTTIE } from "@/lib/lottie-assets";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -76,7 +77,7 @@ export default function SignupPage() {
         <div className="max-w-md text-center px-12">
           <div className="w-64 h-64 mx-auto mb-8">
             <LottieAnimation
-              src="https://lottie.host/2cc81489-2645-4f2f-b980-89f103a9b498/ZzFHFOMOdG.lottie"
+              src={LOTTIE.authIllustration}
               loop
               className="w-full h-full"
             />
@@ -259,7 +260,7 @@ export default function SignupPage() {
             >
               <div className="w-28 h-28 mx-auto mb-4">
                 <DotLottieReact
-                  src="https://lottie.host/d7ccf5c8-cba7-41a7-b5fe-c39238aaf512/cdHuCUZYri.lottie"
+                  src={LOTTIE.signupSuccess}
                   autoplay
                   className="w-full h-full"
                 />

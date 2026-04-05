@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { LottieAnimation } from "@/components/lottie-animation";
+import { LOTTIE } from "@/lib/lottie-assets";
 
 export default function NotFound() {
   return (
@@ -7,7 +8,7 @@ export default function NotFound() {
       <div className="text-center max-w-md">
         <div className="w-64 h-64 mx-auto mb-6">
           <LottieAnimation
-            src="https://lottie.host/embed/132950ae-0f3b-4659-a58a-c2091477c5b9/jIsVSY4YGA.lottie"
+            src={LOTTIE.notFoundRobot}
             loop
             className="w-full h-full"
           />

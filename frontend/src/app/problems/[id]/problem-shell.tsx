@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { AuthModal } from "@/components/auth-modal";
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
+import { LOTTIE } from "@/lib/lottie-assets";
 import { ProblemDescription } from "./problem-description";
 import type { Problem, ProblemSubmission } from "@/lib/supabase/types";
 import { awardProblemXp } from "@/lib/xp";
@@ -216,7 +217,7 @@ export function ProblemShell({ problem, submissions: initialSubmissions, isAuthe
                 <div className="flex items-center gap-2">
                   {submitResult.passed && (
                     <DotLottieReact
-                      src="https://lottie.host/49aa1eee-3c18-4d9a-9792-139e222839bb/jH7cKeQa9r.lottie"
+                      src={LOTTIE.problemSuccess}
                       autoplay
                       className="w-10 h-10 shrink-0"
                     />

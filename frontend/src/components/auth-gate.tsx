@@ -5,6 +5,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { LottieAnimation } from "@/components/lottie-animation";
+import { LOTTIE } from "@/lib/lottie-assets";
 
 export function AuthGate({ children }: { children: React.ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
@@ -26,7 +27,7 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="w-20 h-20">
           <LottieAnimation
-            src="https://lottie.host/embed/7d8efe42-f289-412f-9144-96c5c9ed9aaa/0KtgBuo0EM.lottie"
+            src={LOTTIE.greenLoader}
             loop
             className="w-full h-full"
           />

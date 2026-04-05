@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
+import { LOTTIE } from "@/lib/lottie-assets";
 
 interface LevelUpEvent {
   oldLevel: number;
@@ -49,7 +50,7 @@ export function LevelUpOverlay() {
           >
             <div className="w-64 h-64">
               <DotLottieReact
-                src="https://lottie.host/embed/884d0167-164e-4830-ba3e-cd4ea2ae4a57/JovhHlzhef.lottie"
+                src={LOTTIE.levelUp}
                 loop={false}
                 autoplay
                 className="w-full h-full"

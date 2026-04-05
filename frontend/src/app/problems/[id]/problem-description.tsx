@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
+import { LOTTIE } from "@/lib/lottie-assets";
 import { Badge } from "@/components/ui/badge";
 import type { Difficulty, ProblemSubmission } from "@/lib/supabase/types";
 
@@ -149,7 +150,7 @@ export function ProblemDescription({
               <div>
                 <div className="flex items-center gap-2 mb-3">
                   <DotLottieReact
-                    src="https://lottie.host/e7e37b80-60e9-457c-bba6-9316e75839e3/TgVAsNqb9S.lottie"
+                    src={LOTTIE.lightbulb}
                     loop
                     autoplay={false}
                     playOnHover
