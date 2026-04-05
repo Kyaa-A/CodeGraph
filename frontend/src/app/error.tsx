@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
 export default function Error({
@@ -26,12 +27,19 @@ export default function Error({
         <p className="text-slate-500 mb-8">
           An unexpected error occurred. Please try again.
         </p>
-        <Button
-          onClick={reset}
-          className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-full px-6"
-        >
-          Try Again
-        </Button>
+        <div className="flex items-center justify-center gap-3">
+          <Button
+            onClick={reset}
+            className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-full px-6"
+          >
+            Try Again
+          </Button>
+          <Link href="/">
+            <Button variant="outline" className="rounded-full px-6 border-slate-200">
+              Go Home
+            </Button>
+          </Link>
+        </div>
       </div>
     </div>
   );

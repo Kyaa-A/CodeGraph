@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 
@@ -12,6 +13,8 @@ interface AuthModalProps {
 }
 
 export function AuthModal({ open, onClose, message }: AuthModalProps) {
+  const pathname = usePathname();
+
   useEffect(() => {
     if (open) {
       document.body.style.overflow = "hidden";
@@ -37,6 +40,10 @@ export function AuthModal({ open, onClose, message }: AuthModalProps) {
           <div
             className="absolute inset-0 bg-black/60 backdrop-blur-sm"
             onClick={onClose}
+            role="button"
+            aria-label="Close modal"
+            tabIndex={0}
+            onKeyDown={(e) => e.key === "Escape" && onClose()}
           />
 
           {/* Modal */}
@@ -53,6 +60,7 @@ export function AuthModal({ open, onClose, message }: AuthModalProps) {
                 {/* Close button */}
                 <button
                   onClick={onClose}
+                  aria-label="Close"
                   className="absolute top-4 right-4 text-white/40 hover:text-white/80 transition-colors"
                 >
                   <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -80,7 +88,7 @@ export function AuthModal({ open, onClose, message }: AuthModalProps) {
 
               {/* Body */}
               <div className="px-8 py-8 space-y-3">
-                <Link href="/auth/signup" className="block">
+                <Link href={`/auth/signup?next=${encodeURIComponent(pathname)}`} className="block">
                   <Button className="w-full h-12 rounded-xl bg-neutral-900 hover:bg-neutral-800 text-white font-medium text-sm">
                     Create Free Account
                     <svg className="ml-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -89,7 +97,7 @@ export function AuthModal({ open, onClose, message }: AuthModalProps) {
                   </Button>
                 </Link>
 
-                <Link href="/auth/login" className="block">
+                <Link href={`/auth/login?next=${encodeURIComponent(pathname)}`} className="block">
                   <Button
                     variant="outline"
                     className="w-full h-12 rounded-xl border-neutral-200 hover:bg-neutral-50 font-medium text-sm"

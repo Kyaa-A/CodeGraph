@@ -267,6 +267,7 @@ export function Navbar() {
                   <Button
                     variant="ghost"
                     size="sm"
+                    aria-label="Profile"
                     className="rounded-lg text-muted-foreground hover:text-foreground hover:bg-black/5"
                   >
                     <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -318,6 +319,7 @@ function MobileNav({
         variant="ghost"
         size="icon"
         onClick={() => setOpen(!open)}
+        aria-label={open ? "Close menu" : "Open menu"}
         className="rounded-lg"
       >
         {open ? <Icons.close /> : <Icons.menu />}

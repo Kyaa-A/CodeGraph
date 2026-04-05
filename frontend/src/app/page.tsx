@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button";
 
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 import { LOTTIE } from "@/lib/lottie-assets";
-import { ChatbotWidget } from "@/components/chatbot-widget";
 import {
   BookOpen,
   Terminal,
@@ -615,8 +614,6 @@ export default function HomePage() {
         </div>
       </footer>
 
-      {/* Chatbot Widget */}
-      <ChatbotWidget />
     </div>
   );
 }

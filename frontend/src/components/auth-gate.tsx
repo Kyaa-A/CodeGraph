@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { LottieAnimation } from "@/components/lottie-animation";
@@ -9,6 +10,7 @@ import { LOTTIE } from "@/lib/lottie-assets";
 
 export function AuthGate({ children }: { children: React.ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const pathname = usePathname();
   const supabase = createClient();
 
   useEffect(() => {
@@ -65,12 +67,12 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
           </p>
 
           <div className="space-y-3">
-            <Link href={`/auth/login?next=${typeof window !== 'undefined' ? encodeURIComponent(window.location.pathname) : '/'}`} className="block">
+            <Link href={`/auth/login?next=${encodeURIComponent(pathname)}`} className="block">
               <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl h-11">
                 Sign in
               </Button>
             </Link>
-            <Link href={`/auth/signup?next=${typeof window !== 'undefined' ? encodeURIComponent(window.location.pathname) : '/'}`} className="block">
+            <Link href={`/auth/signup?next=${encodeURIComponent(pathname)}`} className="block">
               <Button variant="outline" className="w-full rounded-xl h-11 border-slate-200">
                 Create free account
               </Button>
