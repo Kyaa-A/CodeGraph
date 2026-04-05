@@ -152,7 +152,7 @@ export default async function DashboardPage() {
     id: e.id,
     type: "xp" as const,
     title: `+${e.xp_amount} XP`,
-    subtitle: e.event_type === "problem_solve" ? "Problem solved" : e.event_type === "lesson_complete" ? "Lesson completed" : e.event_type,
+    subtitle: e.event_type === "problem_solve" ? "Problem solved" : e.event_type === "lesson_complete" ? "Lesson completed" : e.event_type === "daily_login" ? "Daily Login" : e.event_type.replace(/_/g, " ").replace(/\b\w/g, (c: string) => c.toUpperCase()),
     href: "#",
     date: e.created_at,
   }));
