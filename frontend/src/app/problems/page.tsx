@@ -20,7 +20,7 @@ export default async function ProblemsPage({
 
   const { data: allProblems } = await supabase
     .from("problems")
-    .select("*")
+    .select("id, title, slug, difficulty, tags")
     .order("created_at", { ascending: true });
 
   const allTyped = (allProblems ?? []) as Problem[];

@@ -257,14 +257,27 @@ export function Navbar() {
 
             {/* Auth */}
             {user ? (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleSignOut}
-                className="rounded-lg text-muted-foreground hover:text-foreground hover:bg-black/5"
-              >
-                Sign out
-              </Button>
+              <div className="flex items-center gap-1">
+                <Link href="/profile">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="rounded-lg text-muted-foreground hover:text-foreground hover:bg-black/5"
+                  >
+                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                  </Button>
+                </Link>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleSignOut}
+                  className="rounded-lg text-muted-foreground hover:text-foreground hover:bg-black/5"
+                >
+                  Sign out
+                </Button>
+              </div>
             ) : (
               <Link href="/auth/login">
                 <Button

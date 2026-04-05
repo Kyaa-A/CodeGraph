@@ -1,22 +1,56 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { Suspense } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 export default function ResetPasswordPage() {
+  return (
+    <Suspense>
+      <ResetPasswordForm />
+    </Suspense>
+  );
+}
+
+function ResetPasswordForm() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [sessionReady, setSessionReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
   const supabase = createClient();
+
+  // Exchange PKCE code for session on mount
+  useEffect(() => {
+    const code = searchParams.get("code");
+    if (code) {
+      supabase.auth.exchangeCodeForSession(code).then(({ error }) => {
+        if (error) {
+          setError("Reset link expired or invalid. Please request a new one.");
+        } else {
+          setSessionReady(true);
+        }
+      });
+    } else {
+      // No code param — check if session already exists (hash-based flow)
+      supabase.auth.getUser().then(({ data }) => {
+        if (data.user) {
+          setSessionReady(true);
+        } else {
+          setError("No valid reset session. Please request a new reset link.");
+        }
+      });
+    }
+  }, [searchParams, supabase.auth]);
 
   async function handleUpdate(e: React.FormEvent) {
     e.preventDefault();
@@ -73,6 +107,11 @@ export default function ResetPasswordPage() {
             {error && (
               <div className="rounded-lg bg-red-50 border border-red-100 p-4 text-sm text-red-600 mb-6">
                 {error}
+                {!sessionReady && (
+                  <Link href="/auth/forgot-password" className="block mt-2 text-emerald-600 hover:text-emerald-700 font-medium">
+                    Request a new reset link
+                  </Link>
+                )}
               </div>
             )}
 
@@ -106,9 +145,9 @@ export default function ResetPasswordPage() {
               <Button
                 type="submit"
                 className="w-full h-12 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-lg"
-                disabled={loading}
+                disabled={loading || !sessionReady}
               >
-                {loading ? "Updating..." : "Update password"}
+                {loading ? "Updating..." : !sessionReady ? "Verifying link..." : "Update password"}
               </Button>
             </form>
           </>
