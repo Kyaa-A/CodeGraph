@@ -58,7 +58,7 @@ export default async function ProblemPage({ params }: { params: Promise<{ id: st
 
   return (
     <AuthGate>
-      <ProblemShell problem={clientProblem} submissions={submissions} isAuthenticated={!!user} />
+      <ProblemShell problem={clientProblem} submissions={submissions} isAuthenticated={!!user} userId={user?.id ?? null} />
     </AuthGate>
   );
 }

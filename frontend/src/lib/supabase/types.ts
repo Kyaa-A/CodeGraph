@@ -28,8 +28,19 @@ export interface Profile {
   name: string;
   avatar_url: string | null;
   role: UserRole;
+  total_xp: number;
+  level: number;
   created_at: string;
   updated_at: string;
+}
+
+export interface XpEvent {
+  id: string;
+  user_id: string;
+  event_type: string;
+  xp_amount: number;
+  metadata: Record<string, unknown>;
+  created_at: string;
 }
 
 export interface UserProgress {

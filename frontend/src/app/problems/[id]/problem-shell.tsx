@@ -8,6 +8,7 @@ import { AuthModal } from "@/components/auth-modal";
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 import { ProblemDescription } from "./problem-description";
 import type { Problem, ProblemSubmission } from "@/lib/supabase/types";
+import { awardProblemXp } from "@/lib/xp";
 
 const MonacoEditor = dynamic(() => import("@monaco-editor/react"), { ssr: false });
 
@@ -25,6 +26,7 @@ interface ProblemShellProps {
   problem: Problem;
   submissions: ProblemSubmission[];
   isAuthenticated: boolean;
+  userId: string | null;
 }
 
 function formatTime(seconds: number): string {
@@ -35,7 +37,7 @@ function formatTime(seconds: number): string {
   return `${m}:${String(s).padStart(2, "0")}`;
 }
 
-export function ProblemShell({ problem, submissions: initialSubmissions, isAuthenticated }: ProblemShellProps) {
+export function ProblemShell({ problem, submissions: initialSubmissions, isAuthenticated, userId }: ProblemShellProps) {
   const availableLanguages = LANGUAGE_OPTIONS.filter((l) => problem.starter_code[l.id]);
   const defaultLang = availableLanguages[0]?.id || "python";
 
@@ -151,9 +153,12 @@ export function ProblemShell({ problem, submissions: initialSubmissions, isAuthe
         solveTime,
       });
       setOutput(data.output || "");
-      // Stop timer on successful submission
+      // Stop timer and award XP on successful submission
       if (data.passed) {
         setTimerRunning(false);
+        if (userId) {
+          awardProblemXp(userId, problem.id, problem.difficulty);
+        }
       }
       if (data.testResults) {
         const newSub: ProblemSubmission = {

@@ -8,6 +8,7 @@ import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import type { User } from "@supabase/supabase-js";
 import React from "react";
+import { XpBar } from "@/components/xp-bar";
 
 // Icons as SVG components
 const Icons = {
@@ -232,6 +233,9 @@ export function Navbar() {
 
           {/* Right side */}
           <div className="flex items-center gap-2">
+            {/* XP bar */}
+            {user && <XpBar userId={user.id} />}
+
             {/* Streak badge */}
             {user && (
               <Link href="/dashboard">

@@ -8,6 +8,7 @@ import { LessonViewer } from "@/components/lesson-viewer";
 import { CodeEditor } from "@/components/code-editor";
 import { AIChatPanel } from "@/components/ai-chat-panel";
 import { QuizModal } from "@/components/quiz-modal";
+import { awardLessonXp } from "@/lib/xp";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { AuthGate } from "@/components/auth-gate";
 import { createClient } from "@/lib/supabase/client";
@@ -87,7 +88,10 @@ export function LessonClientShell({
       { user_id: user.id, lesson_id: lessonId, completed: true, completed_at: new Date().toISOString() },
       { onConflict: "user_id,lesson_id" }
     );
-    if (!error) setCompleted(true);
+    if (!error) {
+      setCompleted(true);
+      awardLessonXp(user.id, lessonId);
+    }
     setCompleting(false);
   }
 
