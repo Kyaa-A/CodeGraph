@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { Button } from "@/components/ui/button";
 import type { Course, Lesson, UserProgress } from "@/lib/supabase/types";
 import { DailyXpTrigger } from "./daily-xp-trigger";
+import { InventoryBag } from "./inventory-bag";
 
 export const metadata = {
   title: "Dashboard | CodeGraph",
@@ -26,7 +27,7 @@ export default async function DashboardPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const [coursesResult, lessonsResult, progressResult, submissionsResult, profileResult, xpEventsResult] =
+  const [coursesResult, lessonsResult, progressResult, submissionsResult, profileResult, xpEventsResult, freezesResult] =
     await Promise.all([
       supabase.from("courses").select("*").order("created_at", { ascending: false }),
       supabase.from("lessons").select("*").order("order_index", { ascending: true }),
@@ -41,7 +42,7 @@ export default async function DashboardPage() {
             .eq("passed", true)
         : Promise.resolve({ data: null }),
       user
-        ? supabase.from("profiles").select("name, total_xp, level").eq("id", user.id).single()
+        ? supabase.from("profiles").select("name, total_xp, level, streak_freezes, streak_recovers").eq("id", user.id).single()
         : Promise.resolve({ data: null }),
       user
         ? supabase
@@ -51,13 +52,19 @@ export default async function DashboardPage() {
             .order("created_at", { ascending: false })
             .limit(10)
         : Promise.resolve({ data: null }),
+      user
+        ? supabase.from("streak_freezes").select("frozen_date").eq("user_id", user.id)
+        : Promise.resolve({ data: null }),
     ]);
 
   const typedCourses = (coursesResult.data ?? []) as Course[];
   const typedLessons = (lessonsResult.data ?? []) as Lesson[];
   const userProgress = (progressResult.data ?? []) as UserProgress[];
   const submissions = (submissionsResult.data ?? []) as { problem_id: string; created_at: string }[];
-  const profile = profileResult.data as { name: string | null; total_xp: number; level: number } | null;
+  const profile = profileResult.data as { name: string | null; total_xp: number; level: number; streak_freezes: number; streak_recovers: number } | null;
+  const frozenDates = ((freezesResult.data ?? []) as { frozen_date: string }[]).map((f) => f.frozen_date);
+  const freezeCount = profile?.streak_freezes ?? 0;
+  const recoverCount = profile?.streak_recovers ?? 0;
   const xpEvents = (xpEventsResult.data ?? []) as {
     id: string;
     event_type: string;
@@ -385,8 +392,21 @@ export default async function DashboardPage() {
             </div>
           </div>
 
-          {/* Sidebar — Recent Activity */}
+          {/* Sidebar */}
           <div className="space-y-6">
+            {/* Inventory Bag */}
+            {user && (freezeCount > 0 || recoverCount > 0) && (
+              <InventoryBag
+                freezeCount={freezeCount}
+                recoverCount={recoverCount}
+                activeTimestamps={[
+                  ...submissions.map((s) => s.created_at),
+                  ...userProgress.filter((p) => p.completed_at).map((p) => p.completed_at!),
+                ]}
+                frozenDates={frozenDates}
+              />
+            )}
+
             <h2 className="text-lg font-bold text-slate-900">Recent Activity</h2>
 
             {recentActivity.length > 0 ? (
