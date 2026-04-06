@@ -53,7 +53,7 @@ export default async function DashboardPage() {
             .limit(10)
         : Promise.resolve({ data: null }),
       user
-        ? supabase.from("streak_freezes").select("frozen_date").eq("user_id", user.id)
+        ? supabase.from("streak_freezes").select("frozen_date, item_type").eq("user_id", user.id)
         : Promise.resolve({ data: null }),
     ]);
 
@@ -62,7 +62,10 @@ export default async function DashboardPage() {
   const userProgress = (progressResult.data ?? []) as UserProgress[];
   const submissions = (submissionsResult.data ?? []) as { problem_id: string; created_at: string }[];
   const profile = profileResult.data as { name: string | null; total_xp: number; level: number; streak_freezes: number; streak_recovers: number } | null;
-  const frozenDates = ((freezesResult.data ?? []) as { frozen_date: string }[]).map((f) => f.frozen_date);
+  const streakFreezeRows = (freezesResult.data ?? []) as { frozen_date: string; item_type: string }[];
+  const frozenDates = streakFreezeRows.filter((f) => f.item_type === "freeze").map((f) => f.frozen_date);
+  const recoveredDates = streakFreezeRows.filter((f) => f.item_type === "recover").map((f) => f.frozen_date);
+  const allProtectedDates = streakFreezeRows.map((f) => f.frozen_date);
   const freezeCount = profile?.streak_freezes ?? 0;
   const recoverCount = profile?.streak_recovers ?? 0;
   const xpEvents = (xpEventsResult.data ?? []) as {
@@ -94,41 +97,43 @@ export default async function DashboardPage() {
     (c) => c.completedLessons === c.totalLessons && c.totalLessons > 0
   ).length;
 
-  // Streak
-  function calculateStreak(progress: UserProgress[]): number {
+  // Streak — counts active days + frozen/recovered days
+  function calculateStreak(progress: UserProgress[], protectedDates: string[]): number {
     const completedDates = progress
       .filter((p) => p.completed_at)
       .map((p) => {
         const d = new Date(p.completed_at!);
         return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
       });
-    const uniqueDays = [...new Set(completedDates)].sort().reverse();
-    if (uniqueDays.length === 0) return 0;
+    // Also count problem submission dates
+    const submissionDates = submissions.map((s) => {
+      const d = new Date(s.created_at);
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+    });
+    const allActiveDates = new Set([...completedDates, ...submissionDates]);
+    const protectedSet = new Set(protectedDates);
 
-    const today = new Date();
     const fmt = (d: Date) =>
       `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-    const todayStr = fmt(today);
-    const yesterday = new Date(today);
-    yesterday.setDate(yesterday.getDate() - 1);
-    const yesterdayStr = fmt(yesterday);
 
-    if (uniqueDays[0] !== todayStr && uniqueDays[0] !== yesterdayStr) return 0;
-
-    let streak = 1;
-    let current = new Date(uniqueDays[0]);
-    for (let i = 1; i < uniqueDays.length; i++) {
-      const prev = new Date(current);
-      prev.setDate(prev.getDate() - 1);
-      if (uniqueDays[i] === fmt(prev)) {
+    // Walk backwards from today counting consecutive days
+    let streak = 0;
+    const today = new Date();
+    for (let i = 0; i < 365; i++) {
+      const d = new Date(today);
+      d.setDate(d.getDate() - i);
+      const dateStr = fmt(d);
+      if (allActiveDates.has(dateStr) || protectedSet.has(dateStr)) {
         streak++;
-        current = prev;
-      } else break;
+      } else if (i > 0) {
+        break;
+      }
+      // If today has no activity, streak can still continue if yesterday does (grace period)
     }
     return streak;
   }
 
-  const currentStreak = calculateStreak(userProgress);
+  const currentStreak = calculateStreak(userProgress, allProtectedDates);
   const totalLessonsCompleted = userProgress.length;
   const totalXp = profile?.total_xp ?? 0;
   const level = profile?.level ?? 1;
@@ -404,6 +409,7 @@ export default async function DashboardPage() {
                   ...userProgress.filter((p) => p.completed_at).map((p) => p.completed_at!),
                 ]}
                 frozenDates={frozenDates}
+                recoveredDates={recoveredDates}
               />
             )}
 

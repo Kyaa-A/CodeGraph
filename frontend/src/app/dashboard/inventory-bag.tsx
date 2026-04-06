@@ -8,6 +8,7 @@ interface InventoryBagProps {
   recoverCount: number;
   activeTimestamps: string[];
   frozenDates: string[];
+  recoveredDates?: string[];
 }
 
 const MONTHS = [
@@ -36,12 +37,12 @@ const ITEMS = [
   {
     type: "streak_recover" as const,
     name: "Streak Recover",
-    icon: "\uD83D\uDD04",
+    icon: "\u271A",
     desc: "Recover a broken streak day from the past",
-    color: "from-purple-400 to-purple-500",
-    bg: "bg-purple-50",
-    border: "border-purple-200",
-    badge: "bg-purple-500",
+    color: "from-red-400 to-red-500",
+    bg: "bg-red-50",
+    border: "border-red-200",
+    badge: "bg-red-500",
     rpc: "use_streak_recover",
     maxDaysBack: 30,
   },
@@ -52,10 +53,12 @@ export function InventoryBag({
   recoverCount: initRecovers,
   activeTimestamps,
   frozenDates: initFrozen,
+  recoveredDates: initRecovered = [],
 }: InventoryBagProps) {
   const [freezes, setFreezes] = useState(initFreezes);
   const [recovers, setRecovers] = useState(initRecovers);
   const [frozenSet, setFrozenSet] = useState(() => new Set(initFrozen));
+  const [recoveredSet, setRecoveredSet] = useState(() => new Set(initRecovered));
   const [selectedItem, setSelectedItem] = useState<typeof ITEMS[number] | null>(null);
   const [viewDate, setViewDate] = useState(new Date());
   const [using, setUsing] = useState<string | null>(null);
@@ -80,7 +83,7 @@ export function InventoryBag({
   const canApply = useCallback(
     (dateStr: string) => {
       if (!selectedItem) return false;
-      if (activeSet.has(dateStr) || frozenSet.has(dateStr)) return false;
+      if (activeSet.has(dateStr) || frozenSet.has(dateStr) || recoveredSet.has(dateStr)) return false;
       if (dateStr >= todayStr) return false;
       const diff = (Date.now() - new Date(dateStr).getTime()) / 86400000;
       return diff <= selectedItem.maxDaysBack;
@@ -102,7 +105,11 @@ export function InventoryBag({
         const result = data as { success: boolean; remaining?: number; error?: string };
 
         if (result.success) {
-          setFrozenSet((prev) => new Set([...prev, dateStr]));
+          if (selectedItem.type === "streak_recover") {
+            setRecoveredSet((prev) => new Set([...prev, dateStr]));
+          } else {
+            setFrozenSet((prev) => new Set([...prev, dateStr]));
+          }
           if (selectedItem.type === "streak_freeze") {
             setFreezes(result.remaining ?? freezes - 1);
           } else {
@@ -218,6 +225,8 @@ export function InventoryBag({
               const dateStr = `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
               const isActive = activeSet.has(dateStr);
               const isFrozen = frozenSet.has(dateStr);
+              const isRecovered = recoveredSet.has(dateStr);
+              const isProtected = isFrozen || isRecovered;
               const isToday = dateStr === todayStr;
               const eligible = canApply(dateStr);
               const isUsing = using === dateStr;
@@ -230,19 +239,25 @@ export function InventoryBag({
                   className={`aspect-square rounded-md flex items-center justify-center text-[10px] font-medium transition-all ${
                     isUsing
                       ? "bg-sky-100 ring-1 ring-sky-300"
-                      : isFrozen
-                        ? "bg-gradient-to-br from-sky-100 to-sky-200 text-sky-700 ring-1 ring-sky-300"
-                        : isActive
-                          ? "bg-emerald-500 text-white"
-                          : isToday
-                            ? "bg-white text-slate-900 ring-1 ring-slate-300"
-                            : eligible
-                              ? `${selectedItem.bg} ${selectedItem.border} border cursor-pointer hover:scale-110 hover:shadow-sm text-slate-700`
-                              : "text-slate-300"
+                      : isRecovered
+                        ? "bg-gradient-to-br from-red-50 to-red-100 text-red-700 ring-1 ring-red-300"
+                        : isFrozen
+                          ? "bg-gradient-to-br from-sky-100 to-sky-200 text-sky-700 ring-1 ring-sky-300"
+                          : isActive
+                            ? "bg-emerald-500 text-white"
+                            : isToday
+                              ? "bg-white text-slate-900 ring-1 ring-slate-300"
+                              : eligible
+                                ? `${selectedItem.bg} ${selectedItem.border} border cursor-pointer hover:scale-110 hover:shadow-sm text-slate-700`
+                                : "text-slate-300"
                   }`}
                 >
                   {isUsing ? (
                     <div className="w-3 h-3 border-2 border-sky-300 border-t-sky-600 rounded-full animate-spin" />
+                  ) : isRecovered ? (
+                    <svg className="w-3.5 h-3.5 text-red-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m-8-8h16" />
+                    </svg>
                   ) : isFrozen ? (
                     <span className="text-xs">{"\u2744\uFE0F"}</span>
                   ) : (

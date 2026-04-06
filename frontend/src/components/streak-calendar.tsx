@@ -8,6 +8,7 @@ import { createClient } from "@/lib/supabase/client";
 interface StreakCalendarProps {
   rawTimestamps: string[];
   frozenDates?: string[];
+  recoveredDates?: string[];
   freezeCount?: number;
   recoverCount?: number;
   interactive?: boolean;
@@ -26,12 +27,14 @@ function toLocalDateStr(date: Date): string {
 export function StreakCalendar({
   rawTimestamps,
   frozenDates: initialFrozen = [],
+  recoveredDates: initialRecovered = [],
   freezeCount: initialFreezes = 0,
   recoverCount: initialRecovers = 0,
   interactive = false,
 }: StreakCalendarProps) {
   const [viewDate, setViewDate] = useState(new Date());
   const [frozenSet, setFrozenSet] = useState(() => new Set(initialFrozen));
+  const [recoveredSet, setRecoveredSet] = useState(() => new Set(initialRecovered));
   const [freezes, setFreezes] = useState(initialFreezes);
   const [recovers, setRecovers] = useState(initialRecovers);
   const [using, setUsing] = useState<string | null>(null);
@@ -49,7 +52,7 @@ export function StreakCalendar({
       const d = new Date(today);
       d.setDate(d.getDate() - i);
       const dateStr = toLocalDateStr(d);
-      if (set.has(dateStr) || frozenSet.has(dateStr)) {
+      if (set.has(dateStr) || frozenSet.has(dateStr) || recoveredSet.has(dateStr)) {
         s++;
         sDates.add(dateStr);
       } else if (i > 0) {
@@ -58,7 +61,7 @@ export function StreakCalendar({
     }
 
     return { activeSet: set, streak: s, streakDates: sDates };
-  }, [rawTimestamps, frozenSet]);
+  }, [rawTimestamps, frozenSet, recoveredSet]);
 
   const year = viewDate.getFullYear();
   const month = viewDate.getMonth();
@@ -87,7 +90,11 @@ export function StreakCalendar({
         const result = data as { success: boolean; error?: string; remaining?: number };
 
         if (result.success) {
-          setFrozenSet((prev) => new Set([...prev, dateStr]));
+          if (itemType === "streak_recover") {
+            setRecoveredSet((prev) => new Set([...prev, dateStr]));
+          } else {
+            setFrozenSet((prev) => new Set([...prev, dateStr]));
+          }
           if (itemType === "streak_freeze") {
             setFreezes(result.remaining ?? freezes - 1);
           } else {
@@ -107,7 +114,7 @@ export function StreakCalendar({
 
   const canUseItemOn = (dateStr: string): boolean => {
     if (!interactive) return false;
-    if (activeSet.has(dateStr) || frozenSet.has(dateStr)) return false;
+    if (activeSet.has(dateStr) || frozenSet.has(dateStr) || recoveredSet.has(dateStr)) return false;
     if (dateStr >= todayStr) return false;
     if (freezes <= 0 && recovers <= 0) return false;
     // Within 30 days
@@ -134,9 +141,9 @@ export function StreakCalendar({
               </div>
             )}
             {recovers > 0 && (
-              <div className="flex items-center gap-1 px-2 py-1 bg-purple-50 border border-purple-200 rounded-lg" title="Streak Recovers — recover a broken streak day">
-                <span className="text-xs">{"\uD83D\uDD04"}</span>
-                <span className="text-[11px] font-bold text-purple-700">{recovers}</span>
+              <div className="flex items-center gap-1 px-2 py-1 bg-red-50 border border-red-200 rounded-lg" title="Streak Recovers — recover a broken streak day">
+                <svg className="h-3 w-3 text-red-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m-8-8h16" /></svg>
+                <span className="text-[11px] font-bold text-red-700">{recovers}</span>
               </div>
             )}
           </div>
@@ -179,6 +186,7 @@ export function StreakCalendar({
           const dateStr = `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
           const isActive = activeSet.has(dateStr);
           const isFrozen = frozenSet.has(dateStr);
+          const isRecovered = recoveredSet.has(dateStr);
           const isStreak = streakDates.has(dateStr);
           const isToday = dateStr === todayStr;
           const isUsing = using === dateStr;
@@ -195,9 +203,11 @@ export function StreakCalendar({
                   }
                 }}
                 className={`aspect-square rounded-lg flex items-center justify-center text-[11px] font-medium transition-all relative ${
-                  isFrozen
-                    ? "bg-gradient-to-br from-sky-100 to-sky-200 text-sky-700 ring-1 ring-sky-300"
-                    : isActive
+                  isRecovered
+                    ? "bg-gradient-to-br from-red-50 to-red-100 text-red-700 ring-1 ring-red-300"
+                    : isFrozen
+                      ? "bg-gradient-to-br from-sky-100 to-sky-200 text-sky-700 ring-1 ring-sky-300"
+                      : isActive
                       ? "bg-emerald-500 text-white"
                       : isToday
                         ? "bg-slate-100 text-slate-900 ring-1 ring-slate-300"
@@ -208,9 +218,11 @@ export function StreakCalendar({
                             : "text-slate-500 hover:bg-slate-50"
                 }`}
                 title={
-                  isFrozen
-                    ? `Streak protected ${"\u2744\uFE0F"}`
-                    : isStreak
+                  isRecovered
+                    ? `Streak recovered ${"\uD83D\uDD04"}`
+                    : isFrozen
+                      ? `Streak frozen ${"\u2744\uFE0F"}`
+                      : isStreak
                       ? "Streak day!"
                       : canUse
                         ? "Click to use a streak item"
@@ -219,11 +231,12 @@ export function StreakCalendar({
               >
                 {isUsing ? (
                   <div className="w-4 h-4 border-2 border-sky-300 border-t-sky-600 rounded-full animate-spin" />
+                ) : isRecovered ? (
+                  <svg className="w-5 h-5 text-red-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m-8-8h16" />
+                  </svg>
                 ) : isFrozen ? (
-                  <div className="flex flex-col items-center">
-                    <span className="text-sm leading-none">{"\u2744\uFE0F"}</span>
-                    <span className="text-[8px] text-sky-600 font-bold">{day}</span>
-                  </div>
+                  <span className="text-sm leading-none">{"\u2744\uFE0F"}</span>
                 ) : isStreak && isActive ? (
                   <div className="absolute inset-0 flex items-center justify-center">
                     <DotLottieReact
@@ -259,9 +272,9 @@ export function StreakCalendar({
                     {recovers > 0 && (
                       <button
                         onClick={() => handleUseItem(dateStr, "streak_recover")}
-                        className="w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-xs text-slate-700 hover:bg-purple-50 transition-colors"
+                        className="w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-xs text-slate-700 hover:bg-red-50 transition-colors"
                       >
-                        <span>{"\uD83D\uDD04"}</span>
+                        <svg className="h-3.5 w-3.5 text-red-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m-8-8h16" /></svg>
                         <span className="font-medium">Recover</span>
                         <span className="text-[10px] text-slate-400 ml-auto">({recovers})</span>
                       </button>
@@ -283,6 +296,10 @@ export function StreakCalendar({
         <div className="flex items-center gap-1">
           <div className="h-2.5 w-2.5 rounded-sm bg-gradient-to-br from-sky-100 to-sky-200 ring-1 ring-sky-300" />
           Frozen
+        </div>
+        <div className="flex items-center gap-1">
+          <div className="h-2.5 w-2.5 rounded-sm bg-gradient-to-br from-red-100 to-red-200 ring-1 ring-red-300" />
+          Recovered
         </div>
         <div className="flex items-center gap-1">
           <div className="h-2.5 w-2.5 rounded-sm bg-slate-100 ring-1 ring-slate-300" />

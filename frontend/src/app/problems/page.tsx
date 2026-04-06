@@ -49,6 +49,7 @@ export default async function ProblemsPage({
   const solvedMap = new Map<string, { solved: boolean; attempts: number }>();
   let submissionDates: string[] = [];
   let frozenDates: string[] = [];
+  let recoveredDates: string[] = [];
   let freezeCount = 0;
   let recoverCount = 0;
 
@@ -60,7 +61,7 @@ export default async function ProblemsPage({
         .eq("user_id", user.id),
       supabase
         .from("streak_freezes")
-        .select("frozen_date")
+        .select("frozen_date, item_type")
         .eq("user_id", user.id),
       supabase
         .from("profiles")
@@ -70,7 +71,9 @@ export default async function ProblemsPage({
     ]);
 
     const submissions = submissionsRes.data ?? [];
-    frozenDates = (freezesRes.data ?? []).map((f: { frozen_date: string }) => f.frozen_date);
+    const freezeRows = (freezesRes.data ?? []) as { frozen_date: string; item_type: string }[];
+    frozenDates = freezeRows.filter((f) => f.item_type === "freeze").map((f) => f.frozen_date);
+    recoveredDates = freezeRows.filter((f) => f.item_type === "recover").map((f) => f.frozen_date);
     freezeCount = profileRes.data?.streak_freezes ?? 0;
     recoverCount = profileRes.data?.streak_recovers ?? 0;
 
@@ -226,6 +229,7 @@ export default async function ProblemsPage({
               <StreakCalendar
                 rawTimestamps={submissionDates}
                 frozenDates={frozenDates}
+                recoveredDates={recoveredDates}
                 freezeCount={freezeCount}
                 recoverCount={recoverCount}
                 interactive={!!user}

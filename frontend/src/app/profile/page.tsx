@@ -25,7 +25,7 @@ export default async function ProfilePage() {
     supabase.from("xp_events").select("event_type, xp_amount, created_at").eq("user_id", user.id).order("created_at", { ascending: false }).limit(20),
     supabase.from("courses").select("id, title"),
     supabase.from("lessons").select("id, course_id"),
-    supabase.from("streak_freezes").select("frozen_date").eq("user_id", user.id),
+    supabase.from("streak_freezes").select("frozen_date, item_type").eq("user_id", user.id),
   ]);
 
   const profile = profileRes.data;
@@ -34,7 +34,9 @@ export default async function ProfilePage() {
   const xpEvents = xpRes.data ?? [];
   const courses = coursesRes.data ?? [];
   const lessons = lessonsRes.data ?? [];
-  const frozenDates = (freezesRes.data ?? []).map((f: { frozen_date: string }) => f.frozen_date);
+  const freezeRows = (freezesRes.data ?? []) as { frozen_date: string; item_type: string }[];
+  const frozenDates = freezeRows.filter((f) => f.item_type === "freeze").map((f) => f.frozen_date);
+  const recoveredDates = freezeRows.filter((f) => f.item_type === "recover").map((f) => f.frozen_date);
   const freezeCount = profile?.streak_freezes ?? 0;
   const recoverCount = profile?.streak_recovers ?? 0;
 
@@ -161,6 +163,7 @@ export default async function ProfilePage() {
             <StreakCalendar
               rawTimestamps={allTimestamps}
               frozenDates={frozenDates}
+              recoveredDates={recoveredDates}
               freezeCount={freezeCount}
               recoverCount={recoverCount}
               interactive
