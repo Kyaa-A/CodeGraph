@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { CodeEditor } from "@/components/code-editor";
 import { AuthModal } from "@/components/auth-modal";
@@ -12,7 +12,11 @@ export default function PlaygroundPage() {
   const [loading, setLoading] = useState(true);
   const [showAuth, setShowAuth] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
   const supabase = createClient();
+
+  const prefillLang = searchParams.get("lang") || undefined;
+  const prefillCode = searchParams.get("code") || undefined;
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
@@ -65,7 +69,7 @@ export default function PlaygroundPage() {
 
       {/* Editor fills remaining space */}
       <div className="flex-1 min-h-0">
-        <CodeEditor />
+        <CodeEditor initialLanguage={prefillLang} initialCode={prefillCode} />
       </div>
     </div>
   );

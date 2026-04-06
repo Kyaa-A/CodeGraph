@@ -8,6 +8,7 @@ import { oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
 
 interface LessonViewerProps {
   content: string;
+  docLang?: string; // If set, shows "Run" button on code blocks linking to playground
 }
 
 function CopyButton({ text }: { text: string }) {
@@ -52,7 +53,40 @@ const LANG_MAP: Record<string, string> = {
   yml: "yaml",
 };
 
-export function LessonViewer({ content }: LessonViewerProps) {
+// Languages supported by the playground
+const RUNNABLE_LANGS = new Set([
+  "python", "javascript", "typescript", "java", "c", "cpp", "csharp", "go", "rust", "ruby", "php", "kotlin",
+]);
+
+// Map doc lang slugs to playground language IDs
+const DOC_TO_PLAYGROUND: Record<string, string> = {
+  "html-css": "", nodejs: "javascript", langchain: "python",
+};
+
+function RunButton({ code, language }: { code: string; language: string }) {
+  return (
+    <a
+      href={`/playground?lang=${encodeURIComponent(language)}&code=${encodeURIComponent(code)}`}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="flex items-center gap-1 text-xs text-emerald-400 hover:text-emerald-300 transition-colors"
+    >
+      <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+      Run
+    </a>
+  );
+}
+
+export function LessonViewer({ content, docLang }: LessonViewerProps) {
+  // Determine the playground language for this doc context
+  const playgroundLang = docLang
+    ? DOC_TO_PLAYGROUND[docLang] !== undefined
+      ? DOC_TO_PLAYGROUND[docLang]
+      : docLang
+    : "";
   return (
     <article className="prose prose-neutral prose-lg max-w-none">
       <ReactMarkdown
@@ -70,7 +104,12 @@ export function LessonViewer({ content }: LessonViewerProps) {
               <div className="relative my-6 rounded-xl overflow-hidden bg-[#1e1e1e] group">
                 <div className="flex items-center justify-between px-4 py-2 bg-[#2d2d2d] border-b border-white/10">
                   <span className="text-xs text-gray-400 font-mono uppercase">{language || "code"}</span>
-                  <CopyButton text={codeStr} />
+                  <div className="flex items-center gap-3">
+                    {playgroundLang && RUNNABLE_LANGS.has(language || playgroundLang) && (
+                      <RunButton code={codeStr} language={language || playgroundLang} />
+                    )}
+                    <CopyButton text={codeStr} />
+                  </div>
                 </div>
                 <SyntaxHighlighter
                   style={oneDark}

@@ -50,11 +50,14 @@ export default async function DocPage({
   const { lang, slug } = await params;
   const supabase = await createClient();
 
-  const { data: allPages } = await supabase
-    .from("doc_topics")
-    .select("slug, title, section, order_index, content")
-    .eq("lang", lang)
-    .order("order_index", { ascending: true });
+  const [{ data: allPages }, { data: { user } }] = await Promise.all([
+    supabase
+      .from("doc_topics")
+      .select("id, slug, title, section, order_index, content")
+      .eq("lang", lang)
+      .order("order_index", { ascending: true }),
+    supabase.auth.getUser(),
+  ]);
 
   if (!allPages || allPages.length === 0) {
     notFound();
@@ -62,22 +65,41 @@ export default async function DocPage({
 
   const typed = allPages as DocTopic[];
 
+  // Fetch read status for logged-in user
+  let readSlugs = new Set<string>();
+  if (user) {
+    const topicIds = typed.map((p) => p.id);
+    const { data: reads } = await supabase
+      .from("doc_reads")
+      .select("doc_topic_id")
+      .eq("user_id", user.id)
+      .in("doc_topic_id", topicIds);
+    const readIds = new Set((reads ?? []).map((r: { doc_topic_id: string }) => r.doc_topic_id));
+    for (const p of typed) {
+      if (readIds.has(p.id)) readSlugs.add(p.slug);
+    }
+  }
+
   const currentPage = typed.find((p) => p.slug === slug);
   if (!currentPage) {
     notFound();
   }
 
-  const sectionMap = new Map<string, { slug: string; title: string }[]>();
+  const sectionMap = new Map<string, { slug: string; title: string; isRead: boolean }[]>();
   for (const p of typed) {
     if (!sectionMap.has(p.section)) {
       sectionMap.set(p.section, []);
     }
-    sectionMap.get(p.section)!.push({ slug: p.slug, title: p.title });
+    sectionMap.get(p.section)!.push({ slug: p.slug, title: p.title, isRead: readSlugs.has(p.slug) });
   }
   const sections = [...sectionMap.entries()].map(([section, pages]) => ({
     section,
     pages,
   }));
+
+  const currentIsRead = readSlugs.has(slug);
+  const totalRead = readSlugs.size;
+  const totalPages = typed.length;
 
   const currentIdx = typed.findIndex((p) => p.slug === slug);
   const prevPage = currentIdx > 0 ? { slug: typed[currentIdx - 1].slug, title: typed[currentIdx - 1].title } : null;
@@ -107,6 +129,10 @@ export default async function DocPage({
             lang={lang}
             prevPage={prevPage}
             nextPage={nextPage}
+            docTopicId={currentPage.id}
+            isRead={currentIsRead}
+            isAuthenticated={!!user}
+            readProgress={{ read: totalRead, total: totalPages }}
           />
         </div>
       </div>

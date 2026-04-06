@@ -5,7 +5,7 @@ import Link from "next/link";
 
 interface SidebarSection {
   section: string;
-  pages: { slug: string; title: string }[];
+  pages: { slug: string; title: string; isRead?: boolean }[];
 }
 
 function SidebarContent({
@@ -67,13 +67,18 @@ function SidebarContent({
                     return (
                       <Link key={p.slug} href={`/docs/${lang}/${p.slug}`} onClick={onNavigate}>
                         <div
-                          className={`px-3 py-2 rounded-lg text-sm transition-all ${
+                          className={`px-3 py-2 rounded-lg text-sm transition-all flex items-center gap-2 ${
                             isActive
                               ? "bg-emerald-50 text-emerald-700 font-medium border-l-[3px] border-emerald-500 pl-[9px]"
                               : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
                           }`}
                         >
-                          {p.title}
+                          <span className="truncate flex-1">{p.title}</span>
+                          {p.isRead && (
+                            <svg className="h-3.5 w-3.5 text-emerald-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                            </svg>
+                          )}
                         </div>
                       </Link>
                     );

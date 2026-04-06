@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
+import { DocSearch } from "./doc-search";
 
 export const revalidate = 600; // cache for 10 minutes
 
@@ -73,10 +74,15 @@ const CATEGORIES = [
 export default async function DocsPage() {
   const supabase = await createClient();
 
-  const { data: counts } = await supabase.from("doc_topics").select("lang");
+  const { data: allTopics } = await supabase
+    .from("doc_topics")
+    .select("lang, slug, title, section")
+    .order("order_index", { ascending: true });
+
+  const topics = (allTopics ?? []) as { lang: string; slug: string; title: string; section: string }[];
 
   const langCounts = new Map<string, number>();
-  for (const row of counts ?? []) {
+  for (const row of topics) {
     langCounts.set(row.lang, (langCounts.get(row.lang) || 0) + 1);
   }
 
@@ -96,9 +102,14 @@ export default async function DocsPage() {
           <h1 className="text-4xl sm:text-5xl font-bold tracking-tight mb-4">
             Learn to Code
           </h1>
-          <p className="text-lg text-slate-400 max-w-xl mx-auto mb-8">
+          <p className="text-lg text-slate-400 max-w-xl mx-auto mb-6">
             Free, comprehensive programming references. No account required.
           </p>
+
+          {/* Search */}
+          <div className="mb-8">
+            <DocSearch items={topics} />
+          </div>
 
           {/* Popular quick links */}
           <div className="flex flex-wrap justify-center gap-2">
