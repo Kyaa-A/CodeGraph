@@ -13,16 +13,28 @@ import { awardProblemXp } from "@/lib/xp";
 
 const MonacoEditor = dynamic(() => import("@monaco-editor/react"), { ssr: false });
 
+const LANG_LOGOS: Record<string, string> = {
+  python: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg",
+  javascript: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg",
+  typescript: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/typescript/typescript-original.svg",
+  java: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/java/java-original.svg",
+  cpp: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/cplusplus/cplusplus-original.svg",
+  c: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/c/c-original.svg",
+  csharp: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/csharp/csharp-original.svg",
+  go: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/go/go-original-wordmark.svg",
+  rust: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/rust/rust-original.svg",
+};
+
 const LANGUAGE_OPTIONS = [
-  { id: "python", name: "Python", icon: "\u{1F40D}" },
-  { id: "javascript", name: "JavaScript", icon: "\u{1F7E8}" },
-  { id: "typescript", name: "TypeScript", icon: "\u{1F537}" },
-  { id: "java", name: "Java", icon: "\u2615" },
-  { id: "cpp", name: "C++", icon: "\u26A1" },
-  { id: "c", name: "C", icon: "\u{1F1E8}" },
-  { id: "csharp", name: "C#", icon: "\u{1F7EA}" },
-  { id: "go", name: "Go", icon: "\u{1F439}" },
-  { id: "rust", name: "Rust", icon: "\u{1F980}" },
+  { id: "python", name: "Python" },
+  { id: "javascript", name: "JavaScript" },
+  { id: "typescript", name: "TypeScript" },
+  { id: "java", name: "Java" },
+  { id: "cpp", name: "C++" },
+  { id: "c", name: "C" },
+  { id: "csharp", name: "C#" },
+  { id: "go", name: "Go" },
+  { id: "rust", name: "Rust" },
 ];
 
 interface ProblemShellProps {
@@ -332,7 +344,7 @@ export function ProblemShell({ problem, submissions: initialSubmissions, isAuthe
               className="rounded-lg text-xs gap-1 sm:gap-1.5 border-slate-200"
               onClick={() => setShowLanguages(!showLanguages)}
             >
-              <span>{currentLang?.icon}</span>
+              {currentLang && <img src={LANG_LOGOS[currentLang.id]} alt={currentLang.name} className="h-4 w-4" />}
               <span className="hidden sm:inline">{currentLang?.name}</span>
               <svg className="h-3 w-3 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
@@ -348,7 +360,7 @@ export function ProblemShell({ problem, submissions: initialSubmissions, isAuthe
                       l.id === language ? "bg-emerald-50 text-emerald-700" : "text-slate-600"
                     }`}
                   >
-                    <span>{l.icon}</span>
+                    <img src={LANG_LOGOS[l.id]} alt={l.name} className="h-4 w-4" />
                     {l.name}
                   </button>
                 ))}
