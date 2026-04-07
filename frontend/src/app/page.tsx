@@ -13,6 +13,7 @@ import {
   FileText
 } from "lucide-react";
 import { LandingPlayground } from "./landing-playground";
+import { TypingCode } from "@/components/typing-code";
 
 export const metadata: Metadata = {
   title: "CodeGraph — Learn to Code with AI",
@@ -106,14 +107,8 @@ export default async function HomePage() {
                   </div>
                   <div className="ml-4 text-sm text-slate-500">solution.py</div>
                 </div>
-                <div className="p-7 bg-white">
-                  <div className="space-y-2.5">
-                    <div className="h-2.5 w-3/4 bg-slate-100 rounded" />
-                    <div className="h-2.5 w-1/2 bg-slate-100 rounded" />
-                    <div className="h-2.5 w-5/6 bg-slate-100 rounded" />
-                    <div className="h-2.5 w-2/3 bg-slate-100 rounded" />
-                    <div className="h-2.5 w-4/5 bg-slate-100 rounded" />
-                  </div>
+                <div className="p-7 bg-white min-h-[180px]">
+                  <TypingCode />
                   <div className="mt-7 flex items-center gap-3">
                     <div className="h-9 w-22 bg-emerald-100 rounded flex items-center justify-center">
                       <span className="text-xs text-emerald-600 font-medium">Easy</span>
