@@ -161,6 +161,23 @@ export default async function ProfilePage() {
         </div>
 
         {/* Difficulty Breakdown */}
+        {totalSolved === 0 && (
+          <div className="bg-white rounded-xl border border-dashed border-slate-300 p-6 mb-6 text-center">
+            <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-emerald-50 flex items-center justify-center">
+              <svg className="h-6 w-6 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+              </svg>
+            </div>
+            <p className="text-sm font-semibold text-slate-700 mb-1">No problems solved yet</p>
+            <p className="text-xs text-slate-400 mb-4">Solve your first problem to see difficulty stats and language breakdown</p>
+            <Link href="/problems" className="inline-flex items-center gap-1.5 text-sm text-emerald-600 hover:text-emerald-700 font-medium">
+              Start solving
+              <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            </Link>
+          </div>
+        )}
         {totalSolved > 0 && (
           <div className="bg-white rounded-xl border border-slate-200 p-5 mb-6">
             <h2 className="text-sm font-semibold text-slate-800 mb-4">Problem Difficulty Breakdown</h2>

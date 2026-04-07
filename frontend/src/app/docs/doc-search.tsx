@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 interface SearchItem {
   lang: string;
@@ -108,7 +109,7 @@ export function DocSearch({ items }: { items: SearchItem[] }) {
       {/* Results dropdown */}
       {open && results.length > 0 && (
         <>
-          <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
+          <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} aria-hidden="true" />
           <div className="absolute top-full mt-2 w-full bg-white rounded-xl shadow-2xl border border-slate-200 z-50 overflow-hidden max-h-[400px] overflow-y-auto">
             {results.map((item, i) => (
               <button
@@ -120,9 +121,11 @@ export function DocSearch({ items }: { items: SearchItem[] }) {
                 }`}
               >
                 <div className="h-8 w-8 rounded-lg bg-slate-100 flex items-center justify-center shrink-0">
-                  <img
+                  <Image
                     src={`https://cdn.jsdelivr.net/gh/devicons/devicon/icons/${item.lang === "html-css" ? "html5/html5" : item.lang === "nodejs" ? "nodejs/nodejs" : item.lang === "cpp" ? "cplusplus/cplusplus" : item.lang === "csharp" ? "csharp/csharp" : item.lang === "langchain" ? "python/python" : `${item.lang}/${item.lang}`}-original.svg`}
-                    alt={item.lang}
+                    alt={`${LANG_NAMES[item.lang] || item.lang} icon`}
+                    width={16}
+                    height={16}
                     className="h-4 w-4"
                   />
                 </div>
@@ -143,9 +146,15 @@ export function DocSearch({ items }: { items: SearchItem[] }) {
 
       {open && query.length >= 2 && results.length === 0 && (
         <>
-          <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
+          <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} aria-hidden="true" />
           <div className="absolute top-full mt-2 w-full bg-white rounded-xl shadow-2xl border border-slate-200 z-50 p-6 text-center">
-            <p className="text-sm text-slate-500">No results for &ldquo;{query}&rdquo;</p>
+            <div className="w-10 h-10 mx-auto mb-3 rounded-full bg-slate-100 flex items-center justify-center">
+              <svg className="h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </div>
+            <p className="text-sm font-medium text-slate-700 mb-1">No results for &ldquo;{query}&rdquo;</p>
+            <p className="text-xs text-slate-400">Try a different keyword or browse by language below</p>
           </div>
         </>
       )}
