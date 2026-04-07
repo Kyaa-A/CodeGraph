@@ -72,7 +72,13 @@ export function CourseCard({ course, progress }: CourseCardProps) {
                 <span className="font-medium text-emerald-600">{Math.round((progress.completed / progress.total) * 100)}%</span>
               </div>
               <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                <div className="h-full bg-emerald-500 rounded-full" style={{ width: `${(progress.completed / progress.total) * 100}%` }} />
+                <motion.div
+                  className="h-full bg-emerald-500 rounded-full"
+                  initial={{ width: "0%" }}
+                  whileInView={{ width: `${(progress.completed / progress.total) * 100}%` }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
+                />
               </div>
             </div>
           )}

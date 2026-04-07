@@ -196,8 +196,11 @@ export default async function CourseDetailPage({
                   </div>
                   <div className="h-2.5 rounded-full bg-slate-200 overflow-hidden">
                     <div
-                      className="h-full rounded-full bg-gradient-to-r from-emerald-400 to-emerald-500 transition-all"
-                      style={{ width: `${progressPercent}%` }}
+                      className="h-full rounded-full bg-gradient-to-r from-emerald-400 to-emerald-500"
+                      style={{
+                        width: `${progressPercent}%`,
+                        animation: "progress-fill 0.8s ease-out",
+                      }}
                     />
                   </div>
                 </div>
