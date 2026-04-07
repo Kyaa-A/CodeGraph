@@ -133,7 +133,11 @@ export function StreakHeatmap({ activeDates, frozenDates = [], recoveredDates = 
                 <div
                   key={day.date}
                   className={`w-[11px] h-[11px] sm:w-[13px] sm:h-[13px] rounded-[2px] ${cellColor(day.level, day.isFrozen, day.isRecovered)} ${
-                    day.isToday ? "ring-1 ring-slate-400 ring-offset-1" : ""
+                    day.isToday
+                      ? day.level >= 1
+                        ? "heatmap-today-solid"
+                        : "heatmap-today-pulse"
+                      : ""
                   }`}
                   title={`${day.date}${day.level >= 1 && !day.isFrozen && !day.isRecovered ? ` - ${day.level} activities` : day.isFrozen ? " - Frozen" : day.isRecovered ? " - Recovered" : ""}`}
                 />
