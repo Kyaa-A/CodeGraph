@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { motion } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
 import { Images, getCourseImage } from "@/lib/images";
@@ -8,6 +9,7 @@ import type { Course } from "@/lib/supabase/types";
 
 interface CourseCardProps {
   course: Course;
+  progress?: { completed: number; total: number } | null;
 }
 
 const Icons = {
@@ -18,7 +20,7 @@ const Icons = {
   play: () => <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" /><path strokeLinecap="round" strokeLinejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>,
 };
 
-export function CourseCard({ course }: CourseCardProps) {
+export function CourseCard({ course, progress }: CourseCardProps) {
   const imageUrl = course.thumbnail_url || getCourseImage(course.id);
   
   return (
@@ -30,10 +32,11 @@ export function CourseCard({ course }: CourseCardProps) {
       >
         {/* Image */}
         <div className="relative aspect-video overflow-hidden">
-          <img
+          <Image
             src={imageUrl}
             alt={course.title}
-            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+            fill
+            className="object-cover transition-transform duration-700 group-hover:scale-110"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
           
@@ -61,6 +64,19 @@ export function CourseCard({ course }: CourseCardProps) {
             {course.description || "Learn AI development with hands-on projects and expert guidance."}
           </p>
           
+          {/* Progress */}
+          {progress && progress.total > 0 && (
+            <div className="px-0 pb-2">
+              <div className="flex items-center justify-between text-xs text-slate-500 mb-1">
+                <span>{progress.completed}/{progress.total} lessons</span>
+                <span className="font-medium text-emerald-600">{Math.round((progress.completed / progress.total) * 100)}%</span>
+              </div>
+              <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                <div className="h-full bg-emerald-500 rounded-full" style={{ width: `${(progress.completed / progress.total) * 100}%` }} />
+              </div>
+            </div>
+          )}
+
           {/* Footer */}
           <div className="flex items-center justify-between pt-4 border-t border-slate-100">
             <div className="flex items-center gap-2 text-sm text-slate-500">

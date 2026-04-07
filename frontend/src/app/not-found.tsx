@@ -1,6 +1,9 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { LottieAnimation } from "@/components/lottie-animation";
 import { LOTTIE } from "@/lib/lottie-assets";
+
+export const metadata: Metadata = { title: "Page Not Found | CodeGraph" };
 
 export default function NotFound() {
   return (

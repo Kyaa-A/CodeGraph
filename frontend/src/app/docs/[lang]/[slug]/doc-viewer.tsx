@@ -106,6 +106,21 @@ export function DocViewer({
   const [isRead, setIsRead] = useState(initialIsRead ?? false);
   const [marking, setMarking] = useState(false);
   const [xpAwarded, setXpAwarded] = useState(false);
+  const [scrollProgress, setScrollProgress] = useState(0);
+
+  useEffect(() => {
+    const scrollArea = document.getElementById("doc-scroll-area");
+    if (!scrollArea) return;
+    const handleScroll = () => {
+      const { scrollTop, scrollHeight, clientHeight } = scrollArea;
+      const pct = scrollHeight - clientHeight > 0
+        ? (scrollTop / (scrollHeight - clientHeight)) * 100
+        : 100;
+      setScrollProgress(Math.min(pct, 100));
+    };
+    scrollArea.addEventListener("scroll", handleScroll, { passive: true });
+    return () => scrollArea.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const markAsRead = useCallback(async () => {
     if (!docTopicId || isRead || marking) return;
@@ -131,7 +146,14 @@ export function DocViewer({
   }, [docTopicId, isRead, marking]);
 
   return (
-    <div id="doc-scroll-area" className="flex-1 overflow-y-auto">
+    <div id="doc-scroll-area" className="flex-1 overflow-y-auto relative">
+      {/* Scroll reading progress bar */}
+      <div className="sticky top-0 left-0 right-0 z-10 h-0.5 bg-slate-100">
+        <div
+          className="h-full bg-emerald-500 transition-[width] duration-150"
+          style={{ width: `${scrollProgress}%` }}
+        />
+      </div>
       <div className="flex">
       <div className="p-6 lg:p-8 max-w-3xl min-w-0 flex-1">
         <LessonViewer content={content} docLang={lang} />

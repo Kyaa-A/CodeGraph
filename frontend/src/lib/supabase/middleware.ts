@@ -43,7 +43,7 @@ export async function updateSession(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   // Protected routes require login
-  const needsAuth = pathname.startsWith("/dashboard") || pathname.startsWith("/admin");
+  const needsAuth = pathname.startsWith("/dashboard") || pathname.startsWith("/admin") || pathname.startsWith("/profile");
   if (needsAuth && !user) {
     const url = request.nextUrl.clone();
     url.pathname = "/auth/login";

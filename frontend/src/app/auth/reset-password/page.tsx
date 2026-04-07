@@ -9,6 +9,7 @@ import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Logo } from "@/components/logo";
 
 export default function ResetPasswordPage() {
   return (
@@ -89,15 +90,7 @@ function ResetPasswordForm() {
         transition={{ duration: 0.5 }}
         className="w-full max-w-sm"
       >
-        <Link href="/" className="flex items-center gap-2.5 mb-10">
-          <svg viewBox="0 0 32 32" fill="none" className="h-8 w-8">
-            <rect width="32" height="32" rx="8" fill="#171717" />
-            <path d="M8 12L12 16L8 20" stroke="#10b981" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-            <path d="M16 20H24" stroke="white" strokeWidth="2" strokeLinecap="round" />
-            <circle cx="20" cy="11" r="2" fill="#10b981" />
-          </svg>
-          <span className="font-bold text-lg text-slate-900">CodeGraph</span>
-        </Link>
+        <Logo className="mb-10" />
 
         {!success ? (
           <>

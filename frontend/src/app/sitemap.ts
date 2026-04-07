@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://codegraph.vercel.app";
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://codegraph.dev";
 
 export default async function sitemap() {
   const supabase = await createClient();
@@ -13,8 +13,6 @@ export default async function sitemap() {
     { url: `${BASE_URL}/problems`, lastModified: new Date(), changeFrequency: "daily" as const, priority: 0.8 },
     { url: `${BASE_URL}/playground`, lastModified: new Date(), changeFrequency: "monthly" as const, priority: 0.6 },
     { url: `${BASE_URL}/leaderboard`, lastModified: new Date(), changeFrequency: "daily" as const, priority: 0.7 },
-    { url: `${BASE_URL}/auth/login`, lastModified: new Date(), changeFrequency: "yearly" as const, priority: 0.3 },
-    { url: `${BASE_URL}/auth/signup`, lastModified: new Date(), changeFrequency: "yearly" as const, priority: 0.3 },
   ];
 
   // Doc language index pages

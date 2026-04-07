@@ -2,15 +2,13 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { StreakCalendar } from "@/components/streak-calendar";
+import { ProfileEditor } from "./profile-editor";
+import { xpForLevel } from "@/lib/xp";
 
 export const metadata = {
   title: "Profile | CodeGraph",
   description: "Your CodeGraph profile and stats",
 };
-
-function xpForLevel(level: number): number {
-  return level * (level - 1) * 50;
-}
 
 export default async function ProfilePage() {
   const supabase = await createClient();
@@ -18,7 +16,7 @@ export default async function ProfilePage() {
 
   if (!user) redirect("/auth/login?next=/profile");
 
-  const [profileRes, submissionsRes, progressRes, xpRes, coursesRes, lessonsRes, freezesRes] = await Promise.all([
+  const [profileRes, submissionsRes, progressRes, xpRes, coursesRes, lessonsRes, freezesRes, problemsRes] = await Promise.all([
     supabase.from("profiles").select("name, avatar_url, total_xp, level, created_at, streak_freezes, streak_recovers").eq("id", user.id).single(),
     supabase.from("problem_submissions").select("problem_id, passed, language, created_at").eq("user_id", user.id),
     supabase.from("user_progress").select("lesson_id, completed, completed_at").eq("user_id", user.id).eq("completed", true),
@@ -26,6 +24,7 @@ export default async function ProfilePage() {
     supabase.from("courses").select("id, title"),
     supabase.from("lessons").select("id, course_id"),
     supabase.from("streak_freezes").select("frozen_date, item_type").eq("user_id", user.id),
+    supabase.from("problems").select("id, difficulty"),
   ]);
 
   const profile = profileRes.data;
@@ -40,12 +39,24 @@ export default async function ProfilePage() {
   const freezeCount = profile?.streak_freezes ?? 0;
   const recoverCount = profile?.streak_recovers ?? 0;
 
+  const allProblems = (problemsRes.data ?? []) as { id: string; difficulty: string }[];
+  const problemDiffMap = new Map(allProblems.map((p) => [p.id, p.difficulty]));
+  const totalProblems = { easy: 0, medium: 0, hard: 0 };
+  for (const p of allProblems) {
+    if (p.difficulty in totalProblems) totalProblems[p.difficulty as keyof typeof totalProblems]++;
+  }
+
   // Stats
   const solvedSet = new Set<string>();
   const langCounts = new Map<string, number>();
+  const diffSolved = { easy: 0, medium: 0, hard: 0 };
   for (const sub of submissions) {
     if (sub.passed) {
-      solvedSet.add(sub.problem_id);
+      if (!solvedSet.has(sub.problem_id)) {
+        solvedSet.add(sub.problem_id);
+        const diff = problemDiffMap.get(sub.problem_id);
+        if (diff === "easy" || diff === "medium" || diff === "hard") diffSolved[diff]++;
+      }
       langCounts.set(sub.language, (langCounts.get(sub.language) || 0) + 1);
     }
   }
@@ -100,21 +111,18 @@ export default async function ProfilePage() {
         {/* Profile Header */}
         <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-2xl p-6 sm:p-8 mb-6">
           <div className="flex items-center gap-5">
-            <div className="h-16 w-16 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center text-white text-2xl font-bold shadow-lg">
-              {(profile?.name || user.email || "U")[0].toUpperCase()}
-            </div>
-            <div>
-              <h1 className="text-xl sm:text-2xl font-bold text-white">
-                {profile?.name || user.email?.split("@")[0]}
-              </h1>
+            <ProfileEditor
+              userId={user.id}
+              initialName={profile?.name || user.email?.split("@")[0] || "User"}
+              initialAvatarUrl={profile?.avatar_url || null}
+            />
+            <div className="ml-auto flex flex-col items-end gap-1">
               <p className="text-slate-400 text-sm">Member since {memberSince}</p>
               <div className="flex items-center gap-2 mt-1 sm:hidden">
                 <span className="text-sm font-semibold text-emerald-400">Level {level}</span>
                 <span className="text-xs text-slate-400">{totalXp.toLocaleString()} XP</span>
               </div>
-            </div>
-            <div className="ml-auto hidden sm:block">
-              <div className="flex items-center gap-3">
+              <div className="hidden sm:flex items-center gap-3 mt-1">
                 <div className="h-12 w-12 rounded-full bg-emerald-500/20 flex items-center justify-center">
                   <span className="text-lg font-bold text-emerald-400">{level}</span>
                 </div>
@@ -155,6 +163,46 @@ export default async function ProfilePage() {
             </div>
           ))}
         </div>
+
+        {/* Difficulty Breakdown */}
+        {totalSolved > 0 && (
+          <div className="bg-white rounded-xl border border-slate-200 p-5 mb-6">
+            <h2 className="text-sm font-semibold text-slate-800 mb-4">Problem Difficulty Breakdown</h2>
+            <div className="grid grid-cols-3 gap-4">
+              {([
+                { label: "Easy", solved: diffSolved.easy, total: totalProblems.easy, color: "emerald", ring: "stroke-emerald-500" },
+                { label: "Medium", solved: diffSolved.medium, total: totalProblems.medium, color: "amber", ring: "stroke-amber-500" },
+                { label: "Hard", solved: diffSolved.hard, total: totalProblems.hard, color: "red", ring: "stroke-red-500" },
+              ]).map((d) => {
+                const pct = d.total > 0 ? (d.solved / d.total) * 100 : 0;
+                const circumference = 2 * Math.PI * 36;
+                const dashOffset = circumference - (pct / 100) * circumference;
+                return (
+                  <div key={d.label} className="flex flex-col items-center">
+                    <div className="relative w-20 h-20 sm:w-24 sm:h-24">
+                      <svg className="w-full h-full -rotate-90" viewBox="0 0 80 80">
+                        <circle cx="40" cy="40" r="36" fill="none" stroke="#f1f5f9" strokeWidth="6" />
+                        <circle
+                          cx="40" cy="40" r="36" fill="none"
+                          className={d.ring}
+                          strokeWidth="6"
+                          strokeLinecap="round"
+                          strokeDasharray={circumference}
+                          strokeDashoffset={dashOffset}
+                        />
+                      </svg>
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <span className="text-lg font-bold text-slate-800">{d.solved}</span>
+                      </div>
+                    </div>
+                    <p className="text-sm font-medium text-slate-700 mt-2">{d.label}</p>
+                    <p className="text-[11px] text-slate-400">{d.solved}/{d.total}</p>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         <div className="grid md:grid-cols-2 gap-6">
           {/* Activity Calendar */}

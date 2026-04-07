@@ -38,12 +38,18 @@ export default function AdminCoursesPage() {
     if (!title.trim()) return;
     setSaving(true);
 
-    await supabase.from("courses").insert({
+    const { error } = await supabase.from("courses").insert({
       title: title.trim(),
       description: description.trim(),
       is_free: true,
       price: 0,
     });
+
+    if (error) {
+      alert(error.message);
+      setSaving(false);
+      return;
+    }
 
     setTitle("");
     setDescription("");
@@ -54,7 +60,11 @@ export default function AdminCoursesPage() {
 
   async function handleDelete(id: string) {
     if (!confirm("Delete this course?")) return;
-    await supabase.from("courses").delete().eq("id", id);
+    const { error } = await supabase.from("courses").delete().eq("id", id);
+    if (error) {
+      alert(error.message);
+      return;
+    }
     loadCourses();
   }
 

@@ -2,34 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { WANDBOX_URL, COMPILER_MAP, MAX_CODE_LENGTH } from "@/lib/compiler-map";
 import { rateLimit } from "@/lib/rate-limit";
-
-function buildTestCode(userCode: string, testCode: string, language: string): string {
-  if (!testCode) return userCode;
-
-  if (language === "java") {
-    // For Java: replace the main method body with test code
-    // User writes methods, tests call those methods
-    const mainRegex = /public\s+static\s+void\s+main\s*\(\s*String\s*\[\s*\]\s*\w+\s*\)\s*\{[\s\S]*?\n\s*\}/;
-    if (mainRegex.test(userCode)) {
-      return userCode.replace(
-        mainRegex,
-        `public static void main(String[] args) {\n${testCode}\n    }`
-      );
-    }
-    // Fallback: append inside the last closing brace
-    const lastBrace = userCode.lastIndexOf("}");
-    if (lastBrace !== -1) {
-      return (
-        userCode.slice(0, lastBrace) +
-        `\n    public static void main(String[] args) {\n${testCode}\n    }\n}`
-      );
-    }
-    return userCode + "\n" + testCode;
-  }
-
-  // For Python, JS, SQL, and all others: simply append
-  return userCode + "\n\n" + testCode;
-}
+import { buildTestCode } from "@/lib/build-test-code";
 
 export async function POST(request: NextRequest) {
   try {

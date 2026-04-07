@@ -9,28 +9,11 @@ import { Button } from "@/components/ui/button";
 import type { User } from "@supabase/supabase-js";
 import React from "react";
 import { XpBar } from "@/components/xp-bar";
+import { LogoIcon } from "@/components/logo";
 
 // Icons as SVG components
 const Icons = {
-  logo: () => (
-    <svg viewBox="0 0 32 32" fill="none" className="h-8 w-8">
-      <rect width="32" height="32" rx="8" fill="#171717" />
-      <path
-        d="M8 12L12 16L8 20"
-        stroke="#10b981"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M16 20H24"
-        stroke="white"
-        strokeWidth="2"
-        strokeLinecap="round"
-      />
-      <circle cx="20" cy="11" r="2" fill="#10b981" />
-    </svg>
-  ),
+  logo: () => <LogoIcon />,
   menu: () => (
     <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
       <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
@@ -115,55 +98,48 @@ export function Navbar() {
       .then(({ data }) => {
         setIsAdmin(data?.role === "admin");
       });
-    // Fetch streak
-    supabase
-      .from("user_progress")
-      .select("completed_at")
-      .eq("user_id", user.id)
-      .eq("completed", true)
-      .then(({ data }) => {
-        if (!data || data.length === 0) {
-          setStreak(0);
-          return;
+    // Fetch streak from all activity sources: lessons, problems, daily logins
+    const fmt = (d: Date) =>
+      `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+
+    Promise.all([
+      supabase.from("user_progress").select("completed_at").eq("user_id", user.id).eq("completed", true),
+      supabase.from("problem_submissions").select("created_at").eq("user_id", user.id).eq("passed", true),
+      supabase.from("xp_events").select("created_at").eq("user_id", user.id).eq("event_type", "daily_login"),
+      supabase.from("streak_freezes").select("frozen_date").eq("user_id", user.id),
+    ]).then(([progressRes, subsRes, loginsRes, freezesRes]) => {
+      const lessonDates = (progressRes.data ?? [])
+        .filter((p) => p.completed_at)
+        .map((p) => fmt(new Date(p.completed_at!)));
+      const submissionDates = (subsRes.data ?? [])
+        .map((s) => fmt(new Date(s.created_at)));
+      const loginDates = (loginsRes.data ?? [])
+        .map((e) => fmt(new Date(e.created_at)));
+      const protectedDates = new Set((freezesRes.data ?? []).map((f) => f.frozen_date));
+
+      const allActiveDates = new Set([...lessonDates, ...submissionDates, ...loginDates]);
+
+      if (allActiveDates.size === 0 && protectedDates.size === 0) {
+        setStreak(0);
+        return;
+      }
+
+      // Walk backwards from today counting consecutive active or protected days
+      let count = 0;
+      const today = new Date();
+      for (let i = 0; i < 365; i++) {
+        const d = new Date(today);
+        d.setDate(d.getDate() - i);
+        const dateStr = fmt(d);
+        if (allActiveDates.has(dateStr) || protectedDates.has(dateStr)) {
+          count++;
+        } else if (i > 0) {
+          break;
         }
-        const days = [
-          ...new Set(
-            data
-              .filter((p) => p.completed_at)
-              .map((p) => {
-                const d = new Date(p.completed_at!);
-                return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-              })
-          ),
-        ]
-          .sort()
-          .reverse();
-        if (days.length === 0) {
-          setStreak(0);
-          return;
-        }
-        const today = new Date();
-        const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
-        const yesterday = new Date(today);
-        yesterday.setDate(yesterday.getDate() - 1);
-        const yesterdayStr = `${yesterday.getFullYear()}-${String(yesterday.getMonth() + 1).padStart(2, "0")}-${String(yesterday.getDate()).padStart(2, "0")}`;
-        if (days[0] !== todayStr && days[0] !== yesterdayStr) {
-          setStreak(0);
-          return;
-        }
-        let count = 1;
-        let current = new Date(days[0]);
-        for (let i = 1; i < days.length; i++) {
-          const prev = new Date(current);
-          prev.setDate(prev.getDate() - 1);
-          const prevStr = `${prev.getFullYear()}-${String(prev.getMonth() + 1).padStart(2, "0")}-${String(prev.getDate()).padStart(2, "0")}`;
-          if (days[i] === prevStr) {
-            count++;
-            current = prev;
-          } else break;
-        }
-        setStreak(count);
-      });
+        // Grace: if today has no activity yet, don't break — check yesterday
+      }
+      setStreak(count);
+    });
   }, [user, supabase]);
 
   async function handleSignOut() {
@@ -179,6 +155,12 @@ export function Navbar() {
     { href: "/docs", label: "Docs", icon: Icons.docs },
     { href: "/courses", label: "Courses", icon: Icons.courses },
     { href: "/problems", label: "Problems", icon: Icons.problems },
+    { href: "/playground", label: "Playground", icon: () => (
+      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+    )},
     { href: "/leaderboard", label: "Ranking", icon: () => (
       <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
@@ -238,6 +220,19 @@ export function Navbar() {
 
           {/* Right side */}
           <div className="flex items-center gap-2">
+            {/* Search button — opens Cmd+K palette */}
+            <button
+              onClick={() => {
+                window.dispatchEvent(new KeyboardEvent("keydown", { key: "k", metaKey: true }));
+              }}
+              className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-lg border border-slate-200 text-xs text-slate-400 hover:text-slate-600 hover:border-slate-300 transition-colors"
+            >
+              <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+              Search
+              <kbd className="ml-1 px-1.5 py-0.5 rounded bg-slate-100 text-[10px] font-mono text-slate-400">⌘K</kbd>
+            </button>
             {/* XP bar - hidden on mobile */}
             {user && <div className="hidden sm:block"><XpBar userId={user.id} /></div>}
 

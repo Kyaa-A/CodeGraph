@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
+import { LogoIcon } from "@/components/logo";
 
 interface AuthModalProps {
   open: boolean;
@@ -70,12 +71,7 @@ export function AuthModal({ open, onClose, message }: AuthModalProps) {
 
                 {/* Logo */}
                 <div className="inline-flex items-center justify-center mb-4">
-                  <svg viewBox="0 0 32 32" fill="none" className="h-12 w-12">
-                    <rect width="32" height="32" rx="8" fill="#171717" />
-                    <path d="M8 12L12 16L8 20" stroke="#10b981" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                    <path d="M16 20H24" stroke="white" strokeWidth="2" strokeLinecap="round" />
-                    <circle cx="20" cy="11" r="2" fill="#10b981" />
-                  </svg>
+                  <LogoIcon className="h-12 w-12" />
                 </div>
 
                 <h2 className="text-xl font-bold text-white">

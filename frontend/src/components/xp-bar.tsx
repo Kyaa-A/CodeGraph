@@ -4,19 +4,13 @@ import { useEffect, useState, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { AnimatePresence, motion } from "framer-motion";
 import type { XpEvent } from "@/lib/supabase/types";
-
-function xpForLevel(level: number): number {
-  return level * (level - 1) * 50;
-}
-
-function xpToNextLevel(level: number): number {
-  return xpForLevel(level + 1) - xpForLevel(level);
-}
+import { xpForLevel, xpToNextLevel } from "@/lib/xp";
 
 const EVENT_LABELS: Record<string, string> = {
   problem_solve: "Problem Solved",
   lesson_complete: "Lesson Complete",
   daily_streak: "Daily Streak",
+  daily_login: "Daily Login",
 };
 
 export function XpBar({ userId }: { userId: string }) {

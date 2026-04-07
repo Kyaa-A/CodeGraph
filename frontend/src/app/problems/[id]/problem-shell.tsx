@@ -3,6 +3,7 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { AuthModal } from "@/components/auth-modal";
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
@@ -71,6 +72,7 @@ export function ProblemShell({ problem, submissions: initialSubmissions, isAuthe
   const [showAuthModal, setShowAuthModal] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const [isMobile, setIsMobile] = useState(false);
+  const [activeTab, setActiveTab] = useState<"description" | "code">("description");
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 768);
@@ -92,6 +94,22 @@ export function ProblemShell({ problem, submissions: initialSubmissions, isAuthe
     }
     return () => { if (timerRef.current) clearInterval(timerRef.current); };
   }, [timerRunning]);
+
+  const [copied, setCopied] = useState(false);
+
+  function handleResetCode() {
+    setCode(problem.starter_code[language] || "");
+    setOutput("");
+    setTestResults([]);
+    setSubmitResult(null);
+  }
+
+  function handleCopyLink() {
+    navigator.clipboard.writeText(window.location.href).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  }
 
   function handleLanguageChange(langId: string) {
     setLanguage(langId);
@@ -120,7 +138,7 @@ export function ProblemShell({ problem, submissions: initialSubmissions, isAuthe
     };
   }, [isDragging]);
 
-  async function handleRun() {
+  const handleRun = useCallback(async () => {
     setRunning(true);
     setOutput("");
     setActivePanel("output");
@@ -141,9 +159,9 @@ export function ProblemShell({ problem, submissions: initialSubmissions, isAuthe
       setOutput("Error: Failed to execute code");
     }
     setRunning(false);
-  }
+  }, [code, language, timerRunning, timerSeconds]);
 
-  async function handleSubmit() {
+  const handleSubmit = useCallback(async () => {
     if (!isAuthenticated) {
       setShowAuthModal(true);
       return;
@@ -193,7 +211,33 @@ export function ProblemShell({ problem, submissions: initialSubmissions, isAuthe
       setOutput("Error: Failed to submit solution");
     }
     setSubmitting(false);
-  }
+  }, [code, language, problem.id, problem.difficulty, isAuthenticated, timerSeconds, userId]);
+
+  // Keyboard shortcuts: Ctrl+Enter = Run, Ctrl+Shift+Enter = Submit
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
+        e.preventDefault();
+        if (e.shiftKey) {
+          handleSubmit();
+        } else {
+          handleRun();
+        }
+      }
+    }
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [handleRun, handleSubmit]);
+
+  // Close language dropdown on Escape
+  useEffect(() => {
+    if (!showLanguages) return;
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setShowLanguages(false);
+    };
+    window.addEventListener("keydown", handleEscape);
+    return () => window.removeEventListener("keydown", handleEscape);
+  }, [showLanguages]);
 
   const currentLang = LANGUAGE_OPTIONS.find((l) => l.id === language);
 
@@ -343,24 +387,29 @@ export function ProblemShell({ problem, submissions: initialSubmissions, isAuthe
               size="sm"
               className="rounded-lg text-xs gap-1 sm:gap-1.5 border-slate-200"
               onClick={() => setShowLanguages(!showLanguages)}
+              aria-haspopup="listbox"
+              aria-expanded={showLanguages}
+              aria-label={`Language: ${currentLang?.name}. Click to change`}
             >
-              {currentLang && <img src={LANG_LOGOS[currentLang.id]} alt={currentLang.name} className="h-4 w-4" />}
+              {currentLang && <Image src={LANG_LOGOS[currentLang.id]} alt={currentLang.name} width={16} height={16} className="h-4 w-4" />}
               <span className="hidden sm:inline">{currentLang?.name}</span>
               <svg className="h-3 w-3 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
               </svg>
             </Button>
             {showLanguages && (
-              <div className="absolute right-0 top-full mt-1 w-44 bg-white rounded-lg border border-slate-200 shadow-xl z-50 py-1">
+              <div role="listbox" aria-label="Select language" className="absolute right-0 top-full mt-1 w-44 bg-white rounded-lg border border-slate-200 shadow-xl z-50 py-1">
                 {availableLanguages.map((l) => (
                   <button
                     key={l.id}
+                    role="option"
+                    aria-selected={l.id === language}
                     onClick={() => handleLanguageChange(l.id)}
                     className={`w-full text-left px-3 py-2 text-sm flex items-center gap-2 hover:bg-slate-50 ${
                       l.id === language ? "bg-emerald-50 text-emerald-700" : "text-slate-600"
                     }`}
                   >
-                    <img src={LANG_LOGOS[l.id]} alt={l.name} className="h-4 w-4" />
+                    <Image src={LANG_LOGOS[l.id]} alt={l.name} width={16} height={16} className="h-4 w-4" />
                     {l.name}
                   </button>
                 ))}
@@ -368,12 +417,39 @@ export function ProblemShell({ problem, submissions: initialSubmissions, isAuthe
             )}
           </div>
 
+          <button
+            onClick={handleCopyLink}
+            title="Copy problem link"
+            className="hidden sm:flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 text-slate-400 hover:text-slate-600 hover:bg-slate-50 transition-colors"
+          >
+            {copied ? (
+              <svg className="h-3.5 w-3.5 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+            ) : (
+              <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+              </svg>
+            )}
+          </button>
+
+          <button
+            onClick={handleResetCode}
+            title="Reset to starter code"
+            className="hidden sm:flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 text-slate-400 hover:text-slate-600 hover:bg-slate-50 transition-colors"
+          >
+            <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+          </button>
+
           <Button
             variant="outline"
             size="sm"
             className="rounded-lg text-xs"
             onClick={handleRun}
             disabled={running || submitting}
+            title="Ctrl+Enter"
           >
             {running ? "..." : "Run"}
           </Button>
@@ -383,17 +459,42 @@ export function ProblemShell({ problem, submissions: initialSubmissions, isAuthe
             className="rounded-lg text-xs bg-emerald-500 hover:bg-emerald-600 text-white"
             onClick={handleSubmit}
             disabled={submitting || running}
+            title="Ctrl+Shift+Enter"
           >
             {submitting ? "..." : "Submit"}
           </Button>
         </div>
       </div>
 
-      {/* Split pane - stacks vertically on mobile, side-by-side on md+ */}
+      {/* Mobile tab switcher */}
+      {isMobile && (
+        <div className="flex border-b border-slate-200 bg-white md:hidden">
+          <button
+            onClick={() => setActiveTab("description")}
+            className={`flex-1 px-4 py-2 text-xs font-medium transition-colors ${
+              activeTab === "description" ? "text-emerald-600 border-b-2 border-emerald-500" : "text-slate-500"
+            }`}
+          >
+            Problem
+          </button>
+          <button
+            onClick={() => setActiveTab("code")}
+            className={`flex-1 px-4 py-2 text-xs font-medium transition-colors ${
+              activeTab === "code" ? "text-emerald-600 border-b-2 border-emerald-500" : "text-slate-500"
+            }`}
+          >
+            Code
+          </button>
+        </div>
+      )}
+
+      {/* Split pane - tabs on mobile, side-by-side on md+ */}
       <div ref={containerRef} className="flex-1 flex flex-col md:flex-row overflow-hidden" style={{ userSelect: isDragging ? "none" : "auto" }}>
         {/* Left: Problem description */}
         <div
-          className="bg-white border-b md:border-b-0 md:border-r border-slate-200 overflow-hidden h-[40vh] md:h-auto shrink-0 md:shrink"
+          className={`bg-white border-b md:border-b-0 md:border-r border-slate-200 overflow-hidden md:h-auto shrink-0 md:shrink ${
+            isMobile ? (activeTab === "code" ? "hidden" : "flex-1") : ""
+          }`}
           style={{ width: isMobile ? undefined : `${splitPosition}%` }}
         >
           <ProblemDescription
@@ -418,7 +519,9 @@ export function ProblemShell({ problem, submissions: initialSubmissions, isAuthe
 
         {/* Right: Editor + Output */}
         <div
-          className="flex flex-col overflow-hidden flex-1"
+          className={`flex flex-col overflow-hidden flex-1 ${
+            isMobile && activeTab !== "code" ? "hidden" : ""
+          }`}
           style={{ width: isMobile ? undefined : `${100 - splitPosition}%` }}
         >
           {/* Editor */}

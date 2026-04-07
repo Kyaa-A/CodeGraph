@@ -43,12 +43,18 @@ export default function AdminLessonsPage() {
     if (!title.trim() || !courseId) return;
     setSaving(true);
 
-    await supabase.from("lessons").insert({
+    const { error } = await supabase.from("lessons").insert({
       course_id: courseId,
       title: title.trim(),
       content: content.trim(),
       order_index: orderIndex,
     });
+
+    if (error) {
+      alert(error.message);
+      setSaving(false);
+      return;
+    }
 
     setTitle("");
     setContent("");
@@ -60,7 +66,11 @@ export default function AdminLessonsPage() {
 
   async function handleDelete(id: string) {
     if (!confirm("Delete this lesson?")) return;
-    await supabase.from("lessons").delete().eq("id", id);
+    const { error } = await supabase.from("lessons").delete().eq("id", id);
+    if (error) {
+      alert(error.message);
+      return;
+    }
     loadData();
   }
 

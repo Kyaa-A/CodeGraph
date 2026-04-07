@@ -7,6 +7,7 @@ import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { LottieAnimation } from "@/components/lottie-animation";
 import { LOTTIE } from "@/lib/lottie-assets";
+import { LogoIcon } from "@/components/logo";
 
 export function AuthGate({ children }: { children: React.ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
@@ -53,12 +54,7 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
         <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 p-8 max-w-sm w-full mx-4 text-center">
           <div className="flex justify-center mb-4">
-            <svg viewBox="0 0 32 32" fill="none" className="h-10 w-10">
-              <rect width="32" height="32" rx="8" fill="#171717" />
-              <path d="M8 12L12 16L8 20" stroke="#10b981" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-              <path d="M16 20H24" stroke="white" strokeWidth="2" strokeLinecap="round" />
-              <circle cx="20" cy="11" r="2" fill="#10b981" />
-            </svg>
+            <LogoIcon className="h-10 w-10" />
           </div>
 
           <h2 className="text-xl font-bold text-slate-900 mb-2">Sign in to continue</h2>

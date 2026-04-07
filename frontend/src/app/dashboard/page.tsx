@@ -2,8 +2,9 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { Button } from "@/components/ui/button";
 import type { Course, Lesson, UserProgress } from "@/lib/supabase/types";
-import { DailyXpTrigger } from "./daily-xp-trigger";
 import { InventoryBag } from "./inventory-bag";
+import { xpForLevel } from "@/lib/xp";
+import { SITE_STATS } from "@/lib/constants";
 
 export const metadata = {
   title: "Dashboard | CodeGraph",
@@ -17,17 +18,13 @@ interface CourseWithProgress {
   nextLessonId: string | null;
 }
 
-function xpForLevel(level: number) {
-  return level * (level - 1) * 50;
-}
-
 export default async function DashboardPage() {
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const [coursesResult, lessonsResult, progressResult, submissionsResult, profileResult, xpEventsResult, freezesResult] =
+  const [coursesResult, lessonsResult, progressResult, submissionsResult, profileResult, xpEventsResult, freezesResult, loginEventsResult, dailyChallengeResult] =
     await Promise.all([
       supabase.from("courses").select("*").order("created_at", { ascending: false }),
       supabase.from("lessons").select("*").order("order_index", { ascending: true }),
@@ -55,6 +52,16 @@ export default async function DashboardPage() {
       user
         ? supabase.from("streak_freezes").select("frozen_date, item_type").eq("user_id", user.id)
         : Promise.resolve({ data: null }),
+      // Fetch all daily_login events for streak calculation
+      user
+        ? supabase
+            .from("xp_events")
+            .select("created_at")
+            .eq("user_id", user.id)
+            .eq("event_type", "daily_login")
+        : Promise.resolve({ data: null }),
+      // Fetch a set of problems for daily challenge
+      supabase.from("problems").select("id, title, difficulty, tags").limit(200),
     ]);
 
   const typedCourses = (coursesResult.data ?? []) as Course[];
@@ -68,6 +75,7 @@ export default async function DashboardPage() {
   const allProtectedDates = streakFreezeRows.map((f) => f.frozen_date);
   const freezeCount = profile?.streak_freezes ?? 0;
   const recoverCount = profile?.streak_recovers ?? 0;
+  const loginDates = (loginEventsResult.data ?? []) as { created_at: string }[];
   const xpEvents = (xpEventsResult.data ?? []) as {
     id: string;
     event_type: string;
@@ -110,7 +118,12 @@ export default async function DashboardPage() {
       const d = new Date(s.created_at);
       return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
     });
-    const allActiveDates = new Set([...completedDates, ...submissionDates]);
+    // Also count daily login dates (any page visit triggers this)
+    const dailyLoginDates = loginDates.map((e) => {
+      const d = new Date(e.created_at);
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+    });
+    const allActiveDates = new Set([...completedDates, ...submissionDates, ...dailyLoginDates]);
     const protectedSet = new Set(protectedDates);
 
     const fmt = (d: Date) =>
@@ -160,6 +173,22 @@ export default async function DashboardPage() {
       };
     });
 
+  // "Continue where you left off" — find most recent incomplete course + most recent problem attempt
+  const lastInProgressCourse = enrolledCourses.find((c) => c.completedLessons < c.totalLessons && c.nextLessonId);
+  const lastProblemSubmission = submissions.length > 0
+    ? submissions.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())[0]
+    : null;
+
+  // Daily Challenge — deterministic random problem based on date, prefer unsolved
+  const allChallengeProblems = (dailyChallengeResult.data ?? []) as { id: string; title: string; difficulty: string; tags: string[] }[];
+  const solvedIds = new Set(submissions.map((s) => s.problem_id));
+  const unsolvedProblems = allChallengeProblems.filter((p) => !solvedIds.has(p.id));
+  const challengePool = unsolvedProblems.length > 0 ? unsolvedProblems : allChallengeProblems;
+  // Simple date-seeded index
+  const today = new Date();
+  const dateSeed = today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate();
+  const dailyChallenge = challengePool.length > 0 ? challengePool[dateSeed % challengePool.length] : null;
+
   const recentXpActivity = xpEvents.slice(0, 5).map((e) => ({
     id: e.id,
     type: "xp" as const,
@@ -187,7 +216,6 @@ export default async function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white pt-20">
-      {user && <DailyXpTrigger />}
       <div className="container mx-auto px-4 py-6 sm:py-10 max-w-6xl">
         {/* Welcome Header */}
         <div className="mb-8 sm:mb-10">
@@ -254,6 +282,92 @@ export default async function DashboardPage() {
             </div>
           </div>
         </div>
+
+        {/* Continue where you left off */}
+        {user && (lastInProgressCourse || lastProblemSubmission) && (
+          <div className="mb-8 rounded-2xl bg-white border border-slate-200 p-5 sm:p-6">
+            <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-4">Continue where you left off</h2>
+            <div className="grid sm:grid-cols-2 gap-4">
+              {lastInProgressCourse && (
+                <Link
+                  href={`/courses/${lastInProgressCourse.course.id}/${lastInProgressCourse.nextLessonId}`}
+                  className="flex items-center gap-4 p-4 rounded-xl bg-emerald-50 border border-emerald-100 hover:bg-emerald-100 transition-colors group"
+                >
+                  <div className="h-11 w-11 rounded-xl bg-emerald-500 flex items-center justify-center shrink-0">
+                    <svg className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                    </svg>
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-semibold text-slate-900 truncate group-hover:text-emerald-700">{lastInProgressCourse.course.title}</p>
+                    <p className="text-xs text-slate-500">{lastInProgressCourse.completedLessons}/{lastInProgressCourse.totalLessons} lessons · Continue next lesson</p>
+                  </div>
+                  <svg className="h-5 w-5 text-emerald-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                  </svg>
+                </Link>
+              )}
+              {lastProblemSubmission && (
+                <Link
+                  href={`/problems/${lastProblemSubmission.problem_id}`}
+                  className="flex items-center gap-4 p-4 rounded-xl bg-blue-50 border border-blue-100 hover:bg-blue-100 transition-colors group"
+                >
+                  <div className="h-11 w-11 rounded-xl bg-blue-500 flex items-center justify-center shrink-0">
+                    <svg className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                    </svg>
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-semibold text-slate-900 truncate group-hover:text-blue-700">Last Problem Attempted</p>
+                    <p className="text-xs text-slate-500">Pick up where you left off</p>
+                  </div>
+                  <svg className="h-5 w-5 text-blue-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                  </svg>
+                </Link>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Daily Challenge */}
+        {user && dailyChallenge && (
+          <div className="mb-8">
+            <Link
+              href={`/problems/${dailyChallenge.id}`}
+              className="block rounded-2xl bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 p-5 sm:p-6 hover:shadow-lg hover:shadow-amber-100/50 transition-all group"
+            >
+              <div className="flex items-center gap-4">
+                <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shrink-0 shadow-sm">
+                  <svg className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-1">
+                    <p className="text-xs font-bold text-amber-600 uppercase tracking-wider">Daily Challenge</p>
+                    <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${
+                      dailyChallenge.difficulty === "easy" ? "bg-emerald-100 text-emerald-700" :
+                      dailyChallenge.difficulty === "medium" ? "bg-amber-100 text-amber-700" :
+                      "bg-red-100 text-red-700"
+                    }`}>{dailyChallenge.difficulty}</span>
+                  </div>
+                  <p className="text-sm sm:text-base font-semibold text-slate-900 truncate group-hover:text-amber-800">
+                    {dailyChallenge.title}
+                  </p>
+                  <div className="flex items-center gap-1.5 mt-1">
+                    {dailyChallenge.tags.slice(0, 3).map((tag) => (
+                      <span key={tag} className="text-[10px] text-amber-600/70">{tag}</span>
+                    ))}
+                  </div>
+                </div>
+                <svg className="h-5 w-5 text-amber-400 group-hover:text-amber-600 shrink-0 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                </svg>
+              </div>
+            </Link>
+          </div>
+        )}
 
         <div className="grid lg:grid-cols-3 gap-6 sm:gap-8">
           {/* Main Content — Enrolled Courses */}
@@ -377,7 +491,7 @@ export default async function DashboardPage() {
                 </div>
                 <div>
                   <p className="text-sm font-semibold text-slate-900">Practice Problems</p>
-                  <p className="text-xs text-slate-500">1000+ challenges</p>
+                  <p className="text-xs text-slate-500">{SITE_STATS.PROBLEMS_LABEL} challenges</p>
                 </div>
               </Link>
               <Link
@@ -391,7 +505,7 @@ export default async function DashboardPage() {
                 </div>
                 <div>
                   <p className="text-sm font-semibold text-slate-900">Documentation</p>
-                  <p className="text-xs text-slate-500">600+ doc pages</p>
+                  <p className="text-xs text-slate-500">{SITE_STATS.DOC_PAGES_LABEL} doc pages</p>
                 </div>
               </Link>
             </div>

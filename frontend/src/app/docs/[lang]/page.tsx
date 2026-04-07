@@ -1,6 +1,8 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
+export const revalidate = 3600; // cache 1 hour — redirect rarely changes
+
 export default async function DocLangPage({
   params,
 }: {

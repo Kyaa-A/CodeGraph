@@ -107,7 +107,11 @@ export default function AdminProblemsPage() {
 
   async function handleDelete(id: string) {
     if (!confirm("Delete this problem? All submissions will also be deleted.")) return;
-    await supabase.from("problems").delete().eq("id", id);
+    const { error } = await supabase.from("problems").delete().eq("id", id);
+    if (error) {
+      alert(error.message);
+      return;
+    }
     loadProblems();
   }
 

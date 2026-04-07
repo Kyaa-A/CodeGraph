@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { createClient } from "@/lib/supabase/server";
 import { DocSearch } from "./doc-search";
 
@@ -31,7 +32,7 @@ const LOGO_URLS: Record<string, string> = {
 function LangLogo({ lang, className = "h-full w-full" }: { lang: string; className?: string }) {
   const url = LOGO_URLS[lang];
   if (!url) return null;
-  return <img src={url} alt={lang} className={className} />;
+  return <Image src={url} alt={lang} width={32} height={32} className={className} />;
 }
 
 /* ── Language data grouped by category ── */
@@ -82,8 +83,10 @@ export default async function DocsPage() {
   const topics = (allTopics ?? []) as { lang: string; slug: string; title: string; section: string }[];
 
   const langCounts = new Map<string, number>();
+  const langFirstSlug = new Map<string, string>();
   for (const row of topics) {
     langCounts.set(row.lang, (langCounts.get(row.lang) || 0) + 1);
+    if (!langFirstSlug.has(row.lang)) langFirstSlug.set(row.lang, row.slug);
   }
 
   const totalPages = Array.from(langCounts.values()).reduce((a, b) => a + b, 0);
@@ -120,7 +123,7 @@ export default async function DocsPage() {
               return (
                 <Link
                   key={lang}
-                  href={`/docs/${lang}`}
+                  href={`/docs/${lang}/${langFirstSlug.get(lang)}`}
                   className="inline-flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full text-sm text-slate-300 hover:text-white transition-all cursor-pointer"
                 >
                   <div className="h-5 w-5 shrink-0 overflow-hidden rounded-sm"><LangLogo lang={lang} /></div>
@@ -149,7 +152,7 @@ export default async function DocsPage() {
                 return (
                   <Link
                     key={l.lang}
-                    href={available ? `/docs/${l.lang}` : "#"}
+                    href={available ? `/docs/${l.lang}/${langFirstSlug.get(l.lang)}` : "#"}
                     className={`group flex items-center gap-4 p-4 rounded-xl border transition-all cursor-pointer ${
                       available
                         ? "bg-white border-slate-200 hover:border-emerald-300 hover:shadow-md hover:shadow-emerald-100/50"

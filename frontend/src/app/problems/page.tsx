@@ -1,21 +1,18 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { AuthGate } from "@/components/auth-gate";
-import type { Problem, Difficulty } from "@/lib/supabase/types";
+import type { Problem } from "@/lib/supabase/types";
 import { StreakCalendar } from "@/components/streak-calendar";
 import { ProblemList } from "./problem-list";
+
+export const revalidate = 300; // cache 5 min
 
 export const metadata = {
   title: "Problems | CodeGraph",
   description: "Practice coding problems like LeetCode",
 };
 
-export default async function ProblemsPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ difficulty?: string; tag?: string; search?: string }>;
-}) {
-  const { difficulty, tag, search } = await searchParams;
+export default async function ProblemsPage() {
   const supabase = await createClient();
 
   const { data: allProblems } = await supabase
@@ -34,15 +31,6 @@ export default async function ProblemsPage({
   }
   const sortedTags = [...tagCounts.entries()].sort((a, b) => b[1] - a[1]);
 
-  // Apply filters
-  let filtered = allTyped;
-  if (difficulty && ["easy", "medium", "hard"].includes(difficulty)) {
-    filtered = filtered.filter((p) => p.difficulty === difficulty);
-  }
-  if (tag) {
-    filtered = filtered.filter((p) => p.tags.includes(tag));
-  }
-  // Search is now handled client-side in ProblemList for instant results
 
   // User submissions
   const { data: { user } } = await supabase.auth.getUser();
@@ -53,8 +41,10 @@ export default async function ProblemsPage({
   let freezeCount = 0;
   let recoverCount = 0;
 
+  let bookmarkedIds: string[] = [];
+
   if (user) {
-    const [submissionsRes, freezesRes, profileRes] = await Promise.all([
+    const [submissionsRes, freezesRes, profileRes, bookmarksRes] = await Promise.all([
       supabase
         .from("problem_submissions")
         .select("problem_id, passed, created_at")
@@ -68,7 +58,13 @@ export default async function ProblemsPage({
         .select("streak_freezes, streak_recovers")
         .eq("id", user.id)
         .single(),
+      supabase
+        .from("bookmarks")
+        .select("problem_id")
+        .eq("user_id", user.id),
     ]);
+
+    bookmarkedIds = (bookmarksRes.data ?? []).map((b: { problem_id: string }) => b.problem_id);
 
     const submissions = submissionsRes.data ?? [];
     const freezeRows = (freezesRes.data ?? []) as { frozen_date: string; item_type: string }[];
@@ -103,73 +99,14 @@ export default async function ProblemsPage({
           {/* ===== MAIN CONTENT ===== */}
           <div className="flex-1 min-w-0">
 
-            {/* Topic Tags */}
-            <div className="flex flex-wrap items-center gap-2 mb-5">
-              {sortedTags.map(([t, count]) => (
-                <Link
-                  key={t}
-                  href={
-                    tag === t
-                      ? `/problems${difficulty ? `?difficulty=${difficulty}` : ""}${search ? `${difficulty ? "&" : "?"}search=${search}` : ""}`
-                      : `/problems?tag=${t}${difficulty ? `&difficulty=${difficulty}` : ""}${search ? `&search=${search}` : ""}`
-                  }
-                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
-                    tag === t
-                      ? "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200"
-                      : "bg-slate-50 text-slate-500 hover:bg-slate-100 hover:text-slate-700"
-                  }`}
-                >
-                  {t}
-                  <span className="text-[10px] opacity-50">{count}</span>
-                </Link>
-              ))}
-            </div>
-
-            {/* Filter Tabs + Search */}
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
-              <div className="flex items-center gap-1 bg-slate-100 rounded-lg p-1 overflow-x-auto scrollbar-none">
-                {([
-                  { value: "all", label: "All" },
-                  { value: "easy", label: "Easy" },
-                  { value: "medium", label: "Medium" },
-                  { value: "hard", label: "Hard" },
-                ] as const).map((d) => (
-                  <Link
-                    key={d.value}
-                    href={
-                      d.value === "all"
-                        ? `/problems${tag ? `?tag=${tag}` : ""}${search ? `${tag ? "&" : "?"}search=${search}` : ""}`
-                        : `/problems?difficulty=${d.value}${tag ? `&tag=${tag}` : ""}${search ? `&search=${search}` : ""}`
-                    }
-                    className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-md text-xs sm:text-sm font-medium transition-all whitespace-nowrap ${
-                      (d.value === "all" && !difficulty) || difficulty === d.value
-                        ? "bg-white text-slate-900 shadow-sm"
-                        : "text-slate-500 hover:text-slate-700"
-                    }`}
-                  >
-                    {d.label}
-                  </Link>
-                ))}
-              </div>
-
-            </div>
-
-            {/* Problem Table with infinite scroll */}
+            {/* All filtering is client-side for instant UX */}
             <ProblemList
-              problems={filtered}
+              problems={allTyped}
               solvedMap={Object.fromEntries(solvedMap)}
-              initialSearch={search}
+              isLoggedIn={!!user}
+              sortedTags={sortedTags}
+              initialBookmarks={bookmarkedIds}
             />
-
-            {/* Footer */}
-            <div className="mt-3 flex items-center justify-between text-xs text-slate-400">
-              <span>{filtered.length} of {totalCount} problems</span>
-              {(difficulty || tag || search) && (
-                <Link href="/problems" className="text-emerald-600 hover:text-emerald-700 transition-colors">
-                  Clear all filters
-                </Link>
-              )}
-            </div>
           </div>
 
           {/* ===== RIGHT SIDEBAR ===== */}

@@ -1,5 +1,15 @@
 import { createClient } from "@/lib/supabase/client";
 
+/** XP required to reach a given level */
+export function xpForLevel(level: number): number {
+  return level * (level - 1) * 50;
+}
+
+/** XP needed from current level to the next */
+export function xpToNextLevel(level: number): number {
+  return xpForLevel(level + 1) - xpForLevel(level);
+}
+
 const XP_AMOUNTS: Record<string, number> = {
   easy: 10,
   medium: 25,

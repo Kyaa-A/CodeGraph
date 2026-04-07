@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import Editor from "@monaco-editor/react";
 import { Button } from "@/components/ui/button";
 
@@ -66,6 +66,7 @@ export function CodeEditor({
   const [submitting, setSubmitting] = useState(false);
   const [exitCode, setExitCode] = useState<number | null>(null);
   const [showLanguages, setShowLanguages] = useState(false);
+  const [shareCopied, setShareCopied] = useState(false);
   const [testResults, setTestResults] = useState<TestResult[]>([]);
   const [submitResult, setSubmitResult] = useState<{
     passed: boolean;
@@ -155,6 +156,16 @@ export function CodeEditor({
     setShowLanguages(false);
   };
 
+  const handleShare = () => {
+    const url = new URL(window.location.origin + "/playground");
+    url.searchParams.set("lang", language);
+    url.searchParams.set("code", code);
+    navigator.clipboard.writeText(url.toString()).then(() => {
+      setShareCopied(true);
+      setTimeout(() => setShareCopied(false), 2000);
+    });
+  };
+
   const handleReset = () => {
     setCode(initialCode || DEFAULT_CODE[language] || "");
     setOutput("");
@@ -163,8 +174,34 @@ export function CodeEditor({
     setSubmitResult(null);
   };
 
+  // Keyboard shortcuts: Ctrl+Enter = Run, Ctrl+Shift+Enter = Submit
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
+        e.preventDefault();
+        if (e.shiftKey && hasTests) {
+          handleSubmit();
+        } else {
+          handleRun();
+        }
+      }
+    }
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [handleRun, handleSubmit, hasTests]);
+
   const currentLang = LANGUAGES.find((l) => l.id === language);
   const isWorking = running || submitting;
+
+  // Close language dropdown on Escape
+  useEffect(() => {
+    if (!showLanguages) return;
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setShowLanguages(false);
+    };
+    window.addEventListener("keydown", handleEscape);
+    return () => window.removeEventListener("keydown", handleEscape);
+  }, [showLanguages]);
 
   return (
     <div className="flex flex-col h-full bg-[#1e1e1e] rounded-2xl overflow-hidden border border-white/10">
@@ -174,6 +211,9 @@ export function CodeEditor({
           <div className="relative">
             <button
               onClick={() => setShowLanguages(!showLanguages)}
+              aria-haspopup="listbox"
+              aria-expanded={showLanguages}
+              aria-label={`Language: ${currentLang?.name}. Click to change`}
               className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-sm text-gray-300 transition-colors"
             >
               <span>{currentLang?.icon}</span>
@@ -192,10 +232,12 @@ export function CodeEditor({
             {showLanguages && (
               <>
                 <div className="fixed inset-0 z-40" onClick={() => setShowLanguages(false)} />
-                <div className="absolute top-full left-0 mt-1 w-48 rounded-xl bg-[#2d2d2d] border border-white/10 shadow-xl z-50 py-1 max-h-64 overflow-y-auto">
+                <div role="listbox" aria-label="Select language" className="absolute top-full left-0 mt-1 w-48 rounded-xl bg-[#2d2d2d] border border-white/10 shadow-xl z-50 py-1 max-h-64 overflow-y-auto">
                   {LANGUAGES.map((lang) => (
                     <button
                       key={lang.id}
+                      role="option"
+                      aria-selected={lang.id === language}
                       onClick={() => handleLanguageChange(lang.id)}
                       className={`w-full flex items-center gap-2 px-3 py-2 text-sm transition-colors ${
                         lang.id === language
@@ -214,6 +256,12 @@ export function CodeEditor({
         </div>
 
         <div className="flex items-center gap-2">
+          <button
+            onClick={handleShare}
+            className="px-3 py-1.5 rounded-lg text-xs text-gray-400 hover:text-gray-200 hover:bg-white/5 transition-colors"
+          >
+            {shareCopied ? "Link copied!" : "Share"}
+          </button>
           <button
             onClick={handleReset}
             className="px-3 py-1.5 rounded-lg text-xs text-gray-400 hover:text-gray-200 hover:bg-white/5 transition-colors"

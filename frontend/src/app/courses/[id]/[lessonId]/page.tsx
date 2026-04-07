@@ -2,11 +2,17 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { LessonClientShell } from "./lesson-client-shell";
 import type { Lesson } from "@/lib/supabase/types";
+import type { Metadata } from "next";
 
-export const metadata = {
-  title: "Lesson | CodeGraph",
-  description: "Course lesson content",
-};
+export async function generateMetadata({ params }: { params: Promise<{ id: string; lessonId: string }> }): Promise<Metadata> {
+  const { lessonId } = await params;
+  const supabase = await createClient();
+  const { data: lesson } = await supabase.from("lessons").select("title").eq("id", lessonId).single();
+  return {
+    title: lesson ? `${lesson.title} | CodeGraph` : "Lesson | CodeGraph",
+    description: "Course lesson content",
+  };
+}
 
 export default async function LessonPage({
   params,

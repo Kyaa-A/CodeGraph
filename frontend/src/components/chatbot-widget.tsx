@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
+import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import ReactMarkdown from "react-markdown";
 
@@ -22,6 +23,11 @@ export function ChatbotWidget() {
   const [loading, setLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  const pathname = usePathname();
+  // Hide on full-screen editor views where the chat bubble would overlap
+  const hiddenRoutes = ["/playground", "/problems/"];
+  const isHidden = hiddenRoutes.some(r => pathname.startsWith(r)) || /\/courses\/[^/]+\/[^/]+/.test(pathname);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -129,6 +135,8 @@ export function ChatbotWidget() {
     },
     [input, loading, messages]
   );
+
+  if (isHidden) return null;
 
   return (
     <>

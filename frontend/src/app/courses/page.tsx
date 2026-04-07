@@ -30,6 +30,34 @@ export default async function CoursesPage() {
 
   const typedCourses = (courses ?? []) as Course[];
 
+  // Fetch lesson counts per course
+  const { data: lessons } = await supabase
+    .from("lessons")
+    .select("id, course_id");
+  const lessonCountMap = new Map<string, number>();
+  const lessonToCourse = new Map<string, string>();
+  for (const l of lessons ?? []) {
+    lessonCountMap.set(l.course_id, (lessonCountMap.get(l.course_id) ?? 0) + 1);
+    lessonToCourse.set(l.id, l.course_id);
+  }
+
+  // Fetch user progress if logged in
+  const { data: { user } } = await supabase.auth.getUser();
+  const progressMap = new Map<string, number>();
+  if (user) {
+    const { data: completions } = await supabase
+      .from("user_progress")
+      .select("lesson_id")
+      .eq("user_id", user.id)
+      .eq("completed", true);
+    for (const c of completions ?? []) {
+      const courseId = lessonToCourse.get(c.lesson_id);
+      if (courseId) {
+        progressMap.set(courseId, (progressMap.get(courseId) ?? 0) + 1);
+      }
+    }
+  }
+
   return (
     <AuthGate>
       <div className="min-h-screen bg-white pt-24 pb-16">
@@ -60,9 +88,17 @@ export default async function CoursesPage() {
             </div>
           ) : (
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {typedCourses.map((course) => (
-                <CourseCard key={course.id} course={course} />
-              ))}
+              {typedCourses.map((course) => {
+                const total = lessonCountMap.get(course.id) ?? 0;
+                const completed = progressMap.get(course.id) ?? 0;
+                return (
+                  <CourseCard
+                    key={course.id}
+                    course={course}
+                    progress={total > 0 ? { completed, total } : null}
+                  />
+                );
+              })}
             </div>
           )}
         </div>

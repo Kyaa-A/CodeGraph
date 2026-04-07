@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { Badge } from "@/components/ui/badge";
@@ -9,11 +10,17 @@ import { AdminOnly } from "@/components/admin-only";
 import { AuthGate } from "@/components/auth-gate";
 import { LottieAnimation } from "@/components/lottie-animation";
 import { LOTTIE } from "@/lib/lottie-assets";
+import type { Metadata } from "next";
 
-export const metadata = {
-  title: "Course | CodeGraph",
-  description: "Course details and lessons",
-};
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+  const { id } = await params;
+  const supabase = await createClient();
+  const { data: course } = await supabase.from("courses").select("title, description").eq("id", id).single();
+  return {
+    title: course ? `${course.title} | CodeGraph` : "Course | CodeGraph",
+    description: course?.description || "Course details and lessons",
+  };
+}
 
 // Helper to get course image
 function getCourseImage(course: Course): string {
@@ -114,10 +121,11 @@ export default async function CourseDetailPage({
           <div className="flex flex-col lg:flex-row">
             {/* Course Image */}
             <div className="lg:w-2/5 h-64 lg:h-auto relative overflow-hidden">
-              <img 
+              <Image
                 src={courseImage}
                 alt={typedCourse.title}
-                className="w-full h-full object-cover"
+                fill
+                className="object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent lg:bg-gradient-to-r" />
               
@@ -168,6 +176,16 @@ export default async function CourseDetailPage({
               <p className="text-base sm:text-lg text-slate-600 leading-relaxed mb-4 sm:mb-6">
                 {typedCourse.description || "Learn modern development with hands-on projects and expert guidance."}
               </p>
+
+              {/* Lesson count for everyone */}
+              {!user && totalLessons > 0 && (
+                <div className="flex items-center gap-2 mb-4 text-sm text-slate-500">
+                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                  </svg>
+                  <span>{totalLessons} lessons</span>
+                </div>
+              )}
 
               {/* Progress bar (if logged in) */}
               {user && totalLessons > 0 && (

@@ -1,9 +1,12 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import { cache } from "react";
 import { createClient } from "@/lib/supabase/server";
 import { DocSidebar } from "./doc-sidebar";
 import { DocViewer } from "./doc-viewer";
 import type { DocTopic } from "@/lib/supabase/types";
+
+export const revalidate = 600; // cache 10 min
 
 const LANG_NAMES: Record<string, string> = {
   python: "Python",
@@ -23,19 +26,29 @@ const LANG_NAMES: Record<string, string> = {
   langchain: "LangChain",
 };
 
+// Deduplicate Supabase calls between generateMetadata and page function
+const getDocData = cache(async (lang: string) => {
+  const supabase = await createClient();
+  // Only fetch metadata for sidebar — NOT content for all pages
+  const [{ data: sidebarPages }, { data: { user } }] = await Promise.all([
+    supabase
+      .from("doc_topics")
+      .select("id, slug, title, section, order_index")
+      .eq("lang", lang)
+      .order("order_index", { ascending: true }),
+    supabase.auth.getUser(),
+  ]);
+  return { sidebarPages, user };
+});
+
 export async function generateMetadata({
   params,
 }: {
   params: Promise<{ lang: string; slug: string }>;
 }) {
   const { lang, slug } = await params;
-  const supabase = await createClient();
-  const { data: page } = await supabase
-    .from("doc_topics")
-    .select("title")
-    .eq("lang", lang)
-    .eq("slug", slug)
-    .single();
+  const { sidebarPages } = await getDocData(lang);
+  const page = (sidebarPages ?? []).find((p) => p.slug === slug);
 
   return {
     title: page ? `${page.title} - ${LANG_NAMES[lang] || lang} | CodeGraph Docs` : "Docs | CodeGraph",
@@ -50,20 +63,25 @@ export default async function DocPage({
   const { lang, slug } = await params;
   const supabase = await createClient();
 
-  const [{ data: allPages }, { data: { user } }] = await Promise.all([
+  // Fetch sidebar data (cached, shared with generateMetadata) + current page content separately
+  const [{ sidebarPages, user }, { data: currentPageData }] = await Promise.all([
+    getDocData(lang),
     supabase
       .from("doc_topics")
       .select("id, slug, title, section, order_index, content")
       .eq("lang", lang)
-      .order("order_index", { ascending: true }),
-    supabase.auth.getUser(),
+      .eq("slug", slug)
+      .single(),
   ]);
 
-  if (!allPages || allPages.length === 0) {
+  const allPages = sidebarPages;
+
+  if (!allPages || allPages.length === 0 || !currentPageData) {
     notFound();
   }
 
-  const typed = allPages as DocTopic[];
+  const typed = allPages as Pick<DocTopic, "id" | "slug" | "title" | "section" | "order_index">[];
+  const currentPage = currentPageData as DocTopic;
 
   // Fetch read status for logged-in user
   let readSlugs = new Set<string>();
@@ -78,11 +96,6 @@ export default async function DocPage({
     for (const p of typed) {
       if (readIds.has(p.id)) readSlugs.add(p.slug);
     }
-  }
-
-  const currentPage = typed.find((p) => p.slug === slug);
-  if (!currentPage) {
-    notFound();
   }
 
   const sectionMap = new Map<string, { slug: string; title: string; isRead: boolean }[]>();
