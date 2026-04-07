@@ -6,6 +6,9 @@ import { InventoryBag } from "./inventory-bag";
 import { StreakHeatmap } from "./streak-heatmap";
 import { xpForLevel } from "@/lib/xp";
 import { EVENT_LABELS, XP_REWARDS } from "@/lib/constants";
+import { AnimatedStatGrid } from "@/components/animated-stats";
+import { LevelProgressRing } from "@/components/level-progress-ring";
+import { DashboardStagger, DashboardSection } from "@/components/dashboard-sections";
 
 export const metadata = {
   title: "Dashboard | CodeGraph",
@@ -257,28 +260,17 @@ export default async function DashboardPage() {
           <div className="relative">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
               <div className="flex items-center gap-4">
-                <div className="h-14 w-14 sm:h-16 sm:w-16 rounded-2xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center text-2xl sm:text-3xl font-bold shadow-lg shadow-emerald-500/30">
-                  {level}
-                </div>
+                <LevelProgressRing level={level} progress={xpProgress} />
                 <div>
                   <p className="text-sm text-slate-400">Level {level}</p>
                   <p className="text-xl sm:text-2xl font-bold">{totalXp.toLocaleString()} XP</p>
                 </div>
               </div>
-              <div className="grid grid-cols-3 gap-4 sm:gap-8 text-center">
-                <div>
-                  <p className="text-2xl font-bold text-emerald-400">{totalLessonsCompleted}</p>
-                  <p className="text-xs text-slate-400">Lessons</p>
-                </div>
-                <div>
-                  <p className="text-2xl font-bold text-emerald-400">{problemsSolved}</p>
-                  <p className="text-xs text-slate-400">Problems</p>
-                </div>
-                <div>
-                  <p className="text-2xl font-bold text-emerald-400">{coursesCompleted}</p>
-                  <p className="text-xs text-slate-400">Courses</p>
-                </div>
-              </div>
+              <AnimatedStatGrid
+                lessons={totalLessonsCompleted}
+                problems={problemsSolved}
+                courses={coursesCompleted}
+              />
             </div>
             <div className="space-y-1.5">
               <div className="flex justify-between text-xs text-slate-400">
@@ -295,6 +287,8 @@ export default async function DashboardPage() {
           </div>
         </div>
 
+        <DashboardStagger>
+        <DashboardSection>
         {/* Activity Heatmap — GitHub style */}
         <div className="mb-8 rounded-2xl bg-white border border-slate-200 shadow-sm p-5 sm:p-6">
           <div className="flex items-center justify-between mb-4">
@@ -308,6 +302,9 @@ export default async function DashboardPage() {
           />
         </div>
 
+        </DashboardSection>
+
+        <DashboardSection>
         {/* Continue where you left off + Daily Challenge row */}
         <div className="grid sm:grid-cols-2 gap-4 mb-8">
           {/* Continue */}
@@ -389,6 +386,9 @@ export default async function DashboardPage() {
           )}
         </div>
 
+        </DashboardSection>
+
+        <DashboardSection>
         {/* Quick Actions */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
           <Link
@@ -438,6 +438,9 @@ export default async function DashboardPage() {
           </Link>
         </div>
 
+        </DashboardSection>
+
+        <DashboardSection>
         <div className="grid lg:grid-cols-3 gap-6 sm:gap-8">
           {/* Main Content — Enrolled Courses */}
           <div className="lg:col-span-2 space-y-6">
@@ -637,6 +640,8 @@ export default async function DashboardPage() {
             </div>
           </div>
         </div>
+        </DashboardSection>
+        </DashboardStagger>
       </div>
     </div>
   );
