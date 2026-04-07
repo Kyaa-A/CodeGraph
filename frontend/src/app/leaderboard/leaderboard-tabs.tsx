@@ -130,7 +130,13 @@ export function LeaderboardTabs({
 
         {users.length === 0 && (
           <div className="px-4 py-16 text-center">
-            <p className="text-slate-500">No activity this period. Be the first!</p>
+            <div className="w-14 h-14 mx-auto mb-4 rounded-2xl bg-slate-100 flex items-center justify-center">
+              <svg className="h-7 w-7 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+            </div>
+            <p className="text-sm font-semibold text-slate-700 mb-1">No activity {period === "weekly" ? "this week" : "this month"}</p>
+            <p className="text-xs text-slate-400">Solve problems or complete lessons to appear here!</p>
           </div>
         )}
       </div>

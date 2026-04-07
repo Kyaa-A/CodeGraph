@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { StreakCalendar } from "@/components/streak-calendar";
 import { ProfileEditor } from "./profile-editor";
 import { xpForLevel } from "@/lib/xp";
+import { EVENT_LABELS } from "@/lib/constants";
 
 export const metadata = {
   title: "Profile | CodeGraph",
@@ -97,13 +98,7 @@ export default async function ProfilePage() {
     ? new Date(profile.created_at).toLocaleDateString("en-US", { month: "long", year: "numeric" })
     : "—";
 
-  const EVENT_LABELS: Record<string, string> = {
-    problem_solve: "Problem Solved",
-    lesson_complete: "Lesson Complete",
-    daily_streak: "Daily Streak",
-    daily_login: "Daily Login",
-    doc_read: "Doc Read",
-  };
+  // EVENT_LABELS imported from @/lib/constants
 
   return (
     <div className="min-h-screen bg-white pt-24 pb-16">

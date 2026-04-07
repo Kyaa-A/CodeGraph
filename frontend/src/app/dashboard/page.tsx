@@ -5,6 +5,7 @@ import type { Course, Lesson, UserProgress } from "@/lib/supabase/types";
 import { InventoryBag } from "./inventory-bag";
 import { StreakHeatmap } from "./streak-heatmap";
 import { xpForLevel } from "@/lib/xp";
+import { EVENT_LABELS, XP_REWARDS } from "@/lib/constants";
 
 export const metadata = {
   title: "Dashboard | CodeGraph",
@@ -178,14 +179,6 @@ export default async function DashboardPage() {
   const today = new Date();
   const dateSeed = today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate();
   const dailyChallenge = challengePool.length > 0 ? challengePool[dateSeed % challengePool.length] : null;
-
-  const EVENT_LABELS: Record<string, string> = {
-    problem_solve: "Problem Solved",
-    lesson_complete: "Lesson Complete",
-    daily_streak: "Daily Streak",
-    daily_login: "Daily Login",
-    doc_read: "Doc Read",
-  };
 
   const recentLessonActivity = userProgress
     .filter((p) => p.completed_at)
@@ -632,14 +625,7 @@ export default async function DashboardPage() {
             <div>
               <h2 className="text-lg font-bold text-slate-900 mb-4">How to Earn XP</h2>
               <div className="bg-white rounded-2xl border border-slate-200 p-4 space-y-3">
-                {[
-                  { label: "Easy problem", xp: 10, color: "bg-green-100 text-green-700" },
-                  { label: "Medium problem", xp: 25, color: "bg-amber-100 text-amber-700" },
-                  { label: "Hard problem", xp: 50, color: "bg-red-100 text-red-700" },
-                  { label: "Complete lesson", xp: 15, color: "bg-blue-100 text-blue-700" },
-                  { label: "Read docs page", xp: 5, color: "bg-purple-100 text-purple-700" },
-                  { label: "Daily login", xp: 5, color: "bg-orange-100 text-orange-700" },
-                ].map((item) => (
+                {XP_REWARDS.map((item) => (
                   <div key={item.label} className="flex items-center justify-between">
                     <span className="text-sm text-slate-600">{item.label}</span>
                     <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${item.color}`}>

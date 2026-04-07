@@ -5,14 +5,7 @@ import { createClient } from "@/lib/supabase/client";
 import { AnimatePresence, motion } from "framer-motion";
 import type { XpEvent } from "@/lib/supabase/types";
 import { xpForLevel, xpToNextLevel } from "@/lib/xp";
-
-const EVENT_LABELS: Record<string, string> = {
-  problem_solve: "Problem Solved",
-  lesson_complete: "Lesson Complete",
-  daily_streak: "Daily Streak",
-  daily_login: "Daily Login",
-  doc_read: "Doc Read",
-};
+import { EVENT_LABELS } from "@/lib/constants";
 
 export function XpBar({ userId }: { userId: string }) {
   const [totalXp, setTotalXp] = useState(0);

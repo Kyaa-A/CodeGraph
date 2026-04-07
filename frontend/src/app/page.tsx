@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { Button } from "@/components/ui/button";
+import { redirect } from "next/navigation";
 import {
   BookOpen,
   ChevronRight,
@@ -9,7 +10,8 @@ import {
   ArrowRight,
   Laptop,
   CheckCircle2,
-  Code2
+  Code2,
+  FileText
 } from "lucide-react";
 import { LandingPlayground } from "./landing-playground";
 
@@ -39,6 +41,10 @@ function HexIcon({ icon, color, className = "" }: { icon: React.ReactNode; color
 
 export default async function HomePage() {
   const supabase = await createClient();
+
+  // Redirect logged-in users to dashboard
+  const { data: { user } } = await supabase.auth.getUser();
+  if (user) redirect("/dashboard");
 
   const [coursesRes, problemsRes, langsRes] = await Promise.all([
     supabase.from("courses").select("*", { count: "exact", head: true }),
@@ -145,9 +151,9 @@ export default async function HomePage() {
       <section id="explore" className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-12">
-            <h2 className="text-emerald-600 font-semibold text-sm uppercase tracking-wider mb-2">Start Exploring</h2>
+            <h2 className="text-emerald-600 font-semibold text-sm uppercase tracking-wider mb-2">Everything You Need</h2>
             <p className="text-slate-600 max-w-2xl mx-auto">
-              Explore is a well-organized tool that helps you get the most out of CodeGraph by providing structure to guide your progress.
+              From structured courses to hands-on coding challenges and comprehensive documentation, CodeGraph gives you all the tools to grow as a developer.
             </p>
           </div>
 
@@ -155,26 +161,26 @@ export default async function HomePage() {
             <div className="flex gap-6">
               <HexIcon icon={<BookOpen className="h-6 w-6" />} color="text-blue-500" />
               <div className="flex-1">
-                <h3 className="text-xl font-semibold text-slate-900 mb-2">Questions, Community & Contests</h3>
+                <h3 className="text-xl font-semibold text-slate-900 mb-2">Coding Problems & Leaderboard</h3>
                 <p className="text-slate-500 leading-relaxed">
-                  Over 1,000 coding problems for you to practice. Join our growing community of developers, build streaks, climb the leaderboard, and earn XP rewards.
+                  {(problemsRes.count ?? 1000).toLocaleString()}+ coding problems across easy, medium, and hard difficulties. Build streaks, climb the leaderboard, and earn XP rewards as you solve.
                 </p>
                 <Link href="/problems" className="inline-flex items-center mt-4 text-emerald-600 hover:text-emerald-700 font-medium text-sm">
-                  View Questions
+                  View Problems
                   <ChevronRight className="ml-1 h-4 w-4" />
                 </Link>
               </div>
             </div>
 
             <div className="flex gap-6">
-              <HexIcon icon={<Laptop className="h-6 w-6" />} color="text-amber-500" />
+              <HexIcon icon={<FileText className="h-6 w-6" />} color="text-amber-500" />
               <div className="flex-1">
-                <h3 className="text-xl font-semibold text-slate-900 mb-2">Interview Prep</h3>
+                <h3 className="text-xl font-semibold text-slate-900 mb-2">Documentation & Guides</h3>
                 <p className="text-slate-500 leading-relaxed">
-                  Sharpen your skills with LeetCode-style problems across multiple difficulty levels. Track your progress, build streaks, and time your solutions to prepare for technical interviews.
+                  Browse {langsRes.count || 15} languages of comprehensive docs, tutorials, and reference material. Mark pages as read to earn XP and track your learning progress.
                 </p>
-                <Link href="/problems" className="inline-flex items-center mt-4 text-emerald-600 hover:text-emerald-700 font-medium text-sm">
-                  Start Practicing
+                <Link href="/docs" className="inline-flex items-center mt-4 text-emerald-600 hover:text-emerald-700 font-medium text-sm">
+                  Browse Docs
                   <ChevronRight className="ml-1 h-4 w-4" />
                 </Link>
               </div>
@@ -190,7 +196,7 @@ export default async function HomePage() {
             <HexIcon icon={<Code2 className="h-6 w-6" />} color="text-emerald-500" className="mx-auto mb-4" />
             <h2 className="text-emerald-600 font-semibold text-lg mb-2">Developer</h2>
             <p className="text-slate-500 max-w-2xl mx-auto">
-              We now support 13 popular coding languages. At our core, CodeGraph is about developers. Our powerful development tools such as Playground help you test, debug and even write your own projects online.
+              Supporting {langsRes.count || 15} programming languages. Our powerful Playground lets you write, test, and debug code right in your browser — no setup needed.
             </p>
           </div>
 
@@ -220,7 +226,7 @@ export default async function HomePage() {
         <div className="max-w-3xl mx-auto px-6 text-center">
           <h2 className="text-emerald-600 font-semibold text-lg mb-2">Ready to start coding?</h2>
           <p className="text-slate-600 mb-8">
-            Join thousands of developers learning and building on CodeGraph. Free forever.
+            Start learning with interactive courses, coding problems, and a powerful playground. Free forever.
           </p>
           <Link href="/auth/signup">
             <Button size="lg" className="bg-emerald-500 hover:bg-emerald-600 text-white font-semibold text-base px-10 h-12 rounded-full">
