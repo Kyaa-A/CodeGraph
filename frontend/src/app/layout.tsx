@@ -3,11 +3,16 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { DM_Sans, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import { Suspense } from "react";
+import dynamic from "next/dynamic";
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
 import { DailyXpTrigger } from "@/app/dashboard/daily-xp-trigger";
 import { ClientWidgets } from "@/components/client-widgets";
 import { LevelUpOverlay } from "@/components/level-up-overlay";
+
+const XpToastProvider = dynamic(() => import("@/components/xp-toast").then((m) => m.XpToastProvider), {
+  ssr: false,
+});
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -67,6 +72,7 @@ export default function RootLayout({
         <Navbar />
         <DailyXpTrigger />
         <LevelUpOverlay />
+        <XpToastProvider />
         <main id="main-content" className="flex-1">{children}</main>
         <Footer />
         <Suspense fallback={null}>
