@@ -155,7 +155,7 @@ export default async function DocsPage() {
                     href={available ? `/docs/${l.lang}/${langFirstSlug.get(l.lang)}` : "#"}
                     className={`group flex items-center gap-4 p-4 rounded-xl border transition-all cursor-pointer ${
                       available
-                        ? "bg-white border-slate-200 hover:border-emerald-300 hover:shadow-md hover:shadow-emerald-100/50"
+                        ? "bg-white border-slate-200 hover:border-emerald-300 hover:shadow-lg hover:shadow-emerald-500/10 hover:-translate-y-1"
                         : "bg-slate-50 border-slate-100 opacity-50 pointer-events-none"
                     }`}
                   >
