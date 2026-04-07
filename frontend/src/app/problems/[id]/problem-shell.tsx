@@ -11,6 +11,7 @@ import { LOTTIE } from "@/lib/lottie-assets";
 import { ProblemDescription } from "./problem-description";
 import type { Problem, ProblemSubmission } from "@/lib/supabase/types";
 import { awardProblemXp } from "@/lib/xp";
+import confetti from "canvas-confetti";
 
 const MonacoEditor = dynamic(() => import("@monaco-editor/react"), { ssr: false });
 
@@ -188,6 +189,15 @@ export function ProblemShell({ problem, submissions: initialSubmissions, isAuthe
       setOutput(data.output || "");
       // Stop timer and award XP on successful submission
       if (data.passed) {
+        // Fire emerald confetti burst
+        confetti({
+          particleCount: 80,
+          spread: 70,
+          gravity: 1.2,
+          ticks: 120,
+          origin: { y: 0.6 },
+          colors: ["#10B981", "#34D399", "#6EE7B7"],
+        });
         setTimerRunning(false);
         if (userId) {
           awardProblemXp(userId, problem.id, problem.difficulty);
