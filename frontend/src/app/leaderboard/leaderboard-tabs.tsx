@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 
 type Period = "weekly" | "monthly" | "all";
@@ -99,50 +100,70 @@ export function LeaderboardTabs({
           <div className="text-right">XP</div>
         </div>
 
-        {users.map((u) => (
-          <div
-            key={u.id}
-            className={`grid grid-cols-[32px_1fr_64px] sm:grid-cols-[48px_1fr_80px_80px_80px] px-3 sm:px-4 py-3 items-center border-b border-slate-50 last:border-0 transition-colors ${
-              u.isCurrentUser ? "bg-emerald-50/50" : u.rank % 2 === 0 ? "bg-slate-50/40" : ""
-            }`}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={period}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
           >
-            <span className={`text-xs sm:text-sm font-mono ${u.rank <= 3 ? "font-bold text-amber-600" : "text-slate-400"}`}>
-              {u.rank}
-            </span>
-            <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-              <div className="h-7 w-7 sm:h-8 sm:w-8 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center text-white text-[10px] sm:text-xs font-bold shrink-0">
-                {u.name[0].toUpperCase()}
-              </div>
-              <div className="min-w-0">
-                <span className={`text-xs sm:text-sm font-medium truncate block ${u.isCurrentUser ? "text-emerald-700" : "text-slate-800"}`}>
-                  {u.name}
-                  {u.isCurrentUser && <span className="text-emerald-500 text-[10px] sm:text-xs ml-1">(you)</span>}
+            {users.map((u, index) => (
+              <motion.div
+                key={u.id}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{
+                  opacity: 1,
+                  x: 0,
+                  scale: u.rank <= 3 ? [1, 1.02, 1] : 1,
+                }}
+                transition={{
+                  duration: 0.3,
+                  delay: index * 0.04,
+                  ease: "easeOut",
+                }}
+                className={`grid grid-cols-[32px_1fr_64px] sm:grid-cols-[48px_1fr_80px_80px_80px] px-3 sm:px-4 py-3 items-center border-b border-slate-50 last:border-0 transition-colors ${
+                  u.isCurrentUser ? "bg-emerald-50/50" : u.rank % 2 === 0 ? "bg-slate-50/40" : ""
+                }`}
+              >
+                <span className={`text-xs sm:text-sm font-mono ${u.rank <= 3 ? "font-bold text-amber-600" : "text-slate-400"}`}>
+                  {u.rank}
                 </span>
-                {/* Show level inline on mobile */}
-                <span className="text-[10px] text-slate-400 sm:hidden">Lvl {u.level} &middot; {u.problemsSolved} solved</span>
-              </div>
-            </div>
-            <div className="hidden sm:block text-center">
-              <span className="inline-flex items-center justify-center h-6 w-8 rounded-md bg-slate-100 text-xs font-bold text-slate-700">
-                {u.level}
-              </span>
-            </div>
-            <div className="hidden sm:block text-center text-sm text-slate-600">{u.problemsSolved}</div>
-            <div className="text-right text-xs sm:text-sm font-semibold text-emerald-600">{u.totalXp.toLocaleString()}</div>
-          </div>
-        ))}
+                <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+                  <div className="h-7 w-7 sm:h-8 sm:w-8 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center text-white text-[10px] sm:text-xs font-bold shrink-0">
+                    {u.name[0].toUpperCase()}
+                  </div>
+                  <div className="min-w-0">
+                    <span className={`text-xs sm:text-sm font-medium truncate block ${u.isCurrentUser ? "text-emerald-700" : "text-slate-800"}`}>
+                      {u.name}
+                      {u.isCurrentUser && <span className="text-emerald-500 text-[10px] sm:text-xs ml-1">(you)</span>}
+                    </span>
+                    <span className="text-[10px] text-slate-400 sm:hidden">Lvl {u.level} &middot; {u.problemsSolved} solved</span>
+                  </div>
+                </div>
+                <div className="hidden sm:block text-center">
+                  <span className="inline-flex items-center justify-center h-6 w-8 rounded-md bg-slate-100 text-xs font-bold text-slate-700">
+                    {u.level}
+                  </span>
+                </div>
+                <div className="hidden sm:block text-center text-sm text-slate-600">{u.problemsSolved}</div>
+                <div className="text-right text-xs sm:text-sm font-semibold text-emerald-600">{u.totalXp.toLocaleString()}</div>
+              </motion.div>
+            ))}
 
-        {users.length === 0 && (
-          <div className="px-4 py-16 text-center">
-            <div className="w-14 h-14 mx-auto mb-4 rounded-2xl bg-slate-100 flex items-center justify-center">
-              <svg className="h-7 w-7 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
-              </svg>
-            </div>
-            <p className="text-sm font-semibold text-slate-700 mb-1">No activity {period === "weekly" ? "this week" : "this month"}</p>
-            <p className="text-xs text-slate-400">Solve problems or complete lessons to appear here!</p>
-          </div>
-        )}
+            {users.length === 0 && (
+              <div className="px-4 py-16 text-center">
+                <div className="w-14 h-14 mx-auto mb-4 rounded-2xl bg-slate-100 flex items-center justify-center">
+                  <svg className="h-7 w-7 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                </div>
+                <p className="text-sm font-semibold text-slate-700 mb-1">No activity {period === "weekly" ? "this week" : "this month"}</p>
+                <p className="text-xs text-slate-400">Solve problems or complete lessons to appear here!</p>
+              </div>
+            )}
+          </motion.div>
+        </AnimatePresence>
       </div>
 
       {/* CTA */}
