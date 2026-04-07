@@ -3,11 +3,8 @@
 import { useMemo } from "react";
 
 interface StreakHeatmapProps {
-  /** ISO date strings of days with activity */
   activeDates: string[];
-  /** ISO date strings of frozen streak days */
   frozenDates?: string[];
-  /** ISO date strings of recovered streak days */
   recoveredDates?: string[];
 }
 
@@ -19,13 +16,20 @@ const DAY_LABELS = ["", "Mon", "", "Wed", "", "Fri", ""];
 
 export function StreakHeatmap({ activeDates, frozenDates = [], recoveredDates = [] }: StreakHeatmapProps) {
   const { weeks, monthLabels } = useMemo(() => {
-    const activeSet = new Set(activeDates);
+    // Count how many activities per day for intensity levels
+    const dayCounts: Record<string, number> = {};
+    for (const ds of activeDates) {
+      dayCounts[ds] = (dayCounts[ds] || 0) + 1;
+    }
     const frozenSet = new Set(frozenDates);
     const recoveredSet = new Set(recoveredDates);
+
     const today = new Date();
-    // Go back 12 weeks (84 days)
+    const todayStr = toDateStr(today);
+
+    // Go back ~52 weeks to fill the full width
     const start = new Date(today);
-    start.setDate(start.getDate() - 83);
+    start.setDate(start.getDate() - 364);
     // Align to Sunday
     start.setDate(start.getDate() - start.getDay());
 
@@ -34,26 +38,36 @@ export function StreakHeatmap({ activeDates, frozenDates = [], recoveredDates = 
     let lastMonth = -1;
 
     const cursor = new Date(start);
-    const todayStr = toDateStr(today);
 
-    while (cursor <= today || weeks.length < 13) {
+    while (cursor <= today || weeks.length % 7 !== 0) {
       const week: typeof weeks[0] = [];
       for (let d = 0; d < 7; d++) {
         const dateStr = toDateStr(cursor);
-        const isActive = activeSet.has(dateStr);
+        const count = dayCounts[dateStr] || 0;
         const isFrozen = frozenSet.has(dateStr);
         const isRecovered = recoveredSet.has(dateStr);
         const isToday = dateStr === todayStr;
         const isFuture = cursor > today;
 
+        // GitHub-style: 0 = empty, 1 = light, 2 = medium, 3 = medium-dark, 4 = dark
         let level = 0;
-        if (isFuture) level = -1;
-        else if (isActive) level = 2;
-        else if (isFrozen || isRecovered) level = 1;
+        if (isFuture) {
+          level = -1;
+        } else if (isFrozen || isRecovered) {
+          level = 1;
+        } else if (count >= 4) {
+          level = 4;
+        } else if (count >= 3) {
+          level = 3;
+        } else if (count >= 2) {
+          level = 2;
+        } else if (count >= 1) {
+          level = 1;
+        }
 
         week.push({ date: dateStr, level, isToday, isFrozen, isRecovered });
 
-        // Track month labels
+        // Track month labels on first occurrence
         if (cursor.getMonth() !== lastMonth && !isFuture) {
           lastMonth = cursor.getMonth();
           monthLabels.push({
@@ -65,7 +79,7 @@ export function StreakHeatmap({ activeDates, frozenDates = [], recoveredDates = 
         cursor.setDate(cursor.getDate() + 1);
       }
       weeks.push(week);
-      if (weeks.length >= 13) break;
+      if (weeks.length >= 53) break;
     }
 
     return { weeks, monthLabels };
@@ -73,63 +87,70 @@ export function StreakHeatmap({ activeDates, frozenDates = [], recoveredDates = 
 
   const cellColor = (level: number, isFrozen: boolean, isRecovered: boolean) => {
     if (level === -1) return "bg-transparent";
-    if (isRecovered) return "bg-red-400/60";
-    if (isFrozen) return "bg-sky-400/60";
-    if (level === 2) return "bg-emerald-500";
-    return "bg-slate-700/30";
+    if (isRecovered) return "bg-red-300";
+    if (isFrozen) return "bg-sky-300";
+    switch (level) {
+      case 4: return "bg-emerald-700";
+      case 3: return "bg-emerald-500";
+      case 2: return "bg-emerald-400";
+      case 1: return "bg-emerald-200";
+      default: return "bg-slate-100";
+    }
   };
 
   return (
-    <div className="w-full">
-      {/* Month labels */}
-      <div className="flex gap-[3px] mb-1 ml-8">
-        {weeks.map((_, i) => {
-          const label = monthLabels.find((m) => m.col === i);
-          return (
-            <div key={i} className="w-[13px] text-[9px] text-slate-500 font-medium">
-              {label?.label || ""}
-            </div>
-          );
-        })}
-      </div>
-
-      <div className="flex gap-0">
-        {/* Day labels */}
-        <div className="flex flex-col gap-[3px] mr-1.5 shrink-0">
-          {DAY_LABELS.map((label, i) => (
-            <div key={i} className="h-[13px] text-[9px] text-slate-500 font-medium flex items-center justify-end w-6">
-              {label}
-            </div>
-          ))}
+    <div className="w-full overflow-x-auto">
+      <div className="min-w-[720px]">
+        {/* Month labels */}
+        <div className="flex gap-[3px] mb-1.5 ml-8">
+          {weeks.map((_, i) => {
+            const label = monthLabels.find((m) => m.col === i);
+            return (
+              <div key={i} className="w-[13px] text-[10px] text-slate-500 font-medium whitespace-nowrap">
+                {label?.label || ""}
+              </div>
+            );
+          })}
         </div>
 
-        {/* Grid */}
-        <div className="flex gap-[3px]">
-          {weeks.map((week, wi) => (
-            <div key={wi} className="flex flex-col gap-[3px]">
-              {week.map((day) => (
-                <div
-                  key={day.date}
-                  className={`w-[13px] h-[13px] rounded-[3px] transition-colors ${cellColor(day.level, day.isFrozen, day.isRecovered)} ${
-                    day.isToday ? "ring-1 ring-emerald-400 ring-offset-1 ring-offset-slate-900" : ""
-                  }`}
-                  title={`${day.date}${day.level === 2 ? " - Active" : day.isFrozen ? " - Frozen" : day.isRecovered ? " - Recovered" : ""}`}
-                />
-              ))}
-            </div>
-          ))}
-        </div>
-      </div>
+        <div className="flex gap-0">
+          {/* Day labels */}
+          <div className="flex flex-col gap-[3px] mr-2 shrink-0">
+            {DAY_LABELS.map((label, i) => (
+              <div key={i} className="h-[13px] text-[10px] text-slate-400 font-medium flex items-center justify-end w-6">
+                {label}
+              </div>
+            ))}
+          </div>
 
-      {/* Legend */}
-      <div className="flex items-center gap-2 mt-2 ml-8">
-        <span className="text-[9px] text-slate-500">Less</span>
-        <div className="w-[10px] h-[10px] rounded-[2px] bg-slate-700/30" />
-        <div className="w-[10px] h-[10px] rounded-[2px] bg-emerald-500/50" />
-        <div className="w-[10px] h-[10px] rounded-[2px] bg-emerald-500" />
-        <span className="text-[9px] text-slate-500">More</span>
-        <div className="w-[10px] h-[10px] rounded-[2px] bg-sky-400/60 ml-2" />
-        <span className="text-[9px] text-slate-500">Freeze</span>
+          {/* Grid */}
+          <div className="flex gap-[3px]">
+            {weeks.map((week, wi) => (
+              <div key={wi} className="flex flex-col gap-[3px]">
+                {week.map((day) => (
+                  <div
+                    key={day.date}
+                    className={`w-[13px] h-[13px] rounded-[2px] ${cellColor(day.level, day.isFrozen, day.isRecovered)} ${
+                      day.isToday ? "ring-1 ring-slate-400 ring-offset-1" : ""
+                    }`}
+                    title={`${day.date}${day.level >= 1 && !day.isFrozen && !day.isRecovered ? ` - ${day.level} activities` : day.isFrozen ? " - Frozen" : day.isRecovered ? " - Recovered" : ""}`}
+                  />
+                ))}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Legend */}
+        <div className="flex items-center justify-end gap-1.5 mt-2">
+          <span className="text-[10px] text-slate-400 mr-0.5">Less</span>
+          <div className="w-[10px] h-[10px] rounded-[2px] bg-slate-100" />
+          <div className="w-[10px] h-[10px] rounded-[2px] bg-emerald-200" />
+          <div className="w-[10px] h-[10px] rounded-[2px] bg-emerald-400" />
+          <div className="w-[10px] h-[10px] rounded-[2px] bg-emerald-500" />
+          <div className="w-[10px] h-[10px] rounded-[2px] bg-emerald-700" />
+          <span className="text-[10px] text-slate-400 ml-0.5">More</span>
+        </div>
       </div>
     </div>
   );
