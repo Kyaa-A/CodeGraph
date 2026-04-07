@@ -106,14 +106,14 @@ export default async function ProfilePage() {
 
         {/* Profile Header */}
         <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-2xl p-6 sm:p-8 mb-6">
-          <div className="flex items-center gap-5">
+          <div className="flex items-center gap-3 sm:gap-5">
             <ProfileEditor
               userId={user.id}
               initialName={profile?.name || user.email?.split("@")[0] || "User"}
               initialAvatarUrl={profile?.avatar_url || null}
             />
-            <div className="ml-auto flex flex-col items-end gap-1">
-              <p className="text-slate-400 text-sm">Member since {memberSince}</p>
+            <div className="ml-auto flex flex-col items-end gap-1 min-w-0">
+              <p className="text-slate-400 text-xs sm:text-sm">Member since {memberSince}</p>
               <div className="flex items-center gap-2 mt-1 sm:hidden">
                 <span className="text-sm font-semibold text-emerald-400">Level {level}</span>
                 <span className="text-xs text-slate-400">{totalXp.toLocaleString()} XP</span>
@@ -153,9 +153,9 @@ export default async function ProfilePage() {
             { label: "Courses Completed", value: coursesCompleted, color: "text-purple-600" },
             { label: "Favorite Language", value: favoriteLang.charAt(0).toUpperCase() + favoriteLang.slice(1), color: "text-amber-600" },
           ].map((stat) => (
-            <div key={stat.label} className="bg-white rounded-xl border border-slate-200 p-4 text-center">
-              <p className={`text-2xl font-bold ${stat.color}`}>{stat.value}</p>
-              <p className="text-xs text-slate-500 mt-1">{stat.label}</p>
+            <div key={stat.label} className="bg-white rounded-xl border border-slate-200 p-3 sm:p-4 text-center">
+              <p className={`text-xl sm:text-2xl font-bold ${stat.color}`}>{stat.value}</p>
+              <p className="text-[11px] sm:text-xs text-slate-500 mt-1">{stat.label}</p>
             </div>
           ))}
         </div>

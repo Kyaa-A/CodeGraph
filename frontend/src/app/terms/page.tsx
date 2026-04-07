@@ -19,7 +19,7 @@ export default function TermsPage() {
           Back to Home
         </Link>
 
-        <h1 className="text-3xl font-bold text-slate-900 mb-8">Terms of Service</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-8">Terms of Service</h1>
 
         <div className="prose prose-slate max-w-none">
           <p className="text-slate-600 mb-6">Last updated: April 4, 2026</p>

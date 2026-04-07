@@ -142,7 +142,7 @@ export function LessonViewer({ content, docLang }: LessonViewerProps) {
           h1: ({ children }) => {
             const id = String(children).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
             return (
-              <h1 id={id} className="text-3xl font-heading font-bold text-foreground mt-8 mb-4 pb-2 border-b border-black/5 scroll-mt-24">
+              <h1 id={id} className="text-2xl sm:text-3xl font-heading font-bold text-foreground mt-8 mb-4 pb-2 border-b border-black/5 scroll-mt-24">
                 {children}
               </h1>
             );

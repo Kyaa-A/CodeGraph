@@ -214,7 +214,7 @@ export function ProblemList({
         </div>
 
         {isLoggedIn && (
-          <div className="flex items-center gap-1 bg-slate-100 rounded-lg p-1">
+          <div className="flex items-center gap-1 bg-slate-100 rounded-lg p-1 overflow-x-auto">
             {([
               { value: "all" as StatusFilter, label: "All" },
               { value: "solved" as StatusFilter, label: "Solved" },
@@ -225,7 +225,7 @@ export function ProblemList({
               <button
                 key={s.value}
                 onClick={() => setStatusFilter(s.value)}
-                className={`px-3 py-1.5 sm:py-2 rounded-md text-xs sm:text-sm font-medium transition-all whitespace-nowrap ${
+                className={`px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-md text-[11px] sm:text-sm font-medium transition-all whitespace-nowrap ${
                   statusFilter === s.value
                     ? "bg-white text-slate-900 shadow-sm"
                     : "text-slate-500 hover:text-slate-700"

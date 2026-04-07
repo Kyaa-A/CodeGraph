@@ -64,10 +64,10 @@ export default async function CoursesPage() {
         <div className="max-w-7xl mx-auto px-4">
           {/* Header */}
           <div className="mb-10">
-            <h1 className="text-3xl font-bold text-slate-900 tracking-tight">
+            <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
               Explore Our Courses
             </h1>
-            <p className="mt-2 text-slate-500 text-lg max-w-2xl">
+            <p className="mt-2 text-slate-500 text-sm sm:text-lg max-w-2xl">
               Master AI development through hands-on, project-based learning.
               Build real applications with LangChain, LangGraph, and cutting-edge tools.
             </p>

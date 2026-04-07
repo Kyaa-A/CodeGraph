@@ -85,6 +85,9 @@ export function StreakHeatmap({ activeDates, frozenDates = [], recoveredDates = 
     return { weeks, monthLabels };
   }, [activeDates, frozenDates, recoveredDates]);
 
+  // Show only recent weeks on small screens (26 weeks ≈ 6 months)
+  const mobileWeekCount = 26;
+
   const cellColor = (level: number, isFrozen: boolean, isRecovered: boolean) => {
     if (level === -1) return "bg-transparent";
     if (isRecovered) return "bg-red-300";
@@ -98,59 +101,77 @@ export function StreakHeatmap({ activeDates, frozenDates = [], recoveredDates = 
     }
   };
 
+  const renderGrid = (displayWeeks: typeof weeks, displayMonthLabels: typeof monthLabels) => (
+    <>
+      {/* Month labels */}
+      <div className="flex gap-[3px] mb-1.5 ml-8">
+        {displayWeeks.map((_, i) => {
+          const label = displayMonthLabels.find((m) => m.col === i);
+          return (
+            <div key={i} className="w-[11px] sm:w-[13px] text-[10px] text-slate-500 font-medium whitespace-nowrap">
+              {label?.label || ""}
+            </div>
+          );
+        })}
+      </div>
+
+      <div className="flex gap-0">
+        {/* Day labels */}
+        <div className="flex flex-col gap-[3px] mr-2 shrink-0">
+          {DAY_LABELS.map((label, i) => (
+            <div key={i} className="h-[11px] sm:h-[13px] text-[10px] text-slate-400 font-medium flex items-center justify-end w-6">
+              {label}
+            </div>
+          ))}
+        </div>
+
+        {/* Grid */}
+        <div className="flex gap-[3px]">
+          {displayWeeks.map((week, wi) => (
+            <div key={wi} className="flex flex-col gap-[3px]">
+              {week.map((day) => (
+                <div
+                  key={day.date}
+                  className={`w-[11px] h-[11px] sm:w-[13px] sm:h-[13px] rounded-[2px] ${cellColor(day.level, day.isFrozen, day.isRecovered)} ${
+                    day.isToday ? "ring-1 ring-slate-400 ring-offset-1" : ""
+                  }`}
+                  title={`${day.date}${day.level >= 1 && !day.isFrozen && !day.isRecovered ? ` - ${day.level} activities` : day.isFrozen ? " - Frozen" : day.isRecovered ? " - Recovered" : ""}`}
+                />
+              ))}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Legend */}
+      <div className="flex items-center justify-end gap-1.5 mt-2">
+        <span className="text-[10px] text-slate-400 mr-0.5">Less</span>
+        <div className="w-[10px] h-[10px] rounded-[2px] bg-slate-100" />
+        <div className="w-[10px] h-[10px] rounded-[2px] bg-emerald-200" />
+        <div className="w-[10px] h-[10px] rounded-[2px] bg-emerald-400" />
+        <div className="w-[10px] h-[10px] rounded-[2px] bg-emerald-500" />
+        <div className="w-[10px] h-[10px] rounded-[2px] bg-emerald-700" />
+        <span className="text-[10px] text-slate-400 ml-0.5">More</span>
+      </div>
+    </>
+  );
+
+  // Mobile: show last N weeks; Desktop: show all
+  const mobileWeeks = weeks.slice(-mobileWeekCount);
+  const mobileOffset = weeks.length - mobileWeekCount;
+  const mobileMonthLabels = monthLabels
+    .filter((m) => m.col >= mobileOffset)
+    .map((m) => ({ ...m, col: m.col - mobileOffset }));
+
   return (
-    <div className="w-full overflow-x-auto">
-      <div className="min-w-[720px]">
-        {/* Month labels */}
-        <div className="flex gap-[3px] mb-1.5 ml-8">
-          {weeks.map((_, i) => {
-            const label = monthLabels.find((m) => m.col === i);
-            return (
-              <div key={i} className="w-[13px] text-[10px] text-slate-500 font-medium whitespace-nowrap">
-                {label?.label || ""}
-              </div>
-            );
-          })}
-        </div>
-
-        <div className="flex gap-0">
-          {/* Day labels */}
-          <div className="flex flex-col gap-[3px] mr-2 shrink-0">
-            {DAY_LABELS.map((label, i) => (
-              <div key={i} className="h-[13px] text-[10px] text-slate-400 font-medium flex items-center justify-end w-6">
-                {label}
-              </div>
-            ))}
-          </div>
-
-          {/* Grid */}
-          <div className="flex gap-[3px]">
-            {weeks.map((week, wi) => (
-              <div key={wi} className="flex flex-col gap-[3px]">
-                {week.map((day) => (
-                  <div
-                    key={day.date}
-                    className={`w-[13px] h-[13px] rounded-[2px] ${cellColor(day.level, day.isFrozen, day.isRecovered)} ${
-                      day.isToday ? "ring-1 ring-slate-400 ring-offset-1" : ""
-                    }`}
-                    title={`${day.date}${day.level >= 1 && !day.isFrozen && !day.isRecovered ? ` - ${day.level} activities` : day.isFrozen ? " - Frozen" : day.isRecovered ? " - Recovered" : ""}`}
-                  />
-                ))}
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Legend */}
-        <div className="flex items-center justify-end gap-1.5 mt-2">
-          <span className="text-[10px] text-slate-400 mr-0.5">Less</span>
-          <div className="w-[10px] h-[10px] rounded-[2px] bg-slate-100" />
-          <div className="w-[10px] h-[10px] rounded-[2px] bg-emerald-200" />
-          <div className="w-[10px] h-[10px] rounded-[2px] bg-emerald-400" />
-          <div className="w-[10px] h-[10px] rounded-[2px] bg-emerald-500" />
-          <div className="w-[10px] h-[10px] rounded-[2px] bg-emerald-700" />
-          <span className="text-[10px] text-slate-400 ml-0.5">More</span>
-        </div>
+    <div className="w-full">
+      {/* Mobile: fewer weeks, no scroll */}
+      <div className="sm:hidden">
+        {renderGrid(mobileWeeks, mobileMonthLabels)}
+      </div>
+      {/* Desktop: full 52 weeks */}
+      <div className="hidden sm:block">
+        {renderGrid(weeks, monthLabels)}
       </div>
     </div>
   );

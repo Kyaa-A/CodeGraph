@@ -112,7 +112,7 @@ export default function AdminUsersPage() {
             </p>
           </div>
           <div className="glass-card rounded-xl px-5 py-3 text-center shrink-0">
-            <p className="text-3xl font-heading font-bold">{users.length}</p>
+            <p className="text-2xl sm:text-3xl font-heading font-bold">{users.length}</p>
             <p className="text-xs text-muted-foreground">Total Users</p>
           </div>
         </div>

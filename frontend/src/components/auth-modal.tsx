@@ -57,7 +57,7 @@ export function AuthModal({ open, onClose, message }: AuthModalProps) {
           >
             <div className="bg-white rounded-3xl shadow-2xl shadow-black/20 overflow-hidden">
               {/* Header with gradient */}
-              <div className="relative bg-gradient-to-br from-neutral-900 to-neutral-800 px-8 pt-10 pb-8 text-center rounded-t-3xl">
+              <div className="relative bg-gradient-to-br from-neutral-900 to-neutral-800 px-5 sm:px-8 pt-8 sm:pt-10 pb-6 sm:pb-8 text-center rounded-t-3xl">
                 {/* Close button */}
                 <button
                   onClick={onClose}
@@ -83,7 +83,7 @@ export function AuthModal({ open, onClose, message }: AuthModalProps) {
               </div>
 
               {/* Body */}
-              <div className="px-8 py-8 space-y-3">
+              <div className="px-5 sm:px-8 py-6 sm:py-8 space-y-3">
                 <Link href={`/auth/signup?next=${encodeURIComponent(pathname)}`} className="block">
                   <Button className="w-full h-12 rounded-xl bg-neutral-900 hover:bg-neutral-800 text-white font-medium text-sm">
                     Create Free Account

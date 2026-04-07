@@ -157,11 +157,11 @@ export default async function HomePage() {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-8">
-            <div className="flex gap-6">
+          <div className="grid md:grid-cols-2 gap-6 sm:gap-8">
+            <div className="flex gap-4 sm:gap-6">
               <HexIcon icon={<BookOpen className="h-6 w-6" />} color="text-blue-500" />
               <div className="flex-1">
-                <h3 className="text-xl font-semibold text-slate-900 mb-2">Coding Problems & Leaderboard</h3>
+                <h3 className="text-lg sm:text-xl font-semibold text-slate-900 mb-2">Coding Problems & Leaderboard</h3>
                 <p className="text-slate-500 leading-relaxed">
                   {(problemsRes.count ?? 1000).toLocaleString()}+ coding problems across easy, medium, and hard difficulties. Build streaks, climb the leaderboard, and earn XP rewards as you solve.
                 </p>
@@ -172,10 +172,10 @@ export default async function HomePage() {
               </div>
             </div>
 
-            <div className="flex gap-6">
+            <div className="flex gap-4 sm:gap-6">
               <HexIcon icon={<FileText className="h-6 w-6" />} color="text-amber-500" />
               <div className="flex-1">
-                <h3 className="text-xl font-semibold text-slate-900 mb-2">Documentation & Guides</h3>
+                <h3 className="text-lg sm:text-xl font-semibold text-slate-900 mb-2">Documentation & Guides</h3>
                 <p className="text-slate-500 leading-relaxed">
                   Browse {langsRes.count || 15} languages of comprehensive docs, tutorials, and reference material. Mark pages as read to earn XP and track your learning progress.
                 </p>

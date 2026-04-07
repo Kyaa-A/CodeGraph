@@ -398,7 +398,7 @@ export function QuizModal({ open, onOpenChange, lessonId }: QuizModalProps) {
                 className="space-y-3"
               >
                 <div className="flex items-center justify-center gap-2">
-                  <span className="text-5xl font-bold">{score}</span>
+                  <span className="text-3xl sm:text-5xl font-bold">{score}</span>
                   <span className="text-2xl text-muted-foreground">/</span>
                   <span className="text-2xl text-muted-foreground">{questions.length}</span>
                 </div>

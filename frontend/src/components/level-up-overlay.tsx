@@ -66,7 +66,7 @@ export function LevelUpOverlay() {
               <p className="text-emerald-400 text-sm font-semibold uppercase tracking-widest mb-1">
                 Level Up!
               </p>
-              <p className="text-white text-5xl font-bold mb-2">
+              <p className="text-white text-3xl sm:text-5xl font-bold mb-2">
                 Level {levelUp.newLevel}
               </p>
               <p className="text-white/60 text-sm">
