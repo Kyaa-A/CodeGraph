@@ -41,7 +41,9 @@ export async function awardProblemXp(
   const result = data as { leveled_up: boolean; level: number; total_xp: number; old_level: number };
 
   // Fire events for UI updates
-  window.dispatchEvent(new Event("xp-updated"));
+  window.dispatchEvent(new CustomEvent("xp-updated", {
+    detail: { amount: xpAmount, reason: "Problem Solved" },
+  }));
 
   if (result.leveled_up) {
     window.dispatchEvent(
@@ -78,7 +80,9 @@ export async function awardLessonXp(
 
   const result = data as { leveled_up: boolean; level: number; total_xp: number; old_level: number };
 
-  window.dispatchEvent(new Event("xp-updated"));
+  window.dispatchEvent(new CustomEvent("xp-updated", {
+    detail: { amount: XP_AMOUNTS.lesson, reason: "Lesson Complete" },
+  }));
 
   if (result.leveled_up) {
     window.dispatchEvent(

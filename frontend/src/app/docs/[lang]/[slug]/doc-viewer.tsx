@@ -134,7 +134,9 @@ export function DocViewer({
         setIsRead(true);
         if (result.xp_awarded > 0) {
           setXpAwarded(true);
-          window.dispatchEvent(new Event("xp-updated"));
+          window.dispatchEvent(new CustomEvent("xp-updated", {
+            detail: { amount: 5, reason: "Doc Read" },
+          }));
           setTimeout(() => setXpAwarded(false), 3000);
         }
       }

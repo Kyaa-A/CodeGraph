@@ -13,7 +13,9 @@ export function DailyXpTrigger() {
     awardDailyLoginXp().then((result) => {
       sessionStorage.setItem(key, today);
       if (result) {
-        window.dispatchEvent(new Event("xp-updated"));
+        window.dispatchEvent(new CustomEvent("xp-updated", {
+          detail: { amount: 5, reason: "Daily Login" },
+        }));
       }
     });
   }, []);
