@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import Editor from "@monaco-editor/react";
+import type { editor } from "monaco-editor";
 import { Button } from "@/components/ui/button";
 
 const LANGUAGES = [
@@ -57,6 +58,7 @@ export function CodeEditor({
   hasTests,
   onComplete,
 }: CodeEditorProps) {
+  const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
   const [language, setLanguage] = useState(initialLanguage || "python");
   const [code, setCode] = useState(
     initialCode || DEFAULT_CODE[initialLanguage || "python"] || DEFAULT_CODE.python
@@ -174,6 +176,12 @@ export function CodeEditor({
     setSubmitResult(null);
   };
 
+  const handleFormat = useCallback(() => {
+    if (editorRef.current) {
+      editorRef.current.getAction("editor.action.formatDocument")?.run();
+    }
+  }, []);
+
   // Keyboard shortcuts: Ctrl+Enter = Run, Ctrl+Shift+Enter = Submit
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
@@ -257,6 +265,16 @@ export function CodeEditor({
 
         <div className="flex items-center gap-2">
           <button
+            onClick={handleFormat}
+            className="px-3 py-1.5 rounded-lg text-xs text-gray-400 hover:text-gray-200 hover:bg-white/5 transition-colors hidden sm:inline-flex items-center gap-1"
+            title="Format code (Alt+Shift+F)"
+          >
+            <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h10M4 18h14" />
+            </svg>
+            Format
+          </button>
+          <button
             onClick={handleShare}
             className="px-3 py-1.5 rounded-lg text-xs text-gray-400 hover:text-gray-200 hover:bg-white/5 transition-colors"
           >
@@ -326,6 +344,7 @@ export function CodeEditor({
           language={language === "cpp" ? "cpp" : language === "csharp" ? "csharp" : language}
           value={code}
           onChange={(value) => setCode(value || "")}
+          onMount={(editor) => { editorRef.current = editor; }}
           theme="vs-dark"
           options={{
             minimap: { enabled: false },

@@ -62,7 +62,9 @@ function PlaygroundContent() {
   }
 
   return (
-    <div className="h-screen flex flex-col bg-[#1e1e1e] pt-20">
+    <div className="h-screen flex flex-col bg-[#1e1e1e]">
+      {/* Spacer for fixed navbar — white strip so the glass navbar is visible */}
+      <div className="h-20 bg-white shrink-0" />
       <div className="flex items-center justify-between px-4 py-2 bg-[#252526] border-b border-white/10">
         <div className="flex items-center gap-3">
           <h1 className="text-sm font-medium text-gray-300">Playground</h1>
