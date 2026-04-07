@@ -11,6 +11,7 @@ const EVENT_LABELS: Record<string, string> = {
   lesson_complete: "Lesson Complete",
   daily_streak: "Daily Streak",
   daily_login: "Daily Login",
+  doc_read: "Doc Read",
 };
 
 export function XpBar({ userId }: { userId: string }) {

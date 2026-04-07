@@ -102,6 +102,7 @@ export default async function ProfilePage() {
     lesson_complete: "Lesson Complete",
     daily_streak: "Daily Streak",
     daily_login: "Daily Login",
+    doc_read: "Doc Read",
   };
 
   return (

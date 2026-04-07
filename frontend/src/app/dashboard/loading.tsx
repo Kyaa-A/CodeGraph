@@ -3,7 +3,7 @@ import { LOTTIE } from "@/lib/lottie-assets";
 
 export default function DashboardLoading() {
   return (
-    <div className="min-h-screen bg-white flex items-center justify-center">
+    <div className="min-h-screen bg-slate-950 flex items-center justify-center">
       <div className="text-center">
         <div className="w-24 h-24 mx-auto mb-4">
           <LottieAnimation
@@ -12,7 +12,7 @@ export default function DashboardLoading() {
             className="w-full h-full"
           />
         </div>
-        <p className="text-sm text-slate-400">Loading...</p>
+        <p className="text-sm text-slate-500">Loading dashboard...</p>
       </div>
     </div>
   );

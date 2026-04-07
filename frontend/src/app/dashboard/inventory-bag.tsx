@@ -131,12 +131,12 @@ export function InventoryBag({
   if (freezes <= 0 && recovers <= 0) return null;
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6">
+    <div className="bg-slate-800/50 rounded-2xl border border-slate-700/50 p-5 sm:p-6 backdrop-blur-sm">
       <div className="flex items-center gap-2 mb-4">
-        <svg className="h-5 w-5 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <svg className="h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
         </svg>
-        <h2 className="text-sm font-bold text-slate-900">Inventory</h2>
+        <h2 className="text-sm font-bold text-slate-200">Inventory</h2>
       </div>
 
       {/* Item cards */}
@@ -154,8 +154,8 @@ export function InventoryBag({
               }
               className={`relative rounded-xl border-2 p-4 text-center transition-all ${
                 isSelected
-                  ? `${item.border} ${item.bg} shadow-md scale-[1.02]`
-                  : "border-slate-200 bg-white hover:border-slate-300 hover:shadow-sm"
+                  ? `${item.border} bg-slate-700/50 shadow-md scale-[1.02]`
+                  : "border-slate-700 bg-slate-800/50 hover:border-slate-600 hover:shadow-sm"
               }`}
             >
               {/* Item icon */}
@@ -168,8 +168,8 @@ export function InventoryBag({
                 {count}
               </div>
 
-              <p className="text-xs font-semibold text-slate-800">{item.name}</p>
-              <p className="text-[10px] text-slate-400 mt-0.5 leading-tight">
+              <p className="text-xs font-semibold text-slate-200">{item.name}</p>
+              <p className="text-[10px] text-slate-500 mt-0.5 leading-tight">
                 {item.desc}
               </p>
 
@@ -185,24 +185,24 @@ export function InventoryBag({
 
       {/* Calendar picker — shows when an item is selected */}
       {selectedItem && (
-        <div className="mt-4 p-4 rounded-xl bg-slate-50 border border-slate-200">
+        <div className="mt-4 p-4 rounded-xl bg-slate-900/50 border border-slate-700">
           <div className="flex items-center justify-between mb-3">
             <button
               onClick={() => setViewDate(new Date(year, month - 1, 1))}
               aria-label="Previous month"
-              className="p-1 rounded hover:bg-slate-200 text-slate-400 hover:text-slate-600 transition-colors"
+              className="p-1 rounded hover:bg-slate-700 text-slate-500 hover:text-slate-300 transition-colors"
             >
               <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
               </svg>
             </button>
-            <span className="text-xs font-semibold text-slate-700">
+            <span className="text-xs font-semibold text-slate-300">
               {MONTHS[month]} {year}
             </span>
             <button
               onClick={() => setViewDate(new Date(year, month + 1, 1))}
               aria-label="Next month"
-              className="p-1 rounded hover:bg-slate-200 text-slate-400 hover:text-slate-600 transition-colors"
+              className="p-1 rounded hover:bg-slate-700 text-slate-500 hover:text-slate-300 transition-colors"
             >
               <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
@@ -212,7 +212,7 @@ export function InventoryBag({
 
           <div className="grid grid-cols-7 gap-0.5 mb-1">
             {DAYS.map((d) => (
-              <div key={d} className="text-center text-[9px] font-medium text-slate-400 py-0.5">
+              <div key={d} className="text-center text-[9px] font-medium text-slate-500 py-0.5">
                 {d}
               </div>
             ))}
@@ -238,18 +238,18 @@ export function InventoryBag({
                   onClick={() => eligible && handleApply(dateStr)}
                   className={`aspect-square rounded-md flex items-center justify-center text-[10px] font-medium transition-all ${
                     isUsing
-                      ? "bg-sky-100 ring-1 ring-sky-300"
+                      ? "bg-sky-500/20 ring-1 ring-sky-500"
                       : isRecovered
-                        ? "bg-gradient-to-br from-red-50 to-red-100 text-red-700 ring-1 ring-red-300"
+                        ? "bg-gradient-to-br from-red-500/20 to-red-500/30 text-red-400 ring-1 ring-red-500/50"
                         : isFrozen
-                          ? "bg-gradient-to-br from-sky-100 to-sky-200 text-sky-700 ring-1 ring-sky-300"
+                          ? "bg-gradient-to-br from-sky-500/20 to-sky-500/30 text-sky-400 ring-1 ring-sky-500/50"
                           : isActive
                             ? "bg-emerald-500 text-white"
                             : isToday
-                              ? "bg-white text-slate-900 ring-1 ring-slate-300"
+                              ? "bg-slate-700 text-white ring-1 ring-slate-500"
                               : eligible
-                                ? `${selectedItem.bg} ${selectedItem.border} border cursor-pointer hover:scale-110 hover:shadow-sm text-slate-700`
-                                : "text-slate-300"
+                                ? "bg-slate-700/50 border border-slate-600 cursor-pointer hover:scale-110 hover:bg-slate-600 text-slate-300"
+                                : "text-slate-600"
                   }`}
                 >
                   {isUsing ? (
@@ -268,7 +268,7 @@ export function InventoryBag({
             })}
           </div>
 
-          <p className="text-[10px] text-slate-400 text-center mt-2">
+          <p className="text-[10px] text-slate-500 text-center mt-2">
             Click an eligible day to apply {selectedItem.name.toLowerCase()}
           </p>
         </div>
