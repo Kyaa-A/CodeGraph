@@ -169,7 +169,9 @@ export function CodeEditor({
   };
 
   const handleReset = () => {
-    setCode(initialCode || DEFAULT_CODE[language] || "");
+    const defaultCode = initialCode || DEFAULT_CODE[language] || "";
+    if (code !== defaultCode && !window.confirm("Reset code to default? Your changes will be lost.")) return;
+    setCode(defaultCode);
     setOutput("");
     setExitCode(null);
     setTestResults([]);
@@ -266,6 +268,7 @@ export function CodeEditor({
         <div className="flex items-center gap-1 sm:gap-2">
           <button
             onClick={handleFormat}
+            aria-label="Format code"
             className="px-2 sm:px-3 py-1.5 rounded-lg text-xs text-gray-400 hover:text-gray-200 hover:bg-white/5 transition-colors hidden sm:inline-flex items-center gap-1"
             title="Format code (Alt+Shift+F)"
           >
@@ -276,6 +279,7 @@ export function CodeEditor({
           </button>
           <button
             onClick={handleShare}
+            aria-label="Share code"
             className="px-2 sm:px-3 py-1.5 rounded-lg text-xs text-gray-400 hover:text-gray-200 hover:bg-white/5 transition-colors"
             title="Share"
           >
@@ -286,6 +290,7 @@ export function CodeEditor({
           </button>
           <button
             onClick={handleReset}
+            aria-label="Reset code"
             className="px-2 sm:px-3 py-1.5 rounded-lg text-xs text-gray-400 hover:text-gray-200 hover:bg-white/5 transition-colors"
             title="Reset"
           >

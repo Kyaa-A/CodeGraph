@@ -2,12 +2,12 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { DM_Sans, Space_Grotesk } from "next/font/google";
 import "./globals.css";
+import { Suspense } from "react";
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
-import { LevelUpOverlay } from "@/components/level-up-overlay";
-import { ChatbotWidget } from "@/components/chatbot-widget";
-import { SearchPalette } from "@/components/search-palette";
 import { DailyXpTrigger } from "@/app/dashboard/daily-xp-trigger";
+import { ClientWidgets } from "@/components/client-widgets";
+import { LevelUpOverlay } from "@/components/level-up-overlay";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -69,8 +69,9 @@ export default function RootLayout({
         <LevelUpOverlay />
         <main id="main-content" className="flex-1">{children}</main>
         <Footer />
-        <ChatbotWidget />
-        <SearchPalette />
+        <Suspense fallback={null}>
+          <ClientWidgets />
+        </Suspense>
       </body>
     </html>
   );

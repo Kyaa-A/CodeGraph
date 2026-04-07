@@ -8,7 +8,6 @@ import {
   ChevronRight,
   Globe,
   ArrowRight,
-  Laptop,
   CheckCircle2,
   Code2,
   FileText

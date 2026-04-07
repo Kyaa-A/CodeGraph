@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { AnimatePresence, motion } from "framer-motion";
 import type { XpEvent } from "@/lib/supabase/types";
@@ -13,7 +13,7 @@ export function XpBar({ userId }: { userId: string }) {
   const [recentEvents, setRecentEvents] = useState<XpEvent[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
   const [loading, setLoading] = useState(true);
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
 
   const fetchXpData = useCallback(async () => {
     const [profileRes, eventsRes] = await Promise.all([
