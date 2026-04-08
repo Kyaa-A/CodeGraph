@@ -7,7 +7,7 @@ export const revalidate = 600; // cache for 10 minutes
 
 export const metadata = {
   title: "Documentation | CodeGraph",
-  description: "Free programming documentation and tutorials for 15+ languages",
+  description: "Free programming documentation and tutorials for 18+ languages",
 };
 
 /* ── Language logos from CDN ── */
@@ -27,6 +27,9 @@ const LOGO_URLS: Record<string, string> = {
   php: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/php/php-original.svg",
   nodejs: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg",
   langchain: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg",
+  kotlin: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/kotlin/kotlin-original.svg",
+  ruby: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/ruby/ruby-original.svg",
+  swift: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/swift/swift-original.svg",
 };
 
 function LangLogo({ lang, className = "h-full w-full" }: { lang: string; className?: string }) {
@@ -60,6 +63,9 @@ const CATEGORIES = [
       { lang: "csharp", name: "C#", description: "LINQ, generics, async, .NET" },
       { lang: "go", name: "Go", description: "Goroutines, channels, interfaces" },
       { lang: "rust", name: "Rust", description: "Ownership, borrowing, lifetimes, traits" },
+      { lang: "kotlin", name: "Kotlin", description: "Null safety, coroutines, data classes, extensions" },
+      { lang: "ruby", name: "Ruby", description: "Blocks, procs, metaprogramming, Rails" },
+      { lang: "swift", name: "Swift", description: "Optionals, protocols, closures, SwiftUI" },
     ],
   },
   {

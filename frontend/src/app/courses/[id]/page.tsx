@@ -29,21 +29,21 @@ function getCourseImage(course: Course): string {
   // Title-based keyword matching
   const title = course.title.toLowerCase();
   const images: Record<string, string> = {
-    python: "https://images.unsplash.com/photo-1526379095098-d400fd0bf935?q=80&w=800&auto=format&fit=crop",
-    javascript: "https://images.unsplash.com/photo-1579468118864-1b9ea3c0db4a?q=80&w=800&auto=format&fit=crop",
-    react: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?q=80&w=800&auto=format&fit=crop",
-    nextjs: "https://images.unsplash.com/photo-1618477388954-7852f32655ec?q=80&w=800&auto=format&fit=crop",
-    ai: "https://images.unsplash.com/photo-1677442136019-21780ecad995?q=80&w=800&auto=format&fit=crop",
-    langchain: "https://images.unsplash.com/photo-1677442136019-21780ecad995?q=80&w=800&auto=format&fit=crop",
-    database: "https://images.unsplash.com/photo-1544383835-bda2bc66a55d?q=80&w=800&auto=format&fit=crop",
-    backend: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?q=80&w=800&auto=format&fit=crop",
-    frontend: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=800&auto=format&fit=crop",
+    python: "https://images.unsplash.com/photo-1526379095098-d400fd0bf935",
+    javascript: "https://images.unsplash.com/photo-1579468118864-1b9ea3c0db4a",
+    react: "https://images.unsplash.com/photo-1633356122544-f134324a6cee",
+    nextjs: "https://images.unsplash.com/photo-1618477388954-7852f32655ec",
+    ai: "https://images.unsplash.com/photo-1677442136019-21780ecad995",
+    langchain: "https://images.unsplash.com/photo-1677442136019-21780ecad995",
+    database: "https://images.unsplash.com/photo-1544383835-bda2bc66a55d",
+    backend: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31",
+    frontend: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d",
   };
 
   for (const [keyword, url] of Object.entries(images)) {
     if (title.includes(keyword)) return url;
   }
-  return "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?q=80&w=800&auto=format&fit=crop";
+  return "https://images.unsplash.com/photo-1461749280684-dccba630e2f6";
 }
 
 export default async function CourseDetailPage({

@@ -5,9 +5,21 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   images: {
     remotePatterns: [
-      new URL("https://images.unsplash.com/**"),
-      new URL("https://cdn.jsdelivr.net/**"),
-      new URL("https://onpqkzjevvrjnwyvuyuv.supabase.co/**"),
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "cdn.jsdelivr.net",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "onpqkzjevvrjnwyvuyuv.supabase.co",
+        pathname: "/**",
+      },
     ],
   },
   async headers() {

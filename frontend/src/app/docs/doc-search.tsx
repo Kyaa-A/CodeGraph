@@ -16,6 +16,7 @@ const LANG_NAMES: Record<string, string> = {
   react: "React", "html-css": "HTML & CSS", java: "Java", sql: "SQL",
   go: "Go", rust: "Rust", c: "C", cpp: "C++", csharp: "C#",
   php: "PHP", nodejs: "Node.js", langchain: "LangChain",
+  kotlin: "Kotlin", ruby: "Ruby", swift: "Swift",
 };
 
 export function DocSearch({ items }: { items: SearchItem[] }) {
@@ -122,7 +123,7 @@ export function DocSearch({ items }: { items: SearchItem[] }) {
               >
                 <div className="h-8 w-8 rounded-lg bg-slate-100 flex items-center justify-center shrink-0">
                   <Image
-                    src={`https://cdn.jsdelivr.net/gh/devicons/devicon/icons/${item.lang === "html-css" ? "html5/html5" : item.lang === "nodejs" ? "nodejs/nodejs" : item.lang === "cpp" ? "cplusplus/cplusplus" : item.lang === "csharp" ? "csharp/csharp" : item.lang === "langchain" ? "python/python" : `${item.lang}/${item.lang}`}-original.svg`}
+                    src={`https://cdn.jsdelivr.net/gh/devicons/devicon/icons/${item.lang === "html-css" ? "html5/html5" : item.lang === "nodejs" ? "nodejs/nodejs" : item.lang === "cpp" ? "cplusplus/cplusplus" : item.lang === "csharp" ? "csharp/csharp" : item.lang === "langchain" ? "python/python" : item.lang === "sql" ? "mysql/mysql" : `${item.lang}/${item.lang}`}-original.svg`}
                     alt={`${LANG_NAMES[item.lang] || item.lang} icon`}
                     width={16}
                     height={16}

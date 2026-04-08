@@ -24,6 +24,9 @@ const LANG_NAMES: Record<string, string> = {
   php: "PHP",
   nodejs: "Node.js",
   langchain: "LangChain",
+  kotlin: "Kotlin",
+  ruby: "Ruby",
+  swift: "Swift",
 };
 
 // Deduplicate Supabase calls between generateMetadata and page function

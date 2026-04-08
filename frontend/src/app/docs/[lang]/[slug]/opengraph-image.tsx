@@ -9,6 +9,7 @@ const LANG_NAMES: Record<string, string> = {
   react: "React", "html-css": "HTML & CSS", java: "Java", sql: "SQL",
   go: "Go", rust: "Rust", c: "C", cpp: "C++", csharp: "C#",
   php: "PHP", nodejs: "Node.js", langchain: "LangChain",
+  kotlin: "Kotlin", ruby: "Ruby", swift: "Swift",
 };
 
 export default async function Image({
