@@ -151,7 +151,7 @@ export default async function HomePage() {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-6 sm:gap-8">
+          <div className="grid md:grid-cols-3 gap-6 sm:gap-8">
             <div className="flex gap-4 sm:gap-6">
               <HexIcon icon={<BookOpen className="h-6 w-6" />} color="text-blue-500" />
               <div className="flex-1">
@@ -179,12 +179,96 @@ export default async function HomePage() {
                 </Link>
               </div>
             </div>
+
+            <div className="flex gap-4 sm:gap-6">
+              <HexIcon icon={<Code2 className="h-6 w-6" />} color="text-emerald-500" />
+              <div className="flex-1">
+                <h3 className="text-lg sm:text-xl font-semibold text-slate-900 mb-2">AI-Powered Courses</h3>
+                <p className="text-slate-500 leading-relaxed">
+                  {coursesRes.count ?? 5}+ structured courses with hands-on lessons, real-world projects, and AI assistance. Learn Python, LangChain, and more at your own pace.
+                </p>
+                <Link href="/courses" className="inline-flex items-center mt-4 text-emerald-600 hover:text-emerald-700 font-medium text-sm">
+                  Browse Courses
+                  <ChevronRight className="ml-1 h-4 w-4" />
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ===== HOW IT WORKS SECTION ===== */}
+      <section className="py-20 bg-slate-50">
+        <div className="max-w-5xl mx-auto px-6">
+          <div className="text-center mb-14">
+            <h2 className="text-emerald-600 font-semibold text-sm uppercase tracking-wider mb-2">How It Works</h2>
+            <p className="text-slate-600 max-w-2xl mx-auto">
+              Four simple steps to go from beginner to confident developer.
+            </p>
+          </div>
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            {/* Step 1 */}
+            <div className="text-center">
+              <div className="relative inline-flex items-center justify-center h-14 w-14 rounded-2xl bg-blue-100 text-blue-600 mb-4">
+                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
+                </svg>
+                <span className="absolute -top-2 -right-2 h-6 w-6 rounded-full bg-emerald-500 text-white text-xs font-bold flex items-center justify-center">1</span>
+              </div>
+              <h3 className="text-base font-semibold text-slate-900 mb-1.5">Pick a Language</h3>
+              <p className="text-sm text-slate-500 leading-relaxed">
+                Browse {langsRes.count || 15}+ languages of docs and tutorials to find your path.
+              </p>
+            </div>
+
+            {/* Step 2 */}
+            <div className="text-center">
+              <div className="relative inline-flex items-center justify-center h-14 w-14 rounded-2xl bg-emerald-100 text-emerald-600 mb-4">
+                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                </svg>
+                <span className="absolute -top-2 -right-2 h-6 w-6 rounded-full bg-emerald-500 text-white text-xs font-bold flex items-center justify-center">2</span>
+              </div>
+              <h3 className="text-base font-semibold text-slate-900 mb-1.5">Learn by Doing</h3>
+              <p className="text-sm text-slate-500 leading-relaxed">
+                Interactive courses with a built-in code editor so you learn by writing real code.
+              </p>
+            </div>
+
+            {/* Step 3 */}
+            <div className="text-center">
+              <div className="relative inline-flex items-center justify-center h-14 w-14 rounded-2xl bg-amber-100 text-amber-600 mb-4">
+                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                </svg>
+                <span className="absolute -top-2 -right-2 h-6 w-6 rounded-full bg-emerald-500 text-white text-xs font-bold flex items-center justify-center">3</span>
+              </div>
+              <h3 className="text-base font-semibold text-slate-900 mb-1.5">Solve Problems</h3>
+              <p className="text-sm text-slate-500 leading-relaxed">
+                Practice with {(problemsRes.count ?? 1000).toLocaleString()}+ coding challenges across all difficulty levels.
+              </p>
+            </div>
+
+            {/* Step 4 */}
+            <div className="text-center">
+              <div className="relative inline-flex items-center justify-center h-14 w-14 rounded-2xl bg-purple-100 text-purple-600 mb-4">
+                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
+                <span className="absolute -top-2 -right-2 h-6 w-6 rounded-full bg-emerald-500 text-white text-xs font-bold flex items-center justify-center">4</span>
+              </div>
+              <h3 className="text-base font-semibold text-slate-900 mb-1.5">Track Progress</h3>
+              <p className="text-sm text-slate-500 leading-relaxed">
+                XP, streaks, and leaderboards keep you motivated and show how far you have come.
+              </p>
+            </div>
           </div>
         </div>
       </section>
 
       {/* ===== DEVELOPER SECTION ===== */}
-      <section className="py-20 bg-slate-50">
+      <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-12">
             <HexIcon icon={<Code2 className="h-6 w-6" />} color="text-emerald-500" className="mx-auto mb-4" />
@@ -199,7 +283,7 @@ export default async function HomePage() {
       </section>
 
       {/* ===== STATS SECTION ===== */}
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-slate-50">
         <div className="max-w-5xl mx-auto px-6">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-10">
             {stats.map((stat) => (
@@ -216,7 +300,7 @@ export default async function HomePage() {
       </section>
 
       {/* ===== CTA SECTION ===== */}
-      <section className="py-24 bg-slate-50">
+      <section className="py-24 bg-white">
         <div className="max-w-3xl mx-auto px-6 text-center">
           <h2 className="text-emerald-600 font-semibold text-lg mb-2">Ready to start coding?</h2>
           <p className="text-slate-600 mb-8">

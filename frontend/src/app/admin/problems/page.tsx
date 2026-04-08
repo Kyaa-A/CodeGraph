@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { createClient } from "@/lib/supabase/client";
@@ -32,7 +32,7 @@ export default function AdminProblemsPage() {
   const [starterCodeJson, setStarterCodeJson] = useState('{"python": "def solution():\\n    pass", "javascript": "function solution() {\\n\\n}"}');
   const [testCodeJson, setTestCodeJson] = useState('{"python": "", "javascript": ""}');
   const [loading, setLoading] = useState(true);
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
 
   async function loadProblems() {
     setLoading(true);

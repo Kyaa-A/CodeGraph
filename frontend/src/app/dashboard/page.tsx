@@ -1,3 +1,4 @@
+import { redirect } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { Button } from "@/components/ui/button";
@@ -27,6 +28,8 @@ export default async function DashboardPage() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
+
+  if (!user) redirect("/auth/login?next=/dashboard");
 
   const [coursesResult, lessonsResult, progressResult, submissionsResult, profileResult, xpEventsResult, freezesResult, loginEventsResult, dailyChallengeResult, docReadsResult] =
     await Promise.all([

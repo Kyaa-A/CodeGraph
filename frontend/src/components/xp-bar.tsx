@@ -59,6 +59,7 @@ export function XpBar({ userId }: { userId: string }) {
       <button
         onClick={() => setShowDropdown(!showDropdown)}
         className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg hover:bg-emerald-50 transition-colors group"
+        aria-label="XP progress"
       >
         {/* Level badge */}
         <div className="relative h-7 w-7 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center shadow-sm">

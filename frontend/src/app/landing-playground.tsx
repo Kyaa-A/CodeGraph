@@ -166,6 +166,7 @@ export function LandingPlayground() {
             <button
               onClick={handleRun}
               disabled={running}
+              aria-label="Run code"
               className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
                 running
                   ? "bg-slate-200 text-slate-500 cursor-not-allowed"

@@ -283,18 +283,29 @@ export function Navbar() {
                 </Button>
               </div>
             ) : (
-              <Link href="/auth/login">
-                <Button
-                  size="sm"
-                  className="rounded-lg bg-primary text-primary-foreground hover:bg-primary/90"
-                >
-                  Sign in
-                </Button>
-              </Link>
+              <div className="flex items-center gap-2">
+                <Link href="/auth/login">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="rounded-lg text-muted-foreground hover:text-foreground hover:bg-black/5"
+                  >
+                    Sign in
+                  </Button>
+                </Link>
+                <Link href="/auth/signup">
+                  <Button
+                    size="sm"
+                    className="rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white"
+                  >
+                    Sign up
+                  </Button>
+                </Link>
+              </div>
             )}
 
             {/* Mobile nav */}
-            <MobileNav links={navLinks} pathname={pathname} />
+            <MobileNav links={navLinks} pathname={pathname} user={user} />
           </div>
         </nav>
       </div>
@@ -305,9 +316,11 @@ export function Navbar() {
 function MobileNav({
   links,
   pathname,
+  user,
 }: {
   links: { href: string; label: string; icon: () => React.ReactElement }[];
   pathname: string;
+  user: User | null;
 }) {
   const [open, setOpen] = useState(false);
 
@@ -367,6 +380,28 @@ function MobileNav({
                   </Button>
                 </Link>
               ))}
+              {!user && (
+                <>
+                  <div className="h-px bg-slate-100 my-1" />
+                  <Link href="/auth/login" onClick={() => setOpen(false)}>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="w-full justify-start rounded-lg text-muted-foreground hover:text-foreground hover:bg-black/5"
+                    >
+                      Sign in
+                    </Button>
+                  </Link>
+                  <Link href="/auth/signup" onClick={() => setOpen(false)}>
+                    <Button
+                      size="sm"
+                      className="w-full justify-start rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white"
+                    >
+                      Sign up
+                    </Button>
+                  </Link>
+                </>
+              )}
             </nav>
           </motion.div>
         )}

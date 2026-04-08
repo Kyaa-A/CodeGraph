@@ -20,6 +20,9 @@ export function Footer() {
             <Link href="/playground" className="hover:text-slate-700 transition-colors">
               Playground
             </Link>
+            <Link href="/leaderboard" className="hover:text-slate-700 transition-colors">
+              Leaderboard
+            </Link>
             <Link href="/terms" className="hover:text-slate-700 transition-colors">
               Terms
             </Link>

@@ -13,6 +13,8 @@ export default async function sitemap() {
     { url: `${BASE_URL}/problems`, lastModified: new Date(), changeFrequency: "daily" as const, priority: 0.8 },
     { url: `${BASE_URL}/playground`, lastModified: new Date(), changeFrequency: "monthly" as const, priority: 0.6 },
     { url: `${BASE_URL}/leaderboard`, lastModified: new Date(), changeFrequency: "daily" as const, priority: 0.7 },
+    { url: `${BASE_URL}/terms`, lastModified: new Date(), changeFrequency: "monthly" as const, priority: 0.3 },
+    { url: `${BASE_URL}/privacy`, lastModified: new Date(), changeFrequency: "monthly" as const, priority: 0.3 },
   ];
 
   // Doc language index pages

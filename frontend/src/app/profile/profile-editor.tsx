@@ -70,7 +70,15 @@ export function ProfileEditor({
       <div className="relative group">
         <div
           className="relative h-16 w-16 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center text-white text-2xl font-bold shadow-lg overflow-hidden cursor-pointer"
+          role="button"
+          tabIndex={0}
           onClick={() => fileRef.current?.click()}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              fileRef.current?.click();
+            }
+          }}
         >
           {avatarUrl ? (
             <Image src={avatarUrl} alt="Avatar" fill className="object-cover" />
