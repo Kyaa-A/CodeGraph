@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, memo } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
@@ -80,7 +80,7 @@ function RunButton({ code, language }: { code: string; language: string }) {
   );
 }
 
-export function LessonViewer({ content, docLang }: LessonViewerProps) {
+export const LessonViewer = memo(function LessonViewer({ content, docLang }: LessonViewerProps) {
   // Determine the playground language for this doc context
   const playgroundLang = docLang
     ? DOC_TO_PLAYGROUND[docLang] !== undefined
@@ -274,4 +274,4 @@ export function LessonViewer({ content, docLang }: LessonViewerProps) {
       </ReactMarkdown>
     </article>
   );
-}
+});

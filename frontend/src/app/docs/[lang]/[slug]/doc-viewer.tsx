@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo, useCallback, useRef, memo } from "react";
 import Link from "next/link";
 import { LessonViewer } from "@/components/lesson-viewer";
 import { Button } from "@/components/ui/button";
@@ -27,7 +27,7 @@ function extractHeadings(markdown: string): TocItem[] {
   return items;
 }
 
-function TableOfContents({ items }: { items: TocItem[] }) {
+const TableOfContents = memo(function TableOfContents({ items }: { items: TocItem[] }) {
   const [activeId, setActiveId] = useState("");
 
   useEffect(() => {
@@ -81,7 +81,7 @@ function TableOfContents({ items }: { items: TocItem[] }) {
       </ul>
     </nav>
   );
-}
+});
 
 export function DocViewer({
   content,
@@ -106,17 +106,25 @@ export function DocViewer({
   const [isRead, setIsRead] = useState(initialIsRead ?? false);
   const [marking, setMarking] = useState(false);
   const [xpAwarded, setXpAwarded] = useState(false);
-  const [scrollProgress, setScrollProgress] = useState(0);
+  const progressRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const scrollArea = document.getElementById("doc-scroll-area");
     if (!scrollArea) return;
+    let ticking = false;
     const handleScroll = () => {
-      const { scrollTop, scrollHeight, clientHeight } = scrollArea;
-      const pct = scrollHeight - clientHeight > 0
-        ? (scrollTop / (scrollHeight - clientHeight)) * 100
-        : 100;
-      setScrollProgress(Math.min(pct, 100));
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        const { scrollTop, scrollHeight, clientHeight } = scrollArea;
+        const pct = scrollHeight - clientHeight > 0
+          ? (scrollTop / (scrollHeight - clientHeight)) * 100
+          : 100;
+        if (progressRef.current) {
+          progressRef.current.style.transform = `scaleX(${Math.min(pct, 100) / 100})`;
+        }
+        ticking = false;
+      });
     };
     scrollArea.addEventListener("scroll", handleScroll, { passive: true });
     return () => scrollArea.removeEventListener("scroll", handleScroll);
@@ -150,10 +158,11 @@ export function DocViewer({
   return (
     <div id="doc-scroll-area" className="flex-1 overflow-y-auto relative">
       {/* Scroll reading progress bar */}
-      <div className="sticky top-0 left-0 right-0 z-10 h-0.5 bg-slate-100">
+      <div className="sticky top-0 left-0 right-0 z-10 h-0.5 bg-slate-100 overflow-hidden">
         <div
-          className="h-full bg-emerald-500 transition-[width] duration-150"
-          style={{ width: `${scrollProgress}%` }}
+          ref={progressRef}
+          className="h-full w-full bg-emerald-500 origin-left"
+          style={{ transform: "scaleX(0)" }}
         />
       </div>
       <div className="flex">
