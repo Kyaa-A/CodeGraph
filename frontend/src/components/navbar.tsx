@@ -223,7 +223,7 @@ export function Navbar() {
             {/* Search button — opens Cmd+K palette */}
             <button
               onClick={() => {
-                window.dispatchEvent(new KeyboardEvent("keydown", { key: "k", metaKey: true }));
+                document.dispatchEvent(new KeyboardEvent("keydown", { key: "k", metaKey: true, bubbles: true }));
               }}
               className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-lg border border-slate-200 text-xs text-slate-400 hover:text-slate-600 hover:border-slate-300 transition-colors"
             >
@@ -350,7 +350,7 @@ function MobileNav({
               <button
                 onClick={() => {
                   setOpen(false);
-                  window.dispatchEvent(new KeyboardEvent("keydown", { key: "k", metaKey: true }));
+                  document.dispatchEvent(new KeyboardEvent("keydown", { key: "k", metaKey: true, bubbles: true }));
                 }}
                 className="flex items-center gap-3 w-full px-3 py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-black/5 transition-colors"
               >
