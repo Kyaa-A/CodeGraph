@@ -28,20 +28,20 @@ export default function LessonLoading() {
       </div>
 
       {/* Right: Code editor skeleton */}
-      <div className="flex-1 bg-slate-900 p-6 overflow-hidden">
+      <div className="flex-1 bg-slate-50 p-6 overflow-hidden border-l border-slate-200">
         {/* Editor toolbar */}
         <div className="flex items-center gap-3 mb-4">
-          <div className="h-8 w-20 bg-slate-700 rounded animate-pulse" />
-          <div className="h-8 w-24 bg-slate-700 rounded animate-pulse" />
-          <div className="ml-auto h-8 w-20 bg-emerald-800 rounded animate-pulse" />
+          <div className="h-8 w-20 bg-slate-200 rounded animate-pulse" />
+          <div className="h-8 w-24 bg-slate-200 rounded animate-pulse" />
+          <div className="ml-auto h-8 w-20 bg-emerald-100 rounded animate-pulse" />
         </div>
         {/* Line numbers + code lines */}
         <div className="space-y-2 mt-6">
           {Array.from({ length: 12 }).map((_, i) => (
             <div key={i} className="flex items-center gap-4">
-              <div className="h-4 w-6 bg-slate-700 rounded animate-pulse" />
+              <div className="h-4 w-6 bg-slate-200 rounded animate-pulse" />
               <div
-                className="h-4 bg-slate-700 rounded animate-pulse"
+                className="h-4 bg-slate-200 rounded animate-pulse"
                 style={{ width: `${30 + Math.random() * 50}%` }}
               />
             </div>
