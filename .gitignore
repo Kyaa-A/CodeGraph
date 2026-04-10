@@ -43,3 +43,9 @@ Thumbs.db
 coverage/
 .cache/
 .vercel
+.gstack/
+
+# ========================
+# Agent coordination
+# ========================
+.agents/board.json

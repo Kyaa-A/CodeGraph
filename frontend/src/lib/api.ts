@@ -142,16 +142,27 @@ export async function searchLessons(
   return api.post("/api/search", { query, top_k: topK });
 }
 
+export interface QuizChoice {
+  label: string; // "A", "B", "C", "D"
+  text: string;
+}
+
+export interface QuizQuestion {
+  question: string;
+  choices: QuizChoice[];
+  correct_answer: string; // label, e.g. "B"
+  explanation: string;
+}
+
+export interface QuizResponse {
+  lesson_id: string;
+  questions: QuizQuestion[];
+  total_questions: number;
+}
+
 export async function generateQuiz(
   lessonId: string
-): Promise<{
-  questions: {
-    question: string;
-    options: string[];
-    correct: string;
-    explanation: string;
-  }[];
-}> {
+): Promise<QuizResponse> {
   return api.post(`/api/quiz/generate/${lessonId}`);
 }
 

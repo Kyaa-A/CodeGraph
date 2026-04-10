@@ -4,13 +4,11 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { LOTTIE } from "@/lib/lottie-assets";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Logo } from "@/components/logo";
-import { LottieAnimation } from "@/components/lottie-animation";
 
 const Icons = {
   user: () => <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>,
@@ -99,18 +97,16 @@ export default function SignupPage() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.8 }}
-        className="hidden lg:flex relative w-1/2 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 items-center justify-center"
+        className="hidden lg:flex relative w-1/2 bg-gradient-to-br from-emerald-50 via-slate-50 to-white border-r border-slate-200 items-center justify-center"
       >
         <div className="max-w-md text-center px-12">
-          <div className="w-48 h-48 mx-auto mb-4">
-            <LottieAnimation
-              src={LOTTIE.codingHero}
-              loop
-              className="w-full h-full drop-shadow-lg"
-            />
+          <div className="w-48 h-48 mx-auto mb-4 flex items-center justify-center">
+            <svg className="w-32 h-32 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5" />
+            </svg>
           </div>
-          <h2 className="text-2xl font-bold text-white mb-3">Start your coding journey</h2>
-          <p className="text-slate-400 leading-relaxed">
+          <h2 className="text-2xl font-bold text-slate-900 mb-3">Start your coding journey</h2>
+          <p className="text-slate-500 leading-relaxed">
             Master programming with interactive courses, LeetCode-style problems, and a built-in code playground.
           </p>
 
@@ -120,11 +116,11 @@ export default function SignupPage() {
               { icon: "M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4", label: "Code Problems" },
               { icon: "M13 10V3L4 14h7v7l9-11h-7z", label: "Playground" },
             ].map((item) => (
-              <div key={item.label} className="p-3 rounded-xl bg-white/5 border border-white/10">
-                <svg className="h-5 w-5 text-emerald-400 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <div key={item.label} className="p-3 rounded-xl bg-white border border-slate-200 shadow-sm">
+                <svg className="h-5 w-5 text-emerald-500 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d={item.icon} />
                 </svg>
-                <p className="text-xs text-slate-400">{item.label}</p>
+                <p className="text-xs text-slate-600">{item.label}</p>
               </div>
             ))}
           </div>
@@ -331,12 +327,12 @@ export default function SignupPage() {
               animate={{ opacity: 1, scale: 1 }}
               className="text-center py-8"
             >
-              <div className="w-28 h-28 mx-auto mb-4">
-                <LottieAnimation
-                  src={LOTTIE.signupSuccess}
-                  autoplay
-                  className="w-full h-full"
-                />
+              <div className="w-28 h-28 mx-auto mb-4 flex items-center justify-center">
+                <div className="h-20 w-20 rounded-full bg-emerald-100 flex items-center justify-center">
+                  <svg className="h-10 w-10 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
               </div>
               <h3 className="text-xl font-bold text-slate-900 mb-2">Account created!</h3>
               <p className="text-slate-500">Redirecting you to the dashboard...</p>

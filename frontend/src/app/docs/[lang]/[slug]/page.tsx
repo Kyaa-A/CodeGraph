@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { cache } from "react";
 import { createClient } from "@/lib/supabase/server";
+import { withTimeout } from "@/lib/utils";
 import { DocSidebar } from "./doc-sidebar";
 import { DocViewer } from "./doc-viewer";
 import type { DocTopic } from "@/lib/supabase/types";
@@ -66,16 +67,21 @@ export default async function DocPage({
   const { lang, slug } = await params;
   const supabase = await createClient();
 
-  // Fetch sidebar data (cached, shared with generateMetadata) + current page content separately
-  const [{ sidebarPages, user }, { data: currentPageData }] = await Promise.all([
-    getDocData(lang),
-    supabase
-      .from("doc_topics")
-      .select("id, slug, title, section, order_index, content")
-      .eq("lang", lang)
-      .eq("slug", slug)
-      .single(),
-  ]);
+  // Sidebar is cached and shared with generateMetadata via React `cache()`
+  const [{ sidebarPages, user }, { data: currentPageData }] = await withTimeout(
+    Promise.all([
+      getDocData(lang),
+      Promise.resolve(
+        supabase
+          .from("doc_topics")
+          .select("id, slug, title, section, order_index, content")
+          .eq("lang", lang)
+          .eq("slug", slug)
+          .single()
+      ),
+    ]),
+    8000
+  );
 
   const allPages = sidebarPages;
 

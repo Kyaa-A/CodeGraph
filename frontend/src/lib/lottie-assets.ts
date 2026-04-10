@@ -24,6 +24,9 @@ export const LOTTIE = {
   /** Streak calendar fire */
   streakFire: "https://lottie.host/c93e7d82-d61b-4625-bbf3-e05795cb4da2/EDXKgG995W.lottie",
 
+  /** Route loading — hourglass */
+  hourglass: "https://lottie.host/2a21930c-0c73-4b8a-b997-59882caa229f/LOhLdidczR.lottie",
+
   /** Homepage hero coding animation */
   codingHero: "https://lottie.host/a28e7daa-5ade-4ac1-9c91-7353c3cd8f19/brFveAcB21.lottie",
 

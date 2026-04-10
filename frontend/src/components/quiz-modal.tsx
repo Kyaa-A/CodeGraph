@@ -12,14 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
-import { generateQuiz } from "@/lib/api";
-
-interface Question {
-  question: string;
-  options: string[];
-  correct: string;
-  explanation: string;
-}
+import { generateQuiz, type QuizQuestion } from "@/lib/api";
 
 interface QuizModalProps {
   open: boolean;
@@ -63,12 +56,9 @@ const Icons = {
   ),
 };
 
-// Option letter mapping
-const optionLetters = ["A", "B", "C", "D"];
-
 export function QuizModal({ open, onOpenChange, lessonId }: QuizModalProps) {
   const [state, setState] = useState<QuizState>("idle");
-  const [questions, setQuestions] = useState<Question[]>([]);
+  const [questions, setQuestions] = useState<QuizQuestion[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<string>("");
   const [answers, setAnswers] = useState<string[]>([]);
@@ -77,7 +67,7 @@ export function QuizModal({ open, onOpenChange, lessonId }: QuizModalProps) {
 
   const currentQuestion = questions[currentIndex];
   const score = answers.reduce(
-    (acc, answer, i) => (answer === questions[i]?.correct ? acc + 1 : acc),
+    (acc, answer, i) => (answer === questions[i]?.correct_answer ? acc + 1 : acc),
     0
   );
 
@@ -266,10 +256,10 @@ export function QuizModal({ open, onOpenChange, lessonId }: QuizModalProps) {
                 disabled={showExplanation}
                 className="space-y-2"
               >
-                {currentQuestion.options.map((option, i) => {
-                  const isCorrect = showExplanation && option === currentQuestion.correct;
-                  const isWrong = showExplanation && option === selectedAnswer && option !== currentQuestion.correct;
-                  const isSelected = !showExplanation && option === selectedAnswer;
+                {currentQuestion.choices.map((choice, i) => {
+                  const isCorrect = showExplanation && choice.label === currentQuestion.correct_answer;
+                  const isWrong = showExplanation && choice.label === selectedAnswer && choice.label !== currentQuestion.correct_answer;
+                  const isSelected = !showExplanation && choice.label === selectedAnswer;
 
                   return (
                     <motion.div
@@ -286,7 +276,7 @@ export function QuizModal({ open, onOpenChange, lessonId }: QuizModalProps) {
                               ? "border-emerald-500 bg-emerald-50"
                               : "border-black/5 hover:border-emerald-200 hover:bg-emerald-50/30"
                       }`}
-                      onClick={() => !showExplanation && setSelectedAnswer(option)}
+                      onClick={() => !showExplanation && setSelectedAnswer(choice.label)}
                     >
                       <div className={`flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold ${
                         isCorrect
@@ -297,11 +287,11 @@ export function QuizModal({ open, onOpenChange, lessonId }: QuizModalProps) {
                               ? "bg-emerald-500 text-white"
                               : "bg-slate-100 text-slate-500"
                       }`}>
-                        {isCorrect ? <Icons.check /> : isWrong ? <Icons.close /> : optionLetters[i]}
+                        {isCorrect ? <Icons.check /> : isWrong ? <Icons.close /> : choice.label}
                       </div>
-                      <RadioGroupItem value={option} id={`option-${i}`} className="sr-only" />
+                      <RadioGroupItem value={choice.label} id={`option-${i}`} className="sr-only" />
                       <Label htmlFor={`option-${i}`} className="flex-1 cursor-pointer text-sm font-medium">
-                        {option}
+                        {choice.text}
                       </Label>
                     </motion.div>
                   );

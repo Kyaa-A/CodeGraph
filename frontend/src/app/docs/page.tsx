@@ -100,18 +100,18 @@ export default async function DocsPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white pt-20">
       {/* Hero */}
-      <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white">
+      <div className="bg-gradient-to-br from-emerald-50 via-slate-50 to-white border-b border-slate-200">
         <div className="max-w-6xl mx-auto px-4 py-14 sm:py-20 text-center">
-          <div className="inline-flex items-center gap-2 px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 rounded-full text-emerald-400 text-sm font-medium mb-6">
+          <div className="inline-flex items-center gap-2 px-3 py-1 bg-emerald-100 border border-emerald-200 rounded-full text-emerald-700 text-sm font-medium mb-6">
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
             </svg>
             {totalPages}+ pages across {langCounts.size} languages
           </div>
-          <h1 className="text-4xl sm:text-5xl font-bold tracking-tight mb-4">
+          <h1 className="text-4xl sm:text-5xl font-bold tracking-tight text-slate-900 mb-4">
             Learn to Code
           </h1>
-          <p className="text-lg text-slate-400 max-w-xl mx-auto mb-6">
+          <p className="text-lg text-slate-500 max-w-xl mx-auto mb-6">
             Free, comprehensive programming references. No account required.
           </p>
 
@@ -130,7 +130,7 @@ export default async function DocsPage() {
                 <Link
                   key={lang}
                   href={`/docs/${lang}/${langFirstSlug.get(lang)}`}
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full text-sm text-slate-300 hover:text-white transition-all cursor-pointer"
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-white hover:bg-slate-50 border border-slate-200 rounded-full text-sm text-slate-600 hover:text-slate-900 transition-all cursor-pointer shadow-sm"
                 >
                   <div className="h-5 w-5 shrink-0 overflow-hidden rounded-sm"><LangLogo lang={lang} /></div>
                   {name}

@@ -9,8 +9,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Logo } from "@/components/logo";
-import { LottieAnimation } from "@/components/lottie-animation";
-import { LOTTIE } from "@/lib/lottie-assets";
 import { SITE_STATS } from "@/lib/constants";
 
 export default function LoginPage() {
@@ -82,11 +80,12 @@ function LoginForm() {
           transition={{ type: "spring", damping: 15 }}
           className="text-center"
         >
-          <div className="w-32 h-32 mx-auto mb-4">
-            <LottieAnimation
-              src={LOTTIE.confetti}
-              className="w-full h-full"
-            />
+          <div className="w-32 h-32 mx-auto mb-4 flex items-center justify-center">
+            <div className="h-20 w-20 rounded-full bg-emerald-100 flex items-center justify-center">
+              <svg className="h-10 w-10 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
           </div>
           <h2 className="text-xl font-bold text-slate-900 mb-1">Welcome back!</h2>
           <p className="text-sm text-slate-500">Redirecting you now...</p>
@@ -234,34 +233,32 @@ function LoginForm() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.8 }}
-        className="hidden lg:flex relative w-1/2 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 items-center justify-center"
+        className="hidden lg:flex relative w-1/2 bg-gradient-to-br from-emerald-50 via-slate-50 to-white border-l border-slate-200 items-center justify-center"
       >
         <div className="max-w-md text-center px-12">
-          <div className="w-48 h-48 mx-auto mb-4">
-            <LottieAnimation
-              src={LOTTIE.codingHero}
-              loop
-              className="w-full h-full drop-shadow-lg"
-            />
+          <div className="w-48 h-48 mx-auto mb-4 flex items-center justify-center">
+            <svg className="w-32 h-32 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5" />
+            </svg>
           </div>
-          <h2 className="text-2xl font-bold text-white mb-3">Continue your journey</h2>
-          <p className="text-slate-400 leading-relaxed">
+          <h2 className="text-2xl font-bold text-slate-900 mb-3">Continue your journey</h2>
+          <p className="text-slate-500 leading-relaxed">
             Interactive courses, coding problems, and a powerful playground — all free, all in your browser.
           </p>
 
           <div className="mt-10 flex items-center justify-center gap-6 text-sm">
             <div className="text-center">
-              <p className="text-2xl font-bold text-emerald-400">{SITE_STATS.PROBLEMS_LABEL}</p>
+              <p className="text-2xl font-bold text-emerald-600">{SITE_STATS.PROBLEMS_LABEL}</p>
               <p className="text-slate-500">Problems</p>
             </div>
-            <div className="w-px h-10 bg-slate-700" />
+            <div className="w-px h-10 bg-slate-200" />
             <div className="text-center">
-              <p className="text-2xl font-bold text-emerald-400">{SITE_STATS.DOC_PAGES_LABEL}</p>
+              <p className="text-2xl font-bold text-emerald-600">{SITE_STATS.DOC_PAGES_LABEL}</p>
               <p className="text-slate-500">Doc Pages</p>
             </div>
-            <div className="w-px h-10 bg-slate-700" />
+            <div className="w-px h-10 bg-slate-200" />
             <div className="text-center">
-              <p className="text-2xl font-bold text-emerald-400">{SITE_STATS.LANGUAGES_COUNT}</p>
+              <p className="text-2xl font-bold text-emerald-600">{SITE_STATS.LANGUAGES_COUNT}</p>
               <p className="text-slate-500">Languages</p>
             </div>
           </div>
