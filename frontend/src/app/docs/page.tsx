@@ -32,7 +32,49 @@ const LOGO_URLS: Record<string, string> = {
   swift: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/swift/swift-original.svg",
 };
 
+/* ── SVG icons for non-language topics ── */
+const TOPIC_ICONS: Record<string, React.ReactNode> = {
+  "ai-models": (
+    <svg className="h-full w-full text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
+    </svg>
+  ),
+  "prompt-engineering": (
+    <svg className="h-full w-full text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.087.16 2.185.283 3.293.369V21l4.076-4.076a1.526 1.526 0 011.037-.443 48.282 48.282 0 005.68-.494c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0012 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018z" />
+    </svg>
+  ),
+  "claude-code": (
+    <svg className="h-full w-full text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 7.5l3 2.25-3 2.25m4.5 0h3m-9 8.25h13.5A2.25 2.25 0 0021 18V6a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 6v12a2.25 2.25 0 002.25 2.25z" />
+    </svg>
+  ),
+  "ai-coding-tools": (
+    <svg className="h-full w-full text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5" />
+    </svg>
+  ),
+  plugins: (
+    <svg className="h-full w-full text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M14.25 6.087c0-.355.186-.676.401-.959.221-.29.349-.634.349-1.003 0-1.036-1.007-1.875-2.25-1.875s-2.25.84-2.25 1.875c0 .369.128.713.349 1.003.215.283.401.604.401.959v0a.64.64 0 01-.657.643 48.39 48.39 0 01-4.163-.3c.186 1.613.293 3.25.315 4.907a.656.656 0 01-.658.663v0c-.355 0-.676-.186-.959-.401a1.647 1.647 0 00-1.003-.349c-1.036 0-1.875 1.007-1.875 2.25s.84 2.25 1.875 2.25c.369 0 .713-.128 1.003-.349.283-.215.604-.401.959-.401v0c.31 0 .555.26.532.57a48.039 48.039 0 01-.642 5.056c1.518.19 3.058.309 4.616.354a.64.64 0 00.657-.643v0c0-.355-.186-.676-.401-.959a1.647 1.647 0 01-.349-1.003c0-1.035 1.008-1.875 2.25-1.875 1.243 0 2.25.84 2.25 1.875 0 .369-.128.713-.349 1.003-.215.283-.401.604-.401.959v0c0 .333.277.599.61.58a48.1 48.1 0 005.427-.63 48.05 48.05 0 00.582-4.717.532.532 0 00-.533-.57v0c-.355 0-.676.186-.959.401-.29.221-.634.349-1.003.349-1.035 0-1.875-1.007-1.875-2.25s.84-2.25 1.875-2.25c.37 0 .713.128 1.003.349.283.215.604.401.959.401v0a.656.656 0 00.658-.663 48.422 48.422 0 00-.37-5.36c-1.886.342-3.81.574-5.766.689a.578.578 0 01-.61-.58v0z" />
+    </svg>
+  ),
+  mcp: (
+    <svg className="h-full w-full text-rose-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M5.25 14.25h13.5m-13.5 0a3 3 0 01-3-3m3 3a3 3 0 100 6h13.5a3 3 0 100-6m-16.5-3a3 3 0 013-3h13.5a3 3 0 013 3m-19.5 0a4.5 4.5 0 01.9-2.7L5.737 5.1a3.375 3.375 0 012.7-1.35h7.126c1.062 0 2.062.5 2.7 1.35l2.587 3.45a4.5 4.5 0 01.9 2.7m0 0a3 3 0 01-3 3m0 3h.008v.008h-.008v-.008zm0-6h.008v.008h-.008v-.008zm-3 6h.008v.008h-.008v-.008zm0-6h.008v.008h-.008v-.008z" />
+    </svg>
+  ),
+  "ai-cli": (
+    <svg className="h-full w-full text-cyan-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 7.5l3 2.25-3 2.25m4.5 0h3M3 20.25V3.75A2.25 2.25 0 015.25 1.5h13.5A2.25 2.25 0 0121 3.75v16.5A2.25 2.25 0 0118.75 21H5.25A2.25 2.25 0 013 20.25z" />
+    </svg>
+  ),
+};
+
 function LangLogo({ lang, className = "h-full w-full" }: { lang: string; className?: string }) {
+  if (TOPIC_ICONS[lang]) {
+    return <div className={className}>{TOPIC_ICONS[lang]}</div>;
+  }
   const url = LOGO_URLS[lang];
   if (!url) return null;
   return <Image src={url} alt={lang} width={32} height={32} className={className} />;
@@ -76,6 +118,31 @@ const CATEGORIES = [
       { lang: "langchain", name: "LangChain", description: "Chains, agents, RAG, embeddings" },
     ],
   },
+  {
+    title: "AI Models & Prompting",
+    description: "Understand and use large language models effectively",
+    languages: [
+      { lang: "ai-models", name: "AI Models", description: "LLMs, model comparison, APIs, tool use" },
+      { lang: "prompt-engineering", name: "Prompt Engineering", description: "Chain of thought, few-shot, output formatting" },
+    ],
+  },
+  {
+    title: "AI Coding Tools",
+    description: "Tools that write, review, and debug code with you",
+    languages: [
+      { lang: "claude-code", name: "Claude Code", description: "The AI coding CLI — setup, workflows, plugins" },
+      { lang: "ai-coding-tools", name: "AI Coding Tools", description: "Cursor, Copilot, Windsurf, and more" },
+      { lang: "plugins", name: "Plugins & Extensions", description: "Superpowers, open-source plugins, building your own" },
+    ],
+  },
+  {
+    title: "Infrastructure & Automation",
+    description: "Connect AI tools to your systems and workflows",
+    languages: [
+      { lang: "mcp", name: "MCPs", description: "Model Context Protocol — servers, tools, resources" },
+      { lang: "ai-cli", name: "CLI & Automation", description: "Terminal AI workflows, scripting, CI/CD" },
+    ],
+  },
 ];
 
 export default async function DocsPage() {
@@ -106,13 +173,13 @@ export default async function DocsPage() {
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
             </svg>
-            {totalPages}+ pages across {langCounts.size} languages
+            {totalPages}+ pages across {langCounts.size} topics
           </div>
           <h1 className="text-4xl sm:text-5xl font-bold tracking-tight text-slate-900 mb-4">
-            Learn to Code
+            Learn to Code & Build with AI
           </h1>
           <p className="text-lg text-slate-500 max-w-xl mx-auto mb-6">
-            Free, comprehensive programming references. No account required.
+            Free programming references, AI tool guides, and developer resources. No account required.
           </p>
 
           {/* Search */}
@@ -122,7 +189,7 @@ export default async function DocsPage() {
 
           {/* Popular quick links */}
           <div className="flex flex-wrap justify-center gap-2">
-            {["python", "javascript", "java", "sql", "react", "typescript"].map((lang) => {
+            {["python", "javascript", "claude-code", "mcp", "sql", "ai-models"].map((lang) => {
               const count = langCounts.get(lang) || 0;
               if (count === 0) return null;
               const name = CATEGORIES.flatMap((c) => c.languages).find((l) => l.lang === lang)?.name ?? lang;
