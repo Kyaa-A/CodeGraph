@@ -1,16 +1,9 @@
 import { ImageResponse } from "next/og";
 import { createClient } from "@/lib/supabase/server";
+import { LANG_NAMES } from "@/lib/doc-constants";
 
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
-
-const LANG_NAMES: Record<string, string> = {
-  python: "Python", javascript: "JavaScript", typescript: "TypeScript",
-  react: "React", "html-css": "HTML & CSS", java: "Java", sql: "SQL",
-  go: "Go", rust: "Rust", c: "C", cpp: "C++", csharp: "C#",
-  php: "PHP", nodejs: "Node.js", langchain: "LangChain",
-  kotlin: "Kotlin", ruby: "Ruby", swift: "Swift",
-};
 
 export default async function Image({
   params,

@@ -6,29 +6,9 @@ import { withTimeout } from "@/lib/utils";
 import { DocSidebar } from "./doc-sidebar";
 import { DocViewer } from "./doc-viewer";
 import type { DocTopic } from "@/lib/supabase/types";
+import { LANG_NAMES } from "@/lib/doc-constants";
 
 export const revalidate = 600; // cache 10 min
-
-const LANG_NAMES: Record<string, string> = {
-  python: "Python",
-  javascript: "JavaScript",
-  typescript: "TypeScript",
-  react: "React",
-  "html-css": "HTML & CSS",
-  java: "Java",
-  sql: "SQL",
-  go: "Go",
-  rust: "Rust",
-  c: "C",
-  cpp: "C++",
-  csharp: "C#",
-  php: "PHP",
-  nodejs: "Node.js",
-  langchain: "LangChain",
-  kotlin: "Kotlin",
-  ruby: "Ruby",
-  swift: "Swift",
-};
 
 // Deduplicate Supabase calls between generateMetadata and page function
 const getDocData = cache(async (lang: string) => {

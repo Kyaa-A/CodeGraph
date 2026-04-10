@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { LANG_NAMES } from "@/lib/doc-constants";
 
 interface SearchItem {
   lang: string;
@@ -10,14 +11,6 @@ interface SearchItem {
   title: string;
   section: string;
 }
-
-const LANG_NAMES: Record<string, string> = {
-  python: "Python", javascript: "JavaScript", typescript: "TypeScript",
-  react: "React", "html-css": "HTML & CSS", java: "Java", sql: "SQL",
-  go: "Go", rust: "Rust", c: "C", cpp: "C++", csharp: "C#",
-  php: "PHP", nodejs: "Node.js", langchain: "LangChain",
-  kotlin: "Kotlin", ruby: "Ruby", swift: "Swift",
-};
 
 export function DocSearch({ items }: { items: SearchItem[] }) {
   const [query, setQuery] = useState("");
