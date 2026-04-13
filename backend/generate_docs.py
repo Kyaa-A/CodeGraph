@@ -203,9 +203,203 @@ DOCS_STRUCTURE = {
             "LangSmith Integration",
         ]),
     ],
+    "ai-models": [
+        ("Getting Started", [
+            "What Are LLMs",
+            "How LLMs Work",
+            "Tokens and Context Windows",
+            "Temperature and Parameters",
+        ]),
+        ("Model Comparison", [
+            "Claude — Opus, Sonnet, and Haiku",
+            "GPT — 4o, o1, and o3",
+            "Gemini — Pro and Flash",
+            "Llama and Open Source Models",
+            "How to Choose a Model",
+        ]),
+        ("Using Model APIs", [
+            "API Keys and Authentication",
+            "Your First API Call",
+            "Streaming Responses",
+            "Tool Use and Function Calling",
+            "Structured Output",
+        ]),
+        ("Advanced", [
+            "Fine-Tuning Basics",
+            "Embeddings and Vector Search",
+            "Multi-Modal Models",
+            "Cost Optimization",
+            "Rate Limits and Best Practices",
+        ]),
+    ],
+    "prompt-engineering": [
+        ("Fundamentals", [
+            "What Is Prompt Engineering",
+            "Anatomy of a Good Prompt",
+            "System Prompts vs User Prompts",
+            "Zero-Shot vs Few-Shot Prompting",
+        ]),
+        ("Techniques", [
+            "Chain of Thought Prompting",
+            "Role Prompting",
+            "Output Formatting with JSON and XML",
+            "Prompt Chaining",
+            "Guardrails and Safety",
+        ]),
+        ("Patterns", [
+            "Code Generation Prompts",
+            "Data Analysis Prompts",
+            "Writing and Summarization Prompts",
+            "Debugging with AI",
+            "Building Agents via Prompts",
+        ]),
+        ("Advanced", [
+            "Prompt Caching",
+            "Evaluating Prompt Quality",
+            "A/B Testing Prompts",
+            "Prompt Injection Defense",
+            "Production Prompt Management",
+        ]),
+    ],
+    "claude-code": [
+        ("Getting Started", [
+            "What Is Claude Code",
+            "Installation and Setup",
+            "Your First Session",
+            "The CLI Interface",
+        ]),
+        ("Core Features", [
+            "Reading and Editing Files",
+            "Running Commands",
+            "Multi-File Changes",
+            "Git Integration",
+            "Slash Commands",
+        ]),
+        ("Workflows", [
+            "Debugging with Claude Code",
+            "Building Features",
+            "Code Review with Claude Code",
+            "Test-Driven Development",
+            "Pair Programming",
+        ]),
+        ("Customization", [
+            "CLAUDE.md Configuration",
+            "Hooks",
+            "Permissions and Safety",
+            "Memory and Context",
+            "Custom Instructions",
+        ]),
+        ("Ecosystem", [
+            "Plugins and Extensions",
+            "Superpowers Plugin",
+            "MCP Servers in Claude Code",
+            "IDE Integrations",
+        ]),
+    ],
+    "ai-coding-tools": [
+        ("Overview", [
+            "The AI Coding Landscape",
+            "How AI Code Assistants Work",
+            "Choosing the Right Tool",
+        ]),
+        ("Tools", [
+            "Cursor Deep Dive",
+            "GitHub Copilot Deep Dive",
+            "Windsurf Deep Dive",
+            "Cline and Open Source Alternatives",
+            "AI Coding Tools Comparison Matrix",
+        ]),
+        ("Workflows", [
+            "AI-Powered IDE Setup",
+            "Effective Autocomplete Usage",
+            "Chat-Driven Development",
+            "Multi-File Refactoring with AI",
+            "AI-Assisted Debugging",
+        ]),
+        ("Best Practices", [
+            "When to Use AI vs Not",
+            "Reviewing AI-Generated Code",
+            "Security Considerations",
+            "Team Workflows with AI Tools",
+        ]),
+    ],
+    "plugins": [
+        ("Getting Started", [
+            "What Are AI Plugins",
+            "Plugin Architecture",
+            "Installing Plugins",
+        ]),
+        ("Best Plugins", [
+            "Superpowers Deep Dive",
+            "Top Open Source Plugins",
+            "Productivity Plugins",
+            "Code Quality Plugins",
+            "Documentation Plugins",
+        ]),
+        ("Building Plugins", [
+            "Plugin Development Basics",
+            "Skill System Architecture",
+            "Creating Your First Skill",
+            "Publishing and Sharing Plugins",
+        ]),
+    ],
+    "mcp": [
+        ("Getting Started", [
+            "What Is Model Context Protocol",
+            "How MCPs Work",
+            "MCP Architecture",
+        ]),
+        ("Best MCPs", [
+            "Database MCPs",
+            "Git and GitHub MCPs",
+            "File System MCPs",
+            "API Integration MCPs",
+            "Search and Browser MCPs",
+        ]),
+        ("Building MCPs", [
+            "Your First MCP Server",
+            "TypeScript MCP SDK",
+            "Python MCP SDK",
+            "Tools vs Resources vs Prompts",
+            "Testing and Debugging MCPs",
+        ]),
+        ("Advanced", [
+            "MCP in Production",
+            "Security Best Practices for MCPs",
+            "Chaining Multiple MCPs",
+            "Performance Optimization",
+        ]),
+    ],
+    "ai-cli": [
+        ("Getting Started", [
+            "AI in the Terminal",
+            "Setting Up Your AI Terminal",
+            "Shell Integration",
+        ]),
+        ("Tools", [
+            "Claude Code CLI",
+            "GitHub CLI with AI",
+            "Aider",
+            "OpenAI CLI",
+            "Other AI CLIs",
+        ]),
+        ("Automation", [
+            "Scripting with AI",
+            "CI/CD with AI Tools",
+            "Automated Code Review",
+            "Automated Testing with AI",
+            "Git Hooks with AI",
+        ]),
+        ("Advanced", [
+            "Building CLI Agents",
+            "Headless AI Workflows",
+            "Monitoring and Logging",
+            "Cost Management",
+        ]),
+    ],
 }
 
-PROMPT = """Write a comprehensive tutorial page about "{title}" for {lang_name} documentation.
+PROMPT_TUTORIAL = """Write a comprehensive tutorial page about "{title}" for {lang_name} documentation.
 
 Requirements:
 - Start with a clear # heading, then an intro paragraph
@@ -220,8 +414,44 @@ Requirements:
 
 Write ONLY the markdown content. No meta-commentary."""
 
+PROMPT_TOOL_GUIDE = """Write a practical guide about "{title}" for the {lang_name} documentation.
 
-def gen_page(lang, lang_name, lang_code, section, title, order_index):
+Requirements:
+- Start with a clear # heading, then an intro paragraph explaining what this is and why it matters
+- Use ## for major sections within the page
+- Include real CLI commands, configuration snippets, or code examples in ```{lang_code} blocks
+- Show step-by-step setup or workflow instructions
+- Include a "Quick Start" or "Getting Started" section near the top
+- Add a "Tips & Best Practices" section
+- Add a "Key Points" summary at the end as bullet points
+- Write for developers who are new to this tool but experienced in general
+- Total length: 600-1000 words of content (not counting code blocks)
+
+Write ONLY the markdown content. No meta-commentary."""
+
+PROMPT_COMPARISON = """Write an objective comparison page about "{title}" for the {lang_name} documentation.
+
+Requirements:
+- Start with a clear # heading, then an intro paragraph framing the comparison
+- Use ## for major sections within the page
+- Include a feature comparison table (use markdown tables)
+- List pros and cons for each option discussed
+- Include code or command examples showing key differences in ```{lang_code} blocks
+- End with a "Which Should You Choose?" recommendation section based on use case
+- Add a "Key Points" summary at the end as bullet points
+- Be balanced and objective — mention real strengths and weaknesses
+- Total length: 600-1000 words of content (not counting code blocks)
+
+Write ONLY the markdown content. No meta-commentary."""
+
+# Topics that use tool guide prompt (non-programming-language topics)
+TOOL_GUIDE_LANGS = {"claude-code", "ai-coding-tools", "plugins", "mcp", "ai-cli"}
+
+# Sections within tool topics that use comparison prompt instead
+COMPARISON_SECTIONS = {"Model Comparison", "Tools", "Best Plugins", "Best MCPs", "Best Practices"}
+
+
+def gen_page(lang, lang_name, lang_code, section, title, order_index, prompt_template=None):
     """Generate one documentation page."""
     providers_to_try = []
     for _ in range(3):
@@ -234,7 +464,8 @@ def gen_page(lang, lang_name, lang_code, section, title, order_index):
     for provider, key in providers_to_try:
         try:
             llm = make_llm(provider, key)
-            result = llm.invoke(PROMPT.format(
+            template = prompt_template or PROMPT_TUTORIAL
+            result = llm.invoke(template.format(
                 title=title, lang_name=lang_name, lang_code=lang_code
             ))
             content = result.content.strip()
@@ -279,10 +510,16 @@ def main():
     lang_codes = {
         "python": "python", "javascript": "javascript",
         "java": "java", "sql": "sql", "langchain": "python",
+        "ai-models": "python", "prompt-engineering": "text",
+        "claude-code": "bash", "ai-coding-tools": "bash",
+        "plugins": "bash", "mcp": "typescript", "ai-cli": "bash",
     }
     lang_names = {
         "python": "Python", "javascript": "JavaScript",
         "java": "Java", "sql": "SQL", "langchain": "LangChain",
+        "ai-models": "AI Models", "prompt-engineering": "Prompt Engineering",
+        "claude-code": "Claude Code", "ai-coding-tools": "AI Coding Tools",
+        "plugins": "Plugins & Extensions", "mcp": "MCPs", "ai-cli": "CLI & Automation",
     }
 
     target_lang = sys.argv[1] if len(sys.argv) > 1 else None
@@ -311,7 +548,16 @@ def main():
                     print(f"  SKIP: {title} (already exists)", flush=True)
                     continue
 
-                provider = gen_page(lang, lang_name, lang_code, section, title, order)
+                # Select prompt template
+                if lang in TOOL_GUIDE_LANGS:
+                    if section in COMPARISON_SECTIONS:
+                        prompt_template = PROMPT_COMPARISON
+                    else:
+                        prompt_template = PROMPT_TOOL_GUIDE
+                else:
+                    prompt_template = PROMPT_TUTORIAL
+
+                provider = gen_page(lang, lang_name, lang_code, section, title, order, prompt_template)
                 if provider:
                     total += 1
                     print(f"  [{provider}] {title} (#{total})", flush=True)

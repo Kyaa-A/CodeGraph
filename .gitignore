@@ -44,8 +44,14 @@ coverage/
 .cache/
 .vercel
 .gstack/
+.superpowers/
 
 # ========================
 # Agent coordination
 # ========================
 .agents/board.json
+
+# ========================
+# Local tooling
+# ========================
+backend/supabase/.temp/
